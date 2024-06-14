@@ -1,7 +1,7 @@
 import Header from '@/components/Header/Header'
 import Link from 'next/link'
 
-export default async function Login({
+export default async function Signup({
   searchParams,
 }: {
   searchParams: { message: string }
@@ -38,8 +38,18 @@ export default async function Login({
             placeholder='••••••••'
             required
           />
+          <label className='text-md' htmlFor='password'>
+            Confirm Password
+          </label>
+          <input
+            className='rounded-md px-4 py-2 bg-inherit border mb-6'
+            type='password'
+            name='confirmPassword'
+            placeholder='••••••••'
+            required
+          />
           <button className='bg-indigo-700 rounded-md px-4 py-2 text-foreground mb-2'>
-            Sign In
+            Sign up
           </button>
 
           {searchParams?.message && (
@@ -50,20 +60,10 @@ export default async function Login({
         </form>
 
         <Link
-          href='/forgot-password'
-          className='rounded-md no-underline text-indigo-400 text-sm '
-        >
-          Forgotten Password.
-        </Link>
-
-        <br />
-        <br />
-
-        <Link
           href='/signup'
           className='rounded-md no-underline text-foreground text-sm'
         >
-          Don't have an Account? Sign Up
+          Already have an account? Sign In
         </Link>
       </div>
     </div>
