@@ -1,30 +1,34 @@
 import Header from '@/components/Header/Header'
 import { createClient } from '@/utils/supabase/server'
+import { headers } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-export default async function Login({
+export default async function ForgotPassword({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
-  const login = async (formData: FormData) => {
+  const confirmReset = async (formData: FormData) => {
     'use server'
 
+    const origin = headers().get('origin')
     const email = formData.get('email') as string
-    const password = formData.get('password') as string
     const supabase = createClient()
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/reset-password`,
     })
 
     if (error) {
-      return redirect('/login?message=Invalid email or password.')
+      return redirect('/forgot-password?message=Could not authenticate user')
     }
-    redirect('/')
+
+    return redirect(
+      '/confirm?message=Password Reset link has been sent to your email address',
+    )
   }
+
   return (
     <div>
       <Header />
@@ -38,11 +42,11 @@ export default async function Login({
 
       <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
         <form
-          action={login}
+          action={confirmReset}
           className='flex flex-col justify-center flex-1 w-full gap-2 mb-4 animate-in text-foreground'
         >
           <label className='text-md' htmlFor='email'>
-            Email
+            Enter Email Address
           </label>
           <input
             className='px-4 py-2 mb-6 border rounded-md bg-inherit'
@@ -50,18 +54,9 @@ export default async function Login({
             placeholder='you@example.com'
             required
           />
-          <label className='text-md' htmlFor='password'>
-            Password
-          </label>
-          <input
-            className='px-4 py-2 mb-6 border rounded-md bg-inherit'
-            type='password'
-            name='password'
-            placeholder='••••••••'
-            required
-          />
+
           <button className='px-4 py-2 mb-2 bg-indigo-700 rounded-md text-foreground'>
-            Sign In
+            Confirm
           </button>
 
           {searchParams?.message && (
@@ -72,20 +67,10 @@ export default async function Login({
         </form>
 
         <Link
-          href='/forgot-password'
-          className='text-sm text-indigo-400 no-underline rounded-md '
-        >
-          Forgotten Password.
-        </Link>
-
-        <br />
-        <br />
-
-        <Link
-          href='/signup'
+          href='/login'
           className='text-sm no-underline rounded-md text-foreground'
         >
-          Don't have an Account? Sign Up
+          Remember your password? Sign in
         </Link>
       </div>
     </div>
