@@ -1,4 +1,4 @@
-import Header from '@/components/Header/Header'
+import { Button } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/server'
 import { headers } from 'next/headers'
 import Link from 'next/link'
@@ -41,15 +41,6 @@ export default async function Signup({
 
   return (
     <div>
-      <Header />
-
-      <Link
-        href='/'
-        className='px-4 py-2 m-4 text-sm no-underline rounded-md text-foreground bg-btn-background hover:bg-btn-background-hover'
-      >
-        Home
-      </Link>
-
       <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
         <form
           action={signUp}
@@ -84,9 +75,7 @@ export default async function Signup({
             placeholder='••••••••'
             required
           />
-          <button className='px-4 py-2 mb-2 bg-indigo-700 rounded-md text-foreground'>
-            Sign up
-          </button>
+          <Button className='px-4 py-2 mb-2'>Sign up</Button>
 
           {searchParams?.message && (
             <p className='p-4 mt-4 text-center bg-foreground/10 text-foreground'>
@@ -96,7 +85,7 @@ export default async function Signup({
         </form>
 
         <Link
-          href='/sign-up'
+          href='/login'
           className='text-sm no-underline rounded-md text-foreground'
         >
           Already have an account? Sign In

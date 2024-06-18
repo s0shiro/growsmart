@@ -1,5 +1,3 @@
-import Header from '@/components/Header/Header'
-
 export default function Signup({
   searchParams,
 }: {
@@ -7,9 +5,7 @@ export default function Signup({
 }) {
   return (
     <div>
-      <Header />
-
-      <div className='w-full px-8 sm:max-w-lg mx-auto mt-8'>
+      <div className='w-full px-8 mx-auto mt-8 sm:max-w-lg'>
         <p className='text-foreground'>{searchParams.message}</p>
       </div>
     </div>

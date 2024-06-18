@@ -1,5 +1,7 @@
 import { GeistSans } from 'geist/font/sans'
 import './globals.css'
+import { ThemeProvider } from '@/components/MyComponents/shadcn/ThemeProvider'
+import NavBar from '@/components/Navbar'
 
 export const metadata = {
   title: 'Supabase Next Auth',
@@ -14,7 +16,17 @@ export default function RootLayout({
   return (
     <html lang='en' className={GeistSans.className}>
       <body className='bg-background text-foreground '>
-        <main className='min-h-screen'>{children}</main>
+        <main className='min-h-screen'>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            <NavBar />
+            {children}
+          </ThemeProvider>
+        </main>
       </body>
     </html>
   )

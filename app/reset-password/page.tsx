@@ -1,4 +1,3 @@
-import Header from '@/components/Header/Header'
 import { createClient } from '@/utils/supabase/server'
 
 import Link from 'next/link'
@@ -41,8 +40,6 @@ export default async function ResetPassword({
 
   return (
     <div>
-      <Header />
-
       <Link
         href='/'
         className='px-4 py-2 m-4 text-sm no-underline rounded-md text-foreground bg-btn-background hover:bg-btn-background-hover'

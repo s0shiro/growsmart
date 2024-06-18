@@ -1,4 +1,4 @@
-import Header from '@/components/Header/Header'
+import { Button } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -27,15 +27,6 @@ export default async function Login({
   }
   return (
     <div>
-      <Header />
-
-      <Link
-        href='/'
-        className='px-4 py-2 m-4 text-sm no-underline rounded-md text-foreground bg-btn-background hover:bg-btn-background-hover'
-      >
-        Home
-      </Link>
-
       <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
         <form
           action={login}
@@ -60,9 +51,7 @@ export default async function Login({
             placeholder='••••••••'
             required
           />
-          <button className='px-4 py-2 mb-2 bg-indigo-700 rounded-md text-foreground'>
-            Sign In
-          </button>
+          <Button className='px-4 py-2 mb-2'>Sign In</Button>
 
           {searchParams?.message && (
             <p className='p-4 mt-4 text-center bg-foreground/10 text-foreground'>
@@ -73,9 +62,9 @@ export default async function Login({
 
         <Link
           href='/forgot-password'
-          className='text-sm text-indigo-400 no-underline rounded-md '
+          className='text-sm text-indigo-400 no-underline rounded-md'
         >
-          Forgotten Password.
+          Forgot Password?
         </Link>
 
         <br />
