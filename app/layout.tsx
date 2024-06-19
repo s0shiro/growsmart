@@ -1,7 +1,6 @@
 import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { ThemeProvider } from '@/components/MyComponents/shadcn/ThemeProvider'
-import NavBar from '@/components/Navbar'
 
 export const metadata = {
   title: 'Supabase Next Auth',
@@ -23,7 +22,6 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NavBar />
             {children}
           </ThemeProvider>
         </main>

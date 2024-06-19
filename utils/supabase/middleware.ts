@@ -65,7 +65,7 @@ export const updateSession = async (request: NextRequest) => {
     const user = await supabase.auth.getUser()
 
     // Define your protected routes for non-authenticated users
-    const protectedRoutes = ['/profile', '/settings', '/account']
+    const protectedRoutes = ['/profile', '/settings', '/dashboard']
 
     // Define your protected routes for authenticated users
     const protectedRoutesForAuthUsers = [
@@ -76,11 +76,19 @@ export const updateSession = async (request: NextRequest) => {
     ]
 
     if (!user.error) {
-      if (protectedRoutesForAuthUsers.includes(request.nextUrl.pathname)) {
+      if (
+        protectedRoutesForAuthUsers.some((route) =>
+          request.nextUrl.pathname.startsWith(route),
+        )
+      ) {
         return NextResponse.redirect(new URL('/', request.url))
       }
     } else {
-      if (protectedRoutes.includes(request.nextUrl.pathname)) {
+      if (
+        protectedRoutes.some((route) =>
+          request.nextUrl.pathname.startsWith(route),
+        )
+      ) {
         return NextResponse.redirect(new URL('/login', request.url))
       }
     }

@@ -2,6 +2,16 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { Button } from './ui/button'
 
+const DashboardButton = () => {
+  return (
+    <Button asChild>
+      <Link href='/dashboard' className='px-6 py-2.5 text-sm font-semibold'>
+        Dashboard
+      </Link>
+    </Button>
+  )
+}
+
 export const AuthButtons = async () => {
   const supabase = createClient()
   const {
@@ -9,7 +19,7 @@ export const AuthButtons = async () => {
   } = await supabase.auth.getUser()
 
   if (user) {
-    return undefined
+    return <DashboardButton />
   }
 
   return (
