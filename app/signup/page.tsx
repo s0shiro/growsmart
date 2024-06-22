@@ -40,7 +40,7 @@ export default async function Signup({
   }
 
   return (
-    <div>
+    <div className='flex items-center justify-center w-full h-screen'>
       <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
         <form
           action={signUp}

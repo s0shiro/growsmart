@@ -1,7 +1,14 @@
+import { createClient } from '@/utils/supabase/server'
 import ToggleThemeButton from './MyComponents/shadcn/ToggleThemeButton'
-import User from './User'
+import Profile from './Profile'
+import LogOut from './LogOut'
 
-const NavBar: React.FC = () => {
+const NavBar: React.FC = async () => {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <nav className='flex flex-wrap items-center justify-between p-6 border-b bg-background border-border '>
       <div className='flex items-center flex-shrink-0 mr-6 text-white'>
@@ -43,8 +50,11 @@ const NavBar: React.FC = () => {
           </a>
         </div>
       </div>
-      <User />
-      <ToggleThemeButton className='ml-auto' />
+      <div className='flex items-center gap-3'>
+        {user && <Profile />}
+        <LogOut />
+        <ToggleThemeButton className='ml-auto' />
+      </div>
     </nav>
   )
 }
