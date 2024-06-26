@@ -1,4 +1,5 @@
 import ToggleThemeButton from '@/components/MyComponents/shadcn/ToggleThemeButton'
+import Profile from '@/components/Profile'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'

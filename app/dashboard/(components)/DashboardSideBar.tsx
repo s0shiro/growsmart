@@ -5,7 +5,7 @@ import FarmerSideBar from './(RoleBaseSideBar)/FarmerSideBar'
 import { UserRole } from './DashboardNavBar'
 
 function DashboardSideBar() {
-  const role: UserRole = 'admin'
+  const role: UserRole = 'technician'
 
   const roleComponentMap = {
     admin: <AdminSideBar />,

@@ -39,7 +39,7 @@ export default function TechnicianSideBar() {
         <div className='border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white'>
           <Users className='h-3 w-3' />
         </div>
-        Monitor Farm
+        Farmer List
       </Link>
       <Separator className='my-3' />
       <Link

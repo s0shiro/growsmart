@@ -5,7 +5,7 @@ import TechnicianNavBar from './(RoleBaseNavBar)/TechnicianNavBar'
 export type UserRole = 'admin' | 'technician' | 'farmer'
 
 function DashboardNavBar({ children }: { children: React.ReactNode }) {
-  const role: UserRole = 'farmer' // This should come from your user's data
+  const role: UserRole = 'technician' // This should come from your user's data
 
   const roleComponentMap = {
     admin: <AdminNavBar />,
