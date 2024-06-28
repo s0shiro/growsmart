@@ -34,7 +34,7 @@ export default function TechnicianSideBar() {
               pathname === '/dashboard/users',
           },
         )}
-        href='/dashboard/users'
+        href='/dashboard/farmers'
       >
         <div className='border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white'>
           <Users className='h-3 w-3' />
