@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import AdminSideBar from './(RoleBaseSideBar)/AdminSideBar'
-import TechnicianSideBar from './(RoleBaseSideBar)/TechnicianSideBar'
-import FarmerSideBar from './(RoleBaseSideBar)/FarmerSideBar'
+import AdminSideBar from './(role-base-sidebar)/AdminSideBar'
+import TechnicianSideBar from './(role-base-sidebar)/TechnicianSideBar'
+import FarmerSideBar from './(role-base-sidebar)/FarmerSideBar'
 import { UserRole } from './DashboardNavBar'
 
 function DashboardSideBar() {
