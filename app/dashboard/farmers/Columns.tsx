@@ -74,7 +74,7 @@ export const columns: ColumnDef<Farmer>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const payment = row.original
+      const farmer = row.original
 
       return (
         <DropdownMenu>
@@ -87,9 +87,9 @@ export const columns: ColumnDef<Farmer>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(farmer.id)}
             >
-              Copy payment ID
+              Copy farmer ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Farmer</DropdownMenuItem>

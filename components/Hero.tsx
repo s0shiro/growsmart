@@ -2,7 +2,7 @@ import { AuthButtons } from './AuthButton'
 
 const Hero = () => {
   return (
-    <div className='py-20 px-44'>
+    <div className='py-20 px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32'>
       <div className='flex flex-wrap '>
         <div className='flex items-center w-full lg:w-1/2'>
           <div className='max-w-2xl mb-8'>

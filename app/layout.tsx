@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/providers/ThemeProvider'
 import QueryProvider from '@/providers/QueryProvider'
 
 export const metadata = {
-  title: 'Supabase Next Auth',
+  title: 'GrowSmart',
   description: '',
 }
 

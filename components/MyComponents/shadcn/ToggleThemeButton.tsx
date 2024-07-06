@@ -35,9 +35,6 @@ const ToggleThemeButton: React.FC<ToggleThemeButtonProps> = ({ className }) => {
         <DropdownMenuItem onClick={() => setTheme('dark')}>
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
