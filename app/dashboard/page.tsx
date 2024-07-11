@@ -1,4 +1,5 @@
-import CreateFarmer from './(components)/(ui)/(technician)/CreateFarmer'
+import CreateFarmer from "./(technician)/(components)/CreateFarmer"
+
 
 function Dashboard() {
   return (

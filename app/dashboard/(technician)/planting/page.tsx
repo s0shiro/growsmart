@@ -1,5 +1,11 @@
+import CreatePlanting from './CreatePlanting'
+
 const PlantingPage = () => {
-  return <div>Record Planting data here!🌱🌿</div>
+  return (
+    <div>
+      <CreatePlanting />
+    </div>
+  )
 }
 
 export default PlantingPage
