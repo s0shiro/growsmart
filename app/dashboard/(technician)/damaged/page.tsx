@@ -1,5 +1,7 @@
 const DamagedCropsPage = () => {
-  return <div>Monitor damaged crops here</div>
+  return <div>Record damaged crops here!!</div>
 }
 
 export default DamagedCropsPage
+
+
