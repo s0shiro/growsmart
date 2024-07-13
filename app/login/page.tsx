@@ -1,35 +1,27 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/utils/supabase/server'
+import { login } from '@/lib/auth'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { useFormState } from 'react-dom'
+
+const initState = { message: null }
 
 export default async function Login({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
-  const login = async (formData: FormData) => {
-    'use server'
+  const [formState, action] = useFormState<{ message: string | null }>(
+    login,
+    initState,
+  )
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const supabase = createClient()
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      return redirect('/login?message=Invalid email or password.')
-    }
-    redirect('/')
-  }
   return (
     <div className='flex items-center justify-center w-full h-screen'>
       <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
         <form
-          action={login}
+          action={action}
           className='flex flex-col justify-center flex-1 w-full gap-2 mb-4 animate-in text-foreground'
         >
           <label className='text-md' htmlFor='email'>

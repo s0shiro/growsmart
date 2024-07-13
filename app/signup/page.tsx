@@ -1,49 +1,27 @@
-import { Button } from '@/components/ui/button'
-import { createClient } from '@/utils/supabase/server'
-import { headers } from 'next/headers'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
+'use client'
 
-export default async function Signup({
+import { Button } from '@/components/ui/button'
+import { signUp } from '@/lib/auth'
+import Link from 'next/link'
+import { useFormState } from 'react-dom'
+
+const initState = { message: null }
+
+export default function Signup({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
-  const signUp = async (formData: FormData) => {
-    'use server'
-
-    const origin = headers().get('origin')
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const confirmPassword = formData.get('confirmPassword') as string
-    const supabase = createClient()
-
-    if (password !== confirmPassword) {
-      return redirect('/signup?message=Password do not match')
-    }
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback`,
-      },
-    })
-
-    if (error) {
-      return redirect('/signup?message=Could not authenticateuser.')
-    } else {
-      return redirect(
-        `/confirm?message=Check email(${email} to verify sign up.`,
-      )
-    }
-  }
+  const [formState, action] = useFormState<{ message: string | null }>(
+    signUp,
+    initState,
+  )
 
   return (
     <div className='flex items-center justify-center w-full h-screen'>
       <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
         <form
-          action={signUp}
+          action={action}
           className='flex flex-col justify-center flex-1 w-full gap-2 mb-4 animate-in text-foreground'
         >
           <label className='text-md' htmlFor='email'>
