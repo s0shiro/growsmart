@@ -21,8 +21,8 @@ import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 
 const links = [
-  { href: '/dashboard2', Icon: Home, label: 'Dashboard' },
-  { href: '/dashboard2/carts', Icon: ShoppingCart, label: 'Orders' },
+  { href: '/dashboard', Icon: Home, label: 'Dashboard' },
+  { href: '/dashboard/farmers', Icon: ShoppingCart, label: 'Farmers' },
   { href: '#', Icon: Package, label: 'Products' },
   { href: '#', Icon: Users2, label: 'Customers' },
   { href: '#', Icon: LineChart, label: 'Analytics' },
@@ -31,8 +31,8 @@ const links = [
 const isActive = (path: string, route: string) => {
   // all routes other than auth routes include "/dashboard"
   // so handle that first
-  if (route === '/dashboard2') {
-    return path === '/dashboard2'
+  if (route === '/dashboard') {
+    return path === '/dashboard'
   } else {
     return path.includes(route)
   }

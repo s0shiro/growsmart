@@ -33,12 +33,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
 import { Input } from '@/components/ui/input'
 
 import { Button } from '@/components/ui/button'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import ToggleThemeButton from '@/components/MyComponents/shadcn/ToggleThemeButton'
 
 const SheetNav = () => {
   return (
@@ -125,6 +127,7 @@ const SheetNav = () => {
             className='w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]'
           />
         </div>
+        <ToggleThemeButton />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -132,13 +135,13 @@ const SheetNav = () => {
               size='icon'
               className='overflow-hidden rounded-full'
             >
-              <Image
-                src='/placeholder-user.jpg'
-                width={36}
-                height={36}
-                alt='Avatar'
-                className='overflow-hidden rounded-full'
-              />
+              <Avatar>
+                <AvatarImage
+                  src='https://github.com/shadcn.png'
+                  alt='@shadcn'
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>

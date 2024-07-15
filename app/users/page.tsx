@@ -4,7 +4,7 @@ import { getCurrentUser, getUserRole } from '@/lib/users '
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
   const user = await getUserRole(currentUser?.id ?? '')
-  const farmers = await getListOfFarmers('69353098-5e2a-42c4-9dd2-5c903add47b3')
+  const farmers = await getListOfFarmers(currentUser?.id ?? '')
 
   const { id, email } = user[0]
   const { role, user_id } = user[0].permissions[0]
