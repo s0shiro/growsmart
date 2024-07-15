@@ -368,6 +368,10 @@ const Main = () => {
           </CardFooter>
         </Card>
       </TabsContent>
+
+      <TabsContent value='active'>
+        <p>Active Users</p>
+      </TabsContent>
     </Tabs>
   )
 }
