@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { createNewFarmer } from '@/lib/farmer'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -22,9 +23,55 @@ const FormSchema = z.object({
   barangay: z.string(),
   phoneNumber: z
     .string()
-    .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits')
-    .transform((number) => parseInt(number, 10)),
+    .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
 })
+
+type FarmerFieldNames =
+  | 'firstname'
+  | 'lastname'
+  | 'gender'
+  | 'municipality'
+  | 'barangay'
+  | 'phoneNumber'
+
+const fieldConfigs: {
+  name: FarmerFieldNames
+  placeholder: string
+  label: string
+  type: string
+}[] = [
+  {
+    name: 'firstname',
+    placeholder: 'firstname',
+    label: 'Firstname',
+    type: 'text',
+  },
+  {
+    name: 'lastname',
+    placeholder: 'lastname',
+    label: 'Lastname',
+    type: 'text',
+  },
+  { name: 'gender', placeholder: 'Male', label: 'Gender', type: 'text' },
+  {
+    name: 'municipality',
+    placeholder: 'Gasan',
+    label: 'Municipality',
+    type: 'text',
+  },
+  {
+    name: 'barangay',
+    placeholder: 'Libtangin',
+    label: 'Barangay',
+    type: 'text',
+  },
+  {
+    name: 'phoneNumber',
+    placeholder: 'phonenumber',
+    label: 'PhoneNumber',
+    type: 'number',
+  },
+]
 
 function CreateFarmerForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -32,142 +79,50 @@ function CreateFarmerForm() {
     defaultValues: {},
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data)
-    console.log(typeof data.phoneNumber)
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      await createNewFarmer({
+        firstname: data.firstname,
+        lastname: data.lastname,
+        gender: data.gender,
+        municipality: data.municipality,
+        barangay: data.barangay,
+        phoneNumber: data.phoneNumber,
+      })
+      console.log('Farmer created successfully', data)
+      form.reset()
+    } catch (error) {
+      console.error('Failed to create farmer:', error)
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6'>
-          {/* firstname */}
-          <FormField
-            control={form.control}
-            name='firstname'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Firstname</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='firstname'
-                    type='text'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* lastname */}
-          <FormField
-            control={form.control}
-            name='lastname'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Lastname</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='lastname'
-                    type='text'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {fieldConfigs.map(({ name, placeholder, label, type }) => (
+            <FormField
+              key={name}
+              control={form.control}
+              name={name}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{label}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={placeholder}
+                      type={type}
+                      {...field}
+                      onChange={field.onChange}
+                      className='mt-1 block w-full'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
         </div>
-
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6'>
-          {/* gender */}
-          <FormField
-            control={form.control}
-            name='gender'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Male'
-                    type='text'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* municipality */}
-          <FormField
-            control={form.control}
-            name='municipality'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Municipality</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Gasan'
-                    type='text'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* barangay */}
-          <FormField
-            control={form.control}
-            name='barangay'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Barangay</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Libtangin'
-                    type='text'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* phoneNumber */}
-        <FormField
-          control={form.control}
-          name='phoneNumber'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>PhoneNumber</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='phonenumber'
-                  type='number'
-                  {...field}
-                  onChange={field.onChange}
-                  className='mt-1 block w-full'
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <Button
           disabled={form.formState.isSubmitting}

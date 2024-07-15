@@ -7,7 +7,7 @@ import { useFormState } from 'react-dom'
 
 const initState = { message: null }
 
-export default async function Login({
+export default function Login({
   searchParams,
 }: {
   searchParams: { message: string }

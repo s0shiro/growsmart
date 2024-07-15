@@ -40,7 +40,7 @@ function DashboardSideBar() {
                     )}
                     href={link.route}
                   >
-                    {/* <div className='border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white'>
+                    {/* <div className='border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-whi</div>te'>
                 <HomeIcon className='h-3 w-3' />
               </div> */}
                     {link.name}

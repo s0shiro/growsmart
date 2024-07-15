@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card'
 import { TreePalm } from 'lucide-react'
 
-import DailogForm from '../../(components)/(ui)/DialogForm'
+import DailogForm from '../../(components)/DialogForm'
 import CreatePlantingForm from '../(components)/PlantingForm'
 
 function CreatePlanting() {

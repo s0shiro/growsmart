@@ -10,7 +10,7 @@ import {
 import { BookUser } from 'lucide-react'
 
 import CreateFarmerForm from './CreateFarmerForm'
-import DailogForm from '../../(components)/(ui)/DialogForm'
+import DailogForm from '../../(components)/DialogForm'
 
 function CreateFarmer() {
   return (
