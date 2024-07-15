@@ -8,9 +8,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { BookUser } from 'lucide-react'
-
+import DailogForm from '../(components)/DialogForm'
 import CreateFarmerForm from './CreateFarmerForm'
-import DailogForm from '../../(components)/DialogForm'
 
 function CreateFarmer() {
   return (

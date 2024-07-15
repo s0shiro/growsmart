@@ -1,12 +1,3 @@
-import CreateFarmer from "./(technician)/(components)/CreateFarmer"
-
-
-function Dashboard() {
-  return (
-    <div>
-      <CreateFarmer />
-    </div>
-  )
+export default function Dashboard() {
+  return <p>GG kids</p>
 }
-
-export default Dashboard
