@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { getCurrentUser } from './users '
+import { revalidatePath } from 'next/cache'
 
 export const createNewFarmer = async (data: {
   firstname: string
@@ -27,6 +28,8 @@ export const createNewFarmer = async (data: {
   if (error) {
     console.error('Supabase error:', error.message)
   }
+
+  revalidatePath('/dashboard/farmers')
 }
 
 export const getListOfFarmers = async (userId: string) => {
