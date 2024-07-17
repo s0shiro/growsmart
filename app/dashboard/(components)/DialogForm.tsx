@@ -14,8 +14,10 @@ export default function DailogForm({
   id,
   title,
   form,
+  description,
 }: {
   title: string
+  description: string
   Trigger: ReactNode
   id: string
   form: ReactNode
@@ -28,7 +30,7 @@ export default function DailogForm({
       <DialogContent className='sm:max-w-[525px] dark:bg-graident-dark'>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>Add farmer to monitor his crops</DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         {form}
       </DialogContent>

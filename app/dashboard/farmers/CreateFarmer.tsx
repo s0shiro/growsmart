@@ -25,6 +25,7 @@ function CreateFarmer() {
             <DailogForm
               id='create-trigger'
               title='Add Farmer'
+              description='Add farmer to monitor his crops'
               Trigger={<Button variant='outline'>Add Farmer+</Button>}
               form={<CreateFarmerForm />}
             />
