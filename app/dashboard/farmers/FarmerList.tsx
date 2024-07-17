@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Card,
   CardContent,
@@ -28,15 +30,22 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { getCurrentUser } from '@/lib/users '
-import { getListOfFarmers } from '@/lib/farmer'
+
 import { MoreHorizontal } from 'lucide-react'
+import DailogForm from '../(components)/DialogForm'
+import PlantingForm from './PlantingForm'
+
+import useFetchFarmers from '@/hooks/fetchFarmers'
 
 const FarmerList = async () => {
-  const currentUser = await getCurrentUser()
-  const farmers = await getListOfFarmers(currentUser?.id ?? '')
+  const { data, isFetching } = useFetchFarmers()
+
+  const farmers = data
+
+  if (isFetching) {
+    return <div>Loading...</div>
+  }
 
   return (
     <Card x-chunk='dashboard-06-chunk-0'>
@@ -107,8 +116,22 @@ const FarmerList = async () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem>Edit</DropdownMenuItem>
                         <DropdownMenuItem>Delete</DropdownMenuItem>
+                        <DailogForm
+                          id='create-record'
+                          title='Record Planting'
+                          description={`Record planting data to ${firstname}`}
+                          Trigger={
+                            <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              Record Planting
+                            </DropdownMenuItem>
+                          }
+                          form={<PlantingForm />}
+                        />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

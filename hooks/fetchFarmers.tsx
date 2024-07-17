@@ -12,7 +12,7 @@ const initFarmer = {
   phone: '',
 }
 
-export default function fetchFarmers() {
+export default function useFetchFarmers() {
   return useQuery({
     queryKey: ['farmers'],
     queryFn: async () => {

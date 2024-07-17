@@ -1,5 +1,4 @@
 import { File, ListFilter, PlusCircle } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 
 import {
@@ -17,6 +16,7 @@ import FarmerList from './FarmerList'
 import CreateFarmer from './CreateFarmer'
 import DailogForm from '../(components)/DialogForm'
 import CreateFarmerForm from './CreateFarmerForm'
+import PlantingForm from './PlantingForm'
 
 const Main = async () => {
   return (
@@ -24,7 +24,7 @@ const Main = async () => {
       <div className='flex items-center'>
         <TabsList>
           <TabsTrigger value='all'>All</TabsTrigger>
-          <TabsTrigger value='active'>Active</TabsTrigger>
+          <TabsTrigger value='add'>Add Farmer</TabsTrigger>
           <TabsTrigger value='draft'>Draft</TabsTrigger>
           <TabsTrigger value='archived' className='hidden sm:flex'>
             Archived
@@ -75,6 +75,15 @@ const Main = async () => {
       </div>
       <TabsContent value='all'>
         <FarmerList />
+      </TabsContent>
+      <TabsContent value='add'>
+        <CreateFarmerForm />
+      </TabsContent>
+      <TabsContent value='draft'>
+        <PlantingForm />
+      </TabsContent>
+      <TabsContent value='archived'>
+        <p>Archived</p>
       </TabsContent>
     </Tabs>
   )

@@ -1,4 +1,5 @@
-import 'server-only'
+// import 'server-only'
+'use server'
 import { createClient } from '../utils/supabase/server'
 import { cache } from 'react'
 import { QueryData } from '@supabase/supabase-js'
