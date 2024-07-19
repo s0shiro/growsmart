@@ -16,7 +16,7 @@ export const createNewFarmer = async (data: {
   const user = await getCurrentUser()
 
   const { error } = await supabase.from('technician_farmers').insert({
-    user_id: user?.id,
+    user_id: user?.id || '',
     firstname: data.firstname,
     lastname: data.lastname,
     gender: data.gender,
@@ -38,6 +38,22 @@ export const getListOfFarmers = async (userId: string) => {
     .from('technician_farmers')
     .select()
     .eq('user_id', userId)
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+  }
+
+  return data
+}
+
+export const getOneFarmer = async (farmerId: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('technician_farmers')
+    .select()
+    .eq('id', farmerId)
+    .single()
 
   if (error) {
     console.error('Supabase error:', error.message)

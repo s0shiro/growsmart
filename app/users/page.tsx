@@ -1,4 +1,4 @@
-import { getListOfFarmers } from '@/lib/farmer'
+import { getListOfFarmers, getOneFarmer } from '@/lib/farmer'
 import { getCurrentUser, getUserRole } from '@/lib/users '
 
 const UserRole = async () => {

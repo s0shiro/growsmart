@@ -37,11 +37,24 @@ import DailogForm from '../(components)/DialogForm'
 import PlantingForm from './PlantingForm'
 
 import useFetchFarmers from '@/hooks/fetchFarmers'
+import Link from 'next/link'
+
+type Farmer = {
+  barangay: string
+  created_at: string
+  firstname: string
+  gender: string
+  id: string
+  lastname: string
+  municipality: string
+  phone: string
+  user_id: string
+}
 
 const FarmerList = async () => {
   const { data, isFetching } = useFetchFarmers()
 
-  const farmers = data
+  const farmers: Farmer[] = data as Farmer[]
 
   if (isFetching) {
     return <div>Loading...</div>
@@ -117,7 +130,9 @@ const FarmerList = async () => {
                       <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <Link href={`/dashboard/farmers/${id}`}>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem>Delete</DropdownMenuItem>
                         <DailogForm
                           id='create-record'
