@@ -1,5 +1,4 @@
-import FarmerList from '../FarmerList'
-import FarmerProfileTabs from './Tabs'
+import FarmerProfileTabs from './FarmerTabs'
 
 const page = async ({ params }: { params: { id: any } }) => {
   return (

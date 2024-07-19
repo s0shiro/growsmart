@@ -2,9 +2,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import FarmerProfile from './FarmerProfile'
 import { getOneFarmer } from '@/lib/farmer'
+import PlantingForm from '../PlantingForm'
 
 const FarmerProfileTabs = async ({ id }: { id: any }) => {
   const farmer = await getOneFarmer(id)
+  console.log(farmer)
   return (
     <Tabs defaultValue='profile'>
       <div className='flex items-center'>
@@ -24,7 +26,9 @@ const FarmerProfileTabs = async ({ id }: { id: any }) => {
           gender={farmer?.gender}
         />
       </TabsContent>
-      <TabsContent value='planting'></TabsContent>
+      <TabsContent value='planting'>
+        <PlantingForm farmerID={farmer?.id} />
+      </TabsContent>
       <TabsContent value='harvests'></TabsContent>
       <TabsContent value='damages'></TabsContent>
     </Tabs>
