@@ -13,22 +13,26 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { createNewFarmer } from '@/lib/farmer'
+import { addPlantingRecord } from '@/lib/planting'
 
 const FormSchema = z.object({
-  croptype: z.string(),
+  cropType: z.string(),
   variety: z.string(),
-  plantingDate: z.string(),
+  plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: 'Invalid date format for plantingDate',
+  }),
   fieldLocation: z.string(),
-  areaPlanted: z.number(),
-  quantity: z.number(),
+  areaPlanted: z.string(),
+  quantity: z.string(),
   weatherCondition: z.string(),
-  expenses: z.number(),
-  harvestDate: z.string(),
+  expenses: z.string(),
+  harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: 'Invalid date format for harvestDate',
+  }),
 })
 
 type CropFormFieldName =
-  | 'croptype'
+  | 'cropType'
   | 'variety'
   | 'plantingDate'
   | 'fieldLocation'
@@ -45,7 +49,7 @@ const fieldConfigs: {
   type: string
 }[] = [
   {
-    name: 'croptype',
+    name: 'cropType',
     placeholder: 'Crop Type',
     label: 'Crop Type',
     type: 'text',
@@ -100,7 +104,7 @@ const fieldConfigs: {
   },
 ]
 
-function PlantingForm() {
+function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -109,6 +113,18 @@ function PlantingForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       // Modify the code here to handle the form submission
+      await addPlantingRecord({
+        farmerId: farmerID,
+        cropType: data.cropType,
+        variety: data.variety,
+        plantingDate: data.plantingDate,
+        fieldLocation: data.fieldLocation,
+        areaPlanted: data.areaPlanted,
+        quantity: data.quantity,
+        weatherCondition: data.weatherCondition,
+        expenses: data.expenses,
+        harvestDate: data.harvestDate,
+      })
       console.log('Form submitted successfully', data)
       form.reset()
     } catch (error) {

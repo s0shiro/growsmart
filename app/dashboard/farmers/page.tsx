@@ -61,6 +61,7 @@ const Main = async () => {
             id='create-trigger'
             title='Add Farmer'
             // Trigger={<Button variant='outline'>Add Farmer+</Button>}
+            description='Add farmer to your list.'
             Trigger={
               <Button size='sm' className='h-8 gap-1'>
                 <PlusCircle className='h-3.5 w-3.5' />
@@ -79,9 +80,7 @@ const Main = async () => {
       <TabsContent value='add'>
         <CreateFarmerForm />
       </TabsContent>
-      <TabsContent value='draft'>
-        <PlantingForm />
-      </TabsContent>
+      <TabsContent value='draft'></TabsContent>
       <TabsContent value='archived'>
         <p>Archived</p>
       </TabsContent>

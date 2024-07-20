@@ -37,11 +37,24 @@ import DailogForm from '../(components)/DialogForm'
 import PlantingForm from './PlantingForm'
 
 import useFetchFarmers from '@/hooks/fetchFarmers'
+import Link from 'next/link'
+
+type Farmer = {
+  barangay: string
+  created_at: string
+  firstname: string
+  gender: string
+  id: string
+  lastname: string
+  municipality: string
+  phone: string
+  user_id: string
+}
 
 const FarmerList = async () => {
   const { data, isFetching } = useFetchFarmers()
 
-  const farmers = data
+  const farmers: Farmer[] = data as Farmer[]
 
   if (isFetching) {
     return <div>Loading...</div>
@@ -63,9 +76,9 @@ const FarmerList = async () => {
               <TableHead>Farmer Name</TableHead>
               <TableHead>Gender</TableHead>
               <TableHead className='hidden md:table-cell'>Address</TableHead>
-              <TableHead className='hidden md:table-cell'>
+              {/* <TableHead className='hidden md:table-cell'>
                 Contact No.
-              </TableHead>
+              </TableHead>  */}
               <TableHead>
                 <span className='sr-only'>Actions</span>
               </TableHead>
@@ -99,9 +112,9 @@ const FarmerList = async () => {
                   <TableCell className='hidden md:table-cell'>
                     {barangay}, {municipality}
                   </TableCell>
-                  <TableCell className='hidden md:table-cell'>
+                  {/* <TableCell className='hidden md:table-cell'>
                     {phone}
-                  </TableCell>
+                  </TableCell>  */}
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -117,7 +130,9 @@ const FarmerList = async () => {
                       <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <Link href={`/dashboard/farmers/${id}`}>
+                          <DropdownMenuItem>View Farmer</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem>Delete</DropdownMenuItem>
                         <DailogForm
                           id='create-record'
@@ -130,7 +145,7 @@ const FarmerList = async () => {
                               Record Planting
                             </DropdownMenuItem>
                           }
-                          form={<PlantingForm />}
+                          form={<PlantingForm farmerID={id} />}
                         />
                       </DropdownMenuContent>
                     </DropdownMenu>
