@@ -36,3 +36,18 @@ export const addPlantingRecord = async (data: {
 
   revalidatePath('/dashboard/farmers')
 }
+
+export const getAllPlantingRecords = async (farmerID: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select()
+    .eq('farmer_id', farmerID)
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+  }
+
+  return data
+}

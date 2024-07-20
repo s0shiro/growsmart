@@ -131,7 +131,7 @@ const FarmerList = async () => {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <Link href={`/dashboard/farmers/${id}`}>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>View Farmer</DropdownMenuItem>
                         </Link>
                         <DropdownMenuItem>Delete</DropdownMenuItem>
                         <DailogForm
@@ -145,7 +145,7 @@ const FarmerList = async () => {
                               Record Planting
                             </DropdownMenuItem>
                           }
-                          form={<PlantingForm />}
+                          form={<PlantingForm farmerID={id} />}
                         />
                       </DropdownMenuContent>
                     </DropdownMenu>

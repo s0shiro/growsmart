@@ -80,9 +80,7 @@ const Main = async () => {
       <TabsContent value='add'>
         <CreateFarmerForm />
       </TabsContent>
-      <TabsContent value='draft'>
-        <PlantingForm />
-      </TabsContent>
+      <TabsContent value='draft'></TabsContent>
       <TabsContent value='archived'>
         <p>Archived</p>
       </TabsContent>
