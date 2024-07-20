@@ -76,9 +76,9 @@ const FarmerList = async () => {
               <TableHead>Farmer Name</TableHead>
               <TableHead>Gender</TableHead>
               <TableHead className='hidden md:table-cell'>Address</TableHead>
-              <TableHead className='hidden md:table-cell'>
+              {/* <TableHead className='hidden md:table-cell'>
                 Contact No.
-              </TableHead>
+              </TableHead>  */}
               <TableHead>
                 <span className='sr-only'>Actions</span>
               </TableHead>
@@ -112,9 +112,9 @@ const FarmerList = async () => {
                   <TableCell className='hidden md:table-cell'>
                     {barangay}, {municipality}
                   </TableCell>
-                  <TableCell className='hidden md:table-cell'>
+                  {/* <TableCell className='hidden md:table-cell'>
                     {phone}
-                  </TableCell>
+                  </TableCell>  */}
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
