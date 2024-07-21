@@ -61,3 +61,18 @@ export const getOneFarmer = async (farmerId: string) => {
 
   return data
 }
+
+export const getCountOfFarmers = async (userId: string): Promise<number> => {
+  const supabase = createClient()
+  const { data, error, count } = await supabase
+    .from('technician_farmers')
+    .select('user_id', { count: 'exact' })
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return 0 // Return 0 or handle the error as needed
+  }
+
+  return count ?? 0 // Return count or 0 if count is null
+}
