@@ -1,3 +1,3 @@
 export default function Dashboard() {
-  return <p>GG kids</p>
+  return <p>I'm fuccked up, idk what to do with this shit.</p>
 }

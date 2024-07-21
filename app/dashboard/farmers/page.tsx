@@ -13,10 +13,8 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import FarmerList from './FarmerList'
-import CreateFarmer from './CreateFarmer'
 import DailogForm from '../(components)/DialogForm'
 import CreateFarmerForm from './CreateFarmerForm'
-import PlantingForm from './PlantingForm'
 
 const Main = async () => {
   return (
