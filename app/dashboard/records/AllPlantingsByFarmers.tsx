@@ -1,12 +1,13 @@
-import React from 'react'
-import { getPlantingRecordsByCurrentUser } from '@/lib/planting'
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 import { formatDate } from '@/lib/utils'
+import useFetchPlantings from '@/hooks/useFetchPlantings'
 
 // Define an interface for the planting record
-interface PlantingRecord {
+interface PlantingRecords {
   id: string
   created_at: string
   farmer_id: string
@@ -22,19 +23,18 @@ interface PlantingRecord {
   technician_id: string
 }
 
-const Page: React.FC = async () => {
-  const allPlantingRecords: PlantingRecord[] | undefined =
-    await getPlantingRecordsByCurrentUser()
+const AllPlantingsByFarmers = () => {
+  const { data, isFetching } = useFetchPlantings()
+  const allPlantingRecords: PlantingRecords[] = data || []
 
-  // Check if allPlantingRecords is undefined
-  if (!allPlantingRecords) {
-    return <div>Loading...</div> // or any other fallback UI
+  if (isFetching) {
+    return <p>Getting planting records...</p>
   }
 
   return (
     <div>
       <h2 className='text-2xl font-bold'>Planting Records</h2>
-      {allPlantingRecords.map((record: PlantingRecord) => (
+      {allPlantingRecords.map((record: PlantingRecords) => (
         <div key={record.id} className='mb-4 p-4 border border-gray-300'>
           <h3 className='text-lg font-semibold'>
             {record.crop_type} - {record.variety}
@@ -61,11 +61,18 @@ const Page: React.FC = async () => {
           <p>
             <strong>Harvest Date:</strong> {formatDate(record.harvest_date)}
           </p>
-
           <Button asChild variant={`link`}>
             <Link href={`/dashboard/farmers/${record.farmer_id}`}>
               View Farmer
             </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant={`link`}
+            onClick={() => console.log(record.id)}
+          >
+            <Link href={`#`}>Record Harvest</Link>
           </Button>
         </div>
       ))}
@@ -73,4 +80,4 @@ const Page: React.FC = async () => {
   )
 }
 
-export default Page
+export default AllPlantingsByFarmers

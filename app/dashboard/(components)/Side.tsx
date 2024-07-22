@@ -26,7 +26,7 @@ const links = [
     Icon: Users2,
     label: 'View and manage Farmers',
   },
-  { href: '/dashboard/damages', Icon: Package, label: 'Monitor Damaged Crops' },
+  { href: '/dashboard/records', Icon: Package, label: 'Manage Records' },
   { href: '#', Icon: Users2, label: 'Customers' },
   { href: '#', Icon: LineChart, label: 'Analytics' },
 ]

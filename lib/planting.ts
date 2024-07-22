@@ -56,19 +56,13 @@ export const getAllPlantingRecords = async (farmerID: string) => {
   return data
 }
 
-export const getPlantingRecordsByCurrentUser = async () => {
-  const currentUser = await getCurrentUser()
+export const getPlantingRecordsByCurrentUser = async (userID: string) => {
   const supabase = createClient()
-
-  if (!currentUser?.id) {
-    console.error('No current user found')
-    return
-  }
 
   const { data, error } = await supabase
     .from('planting_records')
     .select('*') // Selects all fields; you can specify fields if needed
-    .eq('technician_id', currentUser.id) // Filters records where technician_id matches the current user's ID
+    .eq('technician_id', userID) // Filters records where technician_id matches the current user's ID
     .order('created_at', { ascending: false }) // Orders the records by created_at in descending order
 
   if (error) {
