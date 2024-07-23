@@ -1,82 +1,190 @@
 'use client'
 
-import Link from 'next/link'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 import { formatDate } from '@/lib/utils'
 import useFetchPlantings from '@/hooks/useFetchPlantings'
+import Link from 'next/link'
+import HarvestForm from './HarvestForm'
+import DailogForm from '../(components)/DialogForm'
 
 // Define an interface for the planting record
-interface PlantingRecords {
-  id: string
-  created_at: string
-  farmer_id: string
-  crop_type: string
-  variety: string
-  planting_date: string
-  field_location: string
+type PlantingRecords = {
   area_planted: number
-  quantity: number
-  weather_condition: string
+  created_at: string
+  crop_type: string
   expenses: number
+  farmer_id: string
+  field_location: string
   harvest_date: string
-  technician_id: string
+  id: string
+  planting_date: string
+  quantity: number
+  status: string
+  user_id: string
+  variety: string
+  weather_condition: string
 }
 
-const AllPlantingsByFarmers = () => {
+const AllPlantingsByFarmers = async () => {
   const { data, isFetching } = useFetchPlantings()
-  const allPlantingRecords: PlantingRecords[] = data || []
+  const allPlantingRecords: PlantingRecords[] = data as PlantingRecords[]
 
+  console.log(allPlantingRecords)
   if (isFetching) {
     return <p>Getting planting records...</p>
   }
 
-  return (
-    <div>
-      <h2 className='text-2xl font-bold'>Planting Records</h2>
-      {allPlantingRecords.map((record: PlantingRecords) => (
-        <div key={record.id} className='mb-4 p-4 border border-gray-300'>
-          <h3 className='text-lg font-semibold'>
-            {record.crop_type} - {record.variety}
-          </h3>
-          <p>
-            <strong>Planting Date: </strong>
-            {formatDate(record.planting_date)}
-          </p>
-          <p>
-            <strong>Field Location:</strong> {record.field_location}
-          </p>
-          <p>
-            <strong>Area Planted:</strong> {record.area_planted} sqm
-          </p>
-          <p>
-            <strong>Quantity:</strong> {record.quantity}
-          </p>
-          <p>
-            <strong>Weather Condition:</strong> {record.weather_condition}
-          </p>
-          <p>
-            <strong>Expenses:</strong> ${record.expenses}
-          </p>
-          <p>
-            <strong>Harvest Date:</strong> {formatDate(record.harvest_date)}
-          </p>
-          <Button asChild variant={`link`}>
-            <Link href={`/dashboard/farmers/${record.farmer_id}`}>
-              View Farmer
-            </Link>
-          </Button>
-
-          <Button
-            asChild
-            variant={`link`}
-            onClick={() => console.log(record.id)}
-          >
-            <Link href={`#`}>Record Harvest</Link>
-          </Button>
+  if (allPlantingRecords.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center mt-24'>
+        <div className='text-center'>
+          <p className='text-xl font-semibold'>No records found.</p>
+          <p className='mt-2'>Please add some record to get started.</p>
         </div>
-      ))}
-    </div>
+      </div>
+    )
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Planting Records</CardTitle>
+        <CardDescription>
+          View planting records for all farmers.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Crop Type</TableHead>
+              <TableHead className='hidden sm:table-cell'>Variety</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Planting Date</TableHead>
+              <TableHead className='hidden sm:table-cell'>
+                Field Location
+              </TableHead>
+              <TableHead className='hidden sm:table-cell'>
+                Area Planted
+              </TableHead>
+              <TableHead className='hidden sm:table-cell'>Quantity</TableHead>
+              <TableHead className='hidden sm:table-cell'>
+                Weather Condition
+              </TableHead>
+              <TableHead className='hidden sm:table-cell'>Expenses</TableHead>
+              <TableHead>Harvest Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {allPlantingRecords.map((record) => (
+              <TableRow key={record.id}>
+                <TableCell>{record.crop_type}</TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  {record.variety}
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${
+                      record.status === 'planted'
+                        ? 'bg-green-100 text-green-800'
+                        : record.status === 'harvested'
+                          ? 'bg-red-100 text-red-800 line-through'
+                          : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {record.status.charAt(0).toUpperCase() +
+                      record.status.slice(1)}
+                  </span>
+                </TableCell>
+                <TableCell>{formatDate(record.planting_date)}</TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  {record.field_location}
+                </TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  {record.area_planted} sqm
+                </TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  {record.quantity}
+                </TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  {record.weather_condition}
+                </TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  ₱{record.expenses}
+                </TableCell>
+                <TableCell>{formatDate(record.harvest_date)}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup='true' size='icon' variant='ghost'>
+                        <MoreHorizontal className='h-4 w-4' />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end'>
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Link href={`/dashboard/farmers/${record.farmer_id}`}>
+                          View Farmer
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DailogForm
+                        id='create-harvest'
+                        title='Record Harvest'
+                        description={`Record harvest`}
+                        Trigger={
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Record Harvest
+                          </DropdownMenuItem>
+                        }
+                        form={
+                          <HarvestForm
+                            plantingID={record.id}
+                            farmerID={record.farmer_id}
+                          />
+                        }
+                      />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   )
 }
 

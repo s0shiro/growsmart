@@ -60,6 +60,17 @@ const FarmerList = async () => {
     return <div>Loading...</div>
   }
 
+  if (farmers.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center mt-24'>
+        <div className='text-center'>
+          <p className='text-xl font-semibold'>No farmers available.</p>
+          <p className='mt-2'>Please add some farmers to get started.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <Card x-chunk='dashboard-06-chunk-0'>
       <CardHeader>

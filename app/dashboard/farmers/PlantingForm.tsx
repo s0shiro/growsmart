@@ -29,6 +29,7 @@ const FormSchema = z.object({
   harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for harvestDate',
   }),
+  status: z.string(),
 })
 
 type CropFormFieldName =
@@ -41,6 +42,7 @@ type CropFormFieldName =
   | 'weatherCondition'
   | 'expenses'
   | 'harvestDate'
+  | 'status'
 
 const fieldConfigs: {
   name: CropFormFieldName
@@ -102,6 +104,12 @@ const fieldConfigs: {
     label: 'Harvest Date',
     type: 'date',
   },
+  {
+    name: 'status',
+    placeholder: 'planted',
+    label: 'Status',
+    type: 'text',
+  },
 ]
 
 function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
@@ -124,6 +132,7 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
         weatherCondition: data.weatherCondition,
         expenses: data.expenses,
         harvestDate: data.harvestDate,
+        status: data.status,
       })
       console.log('Form submitted successfully', data)
       form.reset()

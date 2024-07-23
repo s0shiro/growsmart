@@ -1,9 +1,10 @@
 import AllPlantingsByFarmers from './AllPlantingsByFarmers'
+import RecordsTabs from './RecordsTabs'
 
 const FarmersRecordsPage = () => {
   return (
     <div>
-      <AllPlantingsByFarmers />
+      <RecordsTabs />
     </div>
   )
 }
