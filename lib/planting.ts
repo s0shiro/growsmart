@@ -111,3 +111,21 @@ export const updateStatusWhenAddHarvest = async (plantingID: string) => {
     console.log('Planting record status updated successfully:', data)
   }
 }
+
+export const getPlantedStatusRecords = async (userID: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select('*') // Selects all fields; you can specify fields if needed
+    .eq('status', 'planted') // Filters records where status is "planted"
+    .eq('user_id', userID) // Filters records by the provided userID
+    .order('created_at', { ascending: false }) // Orders the records by created_at in descending order
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return
+  }
+
+  return data // Returns the queried records
+}

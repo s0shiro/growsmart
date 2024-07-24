@@ -1,5 +1,9 @@
 import { getCountOfFarmers, getListOfFarmers, getOneFarmer } from '@/lib/farmer'
-import { getAllPlantingRecords } from '@/lib/planting'
+import {
+  getAllPlantingRecords,
+  getPlantedStatusRecords,
+  getPlantingRecordsByCurrentUser,
+} from '@/lib/planting'
 import { getCurrentUser, getUserRole } from '@/lib/users '
 
 const UserRole = async () => {
@@ -14,6 +18,8 @@ const UserRole = async () => {
   const { id, email } = user[0]
   const { role, user_id } = user[0].permissions[0]
 
+  const plantedStatus = await getPlantedStatusRecords(id)
+
   console.log(`User email: ${email}`)
   // console.log(farmers)
 
@@ -23,8 +29,19 @@ const UserRole = async () => {
 
   console.log(`farmers count: ${farmersCount}`)
 
+  console.log(`Planted status Data: ${plantedStatus}`)
+
   return (
     <div>
+      <ul>
+        {plantedStatus?.map((record, index) => (
+          <p key={index}>
+            {/* Display desired data from the record. Example: */}
+            Record ID: {record.id}, Status: {record.status}, Created At:{' '}
+            {record.created_at}
+          </p>
+        ))}
+      </ul>
       {user.map((userInfo) => (
         <div key={userInfo.id}>
           <div>{userInfo.id}</div>

@@ -88,7 +88,9 @@ const AllPlantingsByFarmers = async () => {
               <TableHead>Crop Type</TableHead>
               <TableHead className='hidden sm:table-cell'>Variety</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Planting Date</TableHead>
+              <TableHead className='hidden sm:table-cell'>
+                Planting Date
+              </TableHead>
               <TableHead className='hidden sm:table-cell'>
                 Field Location
               </TableHead>
@@ -125,7 +127,9 @@ const AllPlantingsByFarmers = async () => {
                       record.status.slice(1)}
                   </span>
                 </TableCell>
-                <TableCell>{formatDate(record.planting_date)}</TableCell>
+                <TableCell className='hidden sm:table-cell'>
+                  {formatDate(record.planting_date)}
+                </TableCell>
                 <TableCell className='hidden sm:table-cell'>
                   {record.field_location}
                 </TableCell>

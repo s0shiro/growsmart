@@ -1,4 +1,7 @@
-import { getPlantingRecordsByCurrentUser } from '@/lib/planting'
+import {
+  getPlantedStatusRecords,
+  getPlantingRecordsByCurrentUser,
+} from '@/lib/planting'
 import { createClient } from '@/utils/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 
@@ -25,10 +28,10 @@ const useFetchPlantings = () => {
       const supabase = createClient()
       const { data } = await supabase.auth.getSession()
 
+      //dati etong getAllPlantingRecords()
+
       if (data.session?.user) {
-        const farmers = await getPlantingRecordsByCurrentUser(
-          data.session.user.id,
-        )
+        const farmers = await getPlantedStatusRecords(data.session.user.id)
         return farmers
       }
       return initPlantings
