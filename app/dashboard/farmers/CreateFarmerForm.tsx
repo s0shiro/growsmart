@@ -13,7 +13,9 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { createNewFarmer } from '@/lib/farmer'
+
+import { useTransition } from 'react'
+import { useAddFarmer } from '@/hooks/useAddFarmer'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -79,21 +81,31 @@ function CreateFarmerForm() {
     defaultValues: {},
   })
 
+  const addFarmerMutation = useAddFarmer()
+  const [isPending, startTransition] = useTransition()
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    try {
-      await createNewFarmer({
-        firstname: data.firstname,
-        lastname: data.lastname,
-        gender: data.gender,
-        municipality: data.municipality,
-        barangay: data.barangay,
-        phoneNumber: data.phoneNumber,
-      })
-      console.log('Farmer created successfully', data)
-      form.reset()
-    } catch (error) {
-      console.error('Failed to create farmer:', error)
-    }
+    startTransition(() => {
+      addFarmerMutation.mutate(
+        {
+          firstname: data.firstname,
+          lastname: data.lastname,
+          gender: data.gender,
+          municipality: data.municipality,
+          barangay: data.barangay,
+          phoneNumber: data.phoneNumber,
+        },
+        {
+          onSuccess: () => {
+            console.log('Farmer created successfully', data)
+            form.reset()
+          },
+          onError: (error: any) => {
+            console.error('Failed to create farmer:', error)
+          },
+        },
+      )
+    })
   }
 
   return (
@@ -125,12 +137,14 @@ function CreateFarmerForm() {
         </div>
 
         <Button
-          disabled={form.formState.isSubmitting}
+          disabled={form.formState.isSubmitting || isPending}
           type='submit'
           variant='outline'
           className='w-full'
         >
-          {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
+          {form.formState.isSubmitting || isPending
+            ? 'Submitting...'
+            : 'Submit'}
         </Button>
       </form>
     </Form>

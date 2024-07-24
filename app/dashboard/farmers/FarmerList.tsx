@@ -125,7 +125,7 @@ const FarmerList = async () => {
                   </TableCell>
                   {/* <TableCell className='hidden md:table-cell'>
                     {phone}
-                  </TableCell>  */}
+                  </TableCell> */}
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
