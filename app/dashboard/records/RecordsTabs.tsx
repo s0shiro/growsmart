@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AllPlantingsByFarmers from './AllPlantingsByFarmers'
+import HarvestedStatus from './Harvested'
 
 const RecordsTabs = () => {
   return (
@@ -17,7 +18,7 @@ const RecordsTabs = () => {
         <AllPlantingsByFarmers />
       </TabsContent>
       <TabsContent value='harvests'>
-        <p>Lol</p>
+        <HarvestedStatus />
       </TabsContent>
       <TabsContent value='damages'>
         <p>I'm tired w/ this shit.</p>

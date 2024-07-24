@@ -1,5 +1,6 @@
 'use client'
 
+import useFetchHarvestedStatus from '@/hooks/useFetchHarvestedStatus'
 import useFetchPlantings from '@/hooks/useFetchPlantings'
 import useUser from '@/hooks/useUser'
 import useUserWithRole from '@/hooks/useUserWithRole'
@@ -9,7 +10,7 @@ const page = () => {
 
   // const { data, isFetching } = useUserWithRole()
 
-  const { data, isFetching } = useFetchPlantings()
+  const { data, isFetching } = useFetchHarvestedStatus()
 
   console.log(data)
 

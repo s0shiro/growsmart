@@ -1,6 +1,7 @@
 import { getCountOfFarmers, getListOfFarmers, getOneFarmer } from '@/lib/farmer'
 import {
   getAllPlantingRecords,
+  getHarvestedStatusRecords,
   getPlantedStatusRecords,
   getPlantingRecordsByCurrentUser,
 } from '@/lib/planting'
@@ -20,7 +21,11 @@ const UserRole = async () => {
 
   const plantedStatus = await getPlantedStatusRecords(id)
 
+  const harvestedStatus = await getHarvestedStatusRecords(id)
+
   console.log(`User email: ${email}`)
+
+  console.log('------------------------------------------')
   // console.log(farmers)
 
   // console.log(plantingRecords)
@@ -28,8 +33,13 @@ const UserRole = async () => {
   // console.log(currentUser)
 
   console.log(`farmers count: ${farmersCount}`)
+  console.log('------------------------------------------')
 
-  console.log(`Planted status Data: ${plantedStatus}`)
+  console.log(`Planted status Data: ${JSON.stringify(plantedStatus)}`)
+
+  console.log('------------------------------------------')
+
+  console.log(`Planted status Data: ${JSON.stringify(harvestedStatus)}`)
 
   return (
     <div>

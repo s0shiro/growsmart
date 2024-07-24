@@ -38,6 +38,7 @@ export const getListOfFarmers = async (userId: string) => {
     .from('technician_farmers')
     .select()
     .eq('user_id', userId)
+    .order('created_at', { ascending: false }) // Orders by created_at in descending order
 
   if (error) {
     console.error('Supabase error:', error.message)

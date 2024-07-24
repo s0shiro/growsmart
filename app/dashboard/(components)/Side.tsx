@@ -26,9 +26,7 @@ const links = [
     Icon: Users2,
     label: 'View and manage Farmers',
   },
-  { href: '/dashboard/records', Icon: Package, label: 'Manage Records' },
-  { href: '#', Icon: Users2, label: 'Customers' },
-  { href: '#', Icon: LineChart, label: 'Analytics' },
+  { href: '/dashboard/records', Icon: LineChart, label: 'Manage Records' },
 ]
 
 const isActive = (path: string, route: string) => {
