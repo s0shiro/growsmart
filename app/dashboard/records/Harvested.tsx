@@ -165,24 +165,7 @@ const HarvestedStatus = async () => {
                         </Link>
                       </DropdownMenuItem>
 
-                      <DailogForm
-                        id='create-harvest'
-                        title='Record Harvest'
-                        description={`Record harvest`}
-                        Trigger={
-                          <DropdownMenuItem
-                            onSelect={(e) => e.preventDefault()}
-                          >
-                            Record Harvest
-                          </DropdownMenuItem>
-                        }
-                        form={
-                          <HarvestForm
-                            plantingID={record.id}
-                            farmerID={record.farmer_id}
-                          />
-                        }
-                      />
+                      <DropdownMenuItem>Harvest Details</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -28,8 +28,6 @@ export const createNewFarmer = async (data: {
   if (error) {
     console.error('Supabase error:', error.message)
   }
-
-  revalidatePath('/dashboard/farmers', 'page')
 }
 
 export const getListOfFarmers = async (userId: string) => {
