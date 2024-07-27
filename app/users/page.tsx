@@ -1,11 +1,16 @@
 import { getCountOfFarmers, getListOfFarmers, getOneFarmer } from '@/lib/farmer'
 import {
+  fetchHarvestByPlantingRecordId,
+  getPlantingRecordWithHarvest,
+} from '@/lib/harvests'
+import {
   getAllPlantingRecords,
   getHarvestedStatusRecords,
   getPlantedStatusRecords,
   getPlantingRecordsByCurrentUser,
 } from '@/lib/planting'
 import { getCurrentUser, getUserRole } from '@/lib/users '
+import HarvestDetails from '../test/Harvest'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
@@ -16,6 +21,10 @@ const UserRole = async () => {
     'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
   )
 
+  const harvestRecord = await fetchHarvestByPlantingRecordId(
+    '70968d8a-3fde-4a6b-a53c-fc141681a852',
+  )
+
   const { id, email } = user[0]
   const { role, user_id } = user[0].permissions[0]
 
@@ -23,26 +32,40 @@ const UserRole = async () => {
 
   const harvestedStatus = await getHarvestedStatusRecords(id)
 
-  console.log(`User email: ${email}`)
+  const plantingRecordWithHarvest = await getPlantingRecordWithHarvest(
+    '70968d8a-3fde-4a6b-a53c-fc141681a852',
+  )
 
-  console.log('------------------------------------------')
-  // console.log(farmers)
+  // console.log(`User email: ${email}`)
 
-  // console.log(plantingRecords)
+  // console.log('------------------------------------------')
+  // // console.log(farmers)
 
-  // console.log(currentUser)
+  // // console.log(plantingRecords)
 
-  console.log(`farmers count: ${farmersCount}`)
-  console.log('------------------------------------------')
+  // // console.log(currentUser)
 
-  console.log(`Planted status Data: ${JSON.stringify(plantedStatus)}`)
+  // console.log(`farmers count: ${farmersCount}`)
+  // console.log('------------------------------------------')
 
-  console.log('------------------------------------------')
+  // console.log(`Planted status Data: ${JSON.stringify(plantedStatus)}`)
 
-  console.log(`Planted status Data: ${JSON.stringify(harvestedStatus)}`)
+  // console.log('------------------------------------------')
+
+  // console.log(`Planted status Data: ${JSON.stringify(harvestedStatus)}`)
+
+  // console.log(`Harvest Record: ${JSON.stringify(harvestRecord)}`)
+  console.log(`data: ${JSON.stringify(plantingRecordWithHarvest)}`)
 
   return (
     <div>
+      <div className='container mx-auto'>
+        {plantingRecordWithHarvest ? (
+          <HarvestDetails harvest={plantingRecordWithHarvest} />
+        ) : (
+          <p>No harvest record available.</p>
+        )}
+      </div>
       <ul>
         {plantedStatus?.map((record, index) => (
           <p key={index}>

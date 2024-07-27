@@ -7,7 +7,7 @@ export default async function Dashboard() {
   const farmersCount = await getCountOfFarmers(user?.id ?? '')
   return (
     <div>
-      <Card>
+      <Card className='w-[340px]'>
         <CardContent>
           <div className='w-full flex h-full justify-center items-center'>
             <div>

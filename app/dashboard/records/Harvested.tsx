@@ -165,7 +165,11 @@ const HarvestedStatus = async () => {
                         </Link>
                       </DropdownMenuItem>
 
-                      <DropdownMenuItem>Harvest Details</DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link href={`/dashboard/records/${record.id}`}>
+                          View Harvest
+                        </Link>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
