@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from './users '
 import { QueryData } from '@supabase/supabase-js'
+import { parse } from 'path'
 
 interface HarvestData {
   farmerId: string | undefined
@@ -11,6 +12,9 @@ interface HarvestData {
   harvestDate: string
   yieldQuantity: string
   profit: string
+  areaHarvested: string
+  damagedQuantity: string
+  damagedReason: string
 }
 
 interface HarvestRecord {
@@ -20,6 +24,9 @@ interface HarvestRecord {
   harvest_date: string
   yield_quantity: number
   profit: number
+  area_harvested: number
+  damaged_quantity: number
+  damaged_reason: string
 }
 
 export const addHarvest = async (data: HarvestData) => {
@@ -33,6 +40,9 @@ export const addHarvest = async (data: HarvestData) => {
     harvest_date: data.harvestDate,
     yield_quantity: parseFloat(data.yieldQuantity),
     profit: parseFloat(data.profit),
+    area_harvested: parseFloat(data.areaHarvested),
+    damaged_quantity: parseFloat(data.damagedQuantity),
+    damaged_reason: data.damagedReason,
   }
 
   const { error } = await supabase
@@ -71,7 +81,7 @@ export const getPlantingRecordWithHarvest = async (plantingID: string) => {
   const plantingRecordQuery = supabase
     .from('planting_records')
     .select(
-      `planting_date, weather_condition, expenses, field_location, harvest_records(harvest_date, yield_quantity, profit)`,
+      `crop_type, variety, planting_date, weather_condition, expenses, field_location, harvest_records(harvest_date, yield_quantity, profit, damaged_quantity, damaged_reason)`,
     )
     .eq('id', plantingID) // Filter to only include the record with the matching plantingID
     .single()

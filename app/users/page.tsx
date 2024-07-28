@@ -11,19 +11,20 @@ import {
 } from '@/lib/planting'
 import { getCurrentUser, getUserRole } from '@/lib/users '
 import HarvestDetails from '../test/Harvest'
+import HarvestDetailsTest from '../test/Harvest'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
   const user = await getUserRole(currentUser?.id ?? '')
   const farmers = await getListOfFarmers(currentUser?.id ?? '')
   const farmersCount = await getCountOfFarmers(currentUser?.id ?? '')
-  const plantingRecords = await getAllPlantingRecords(
-    'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
-  )
+  // const plantingRecords = await getAllPlantingRecords(
+  //   'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
+  // )
 
-  const harvestRecord = await fetchHarvestByPlantingRecordId(
-    '70968d8a-3fde-4a6b-a53c-fc141681a852',
-  )
+  // const harvestRecord = await fetchHarvestByPlantingRecordId(
+  //   '70968d8a-3fde-4a6b-a53c-fc141681a852',
+  // )
 
   const { id, email } = user[0]
   const { role, user_id } = user[0].permissions[0]
@@ -33,7 +34,7 @@ const UserRole = async () => {
   const harvestedStatus = await getHarvestedStatusRecords(id)
 
   const plantingRecordWithHarvest = await getPlantingRecordWithHarvest(
-    '70968d8a-3fde-4a6b-a53c-fc141681a852',
+    '4fe832ba-f91d-4643-92bf-01db433e3c02',
   )
 
   // console.log(`User email: ${email}`)
@@ -61,7 +62,7 @@ const UserRole = async () => {
     <div>
       <div className='container mx-auto'>
         {plantingRecordWithHarvest ? (
-          <HarvestDetails harvest={plantingRecordWithHarvest} />
+          <HarvestDetailsTest harvestData={plantingRecordWithHarvest} />
         ) : (
           <p>No harvest record available.</p>
         )}

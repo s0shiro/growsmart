@@ -22,9 +22,18 @@ const FormSchema = z.object({
   }),
   yieldQuantity: z.string(),
   profit: z.string(),
+  areaHarvested: z.string(),
+  damagedQuantity: z.string(),
+  damagedReason: z.string(),
 })
 
-type CropFormFieldName = 'harvestDate' | 'yieldQuantity' | 'profit'
+type CropFormFieldName =
+  | 'harvestDate'
+  | 'yieldQuantity'
+  | 'profit'
+  | 'areaHarvested'
+  | 'damagedQuantity'
+  | 'damagedReason'
 
 const fieldConfigs: {
   name: CropFormFieldName
@@ -50,6 +59,24 @@ const fieldConfigs: {
     label: 'Profit',
     type: 'number',
   },
+  {
+    name: 'areaHarvested',
+    placeholder: 'Area Harvested',
+    label: 'Area',
+    type: 'number',
+  },
+  {
+    name: 'damagedQuantity',
+    placeholder: 'Damage Quantity',
+    label: 'Damaged',
+    type: 'number',
+  },
+  {
+    name: 'damagedReason',
+    placeholder: 'Pest',
+    label: 'Reason',
+    type: 'text',
+  },
 ]
 
 function HarvestForm({
@@ -72,6 +99,9 @@ function HarvestForm({
         harvestDate: data.harvestDate,
         yieldQuantity: data.yieldQuantity,
         profit: data.profit,
+        areaHarvested: data.areaHarvested,
+        damagedQuantity: data.damagedQuantity,
+        damagedReason: data.damagedReason,
       })
 
       await updateStatusWhenAddHarvest(plantingID)

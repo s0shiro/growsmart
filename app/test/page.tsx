@@ -5,6 +5,7 @@ import useFetchPlantings from '@/hooks/useFetchPlantings'
 import useUser from '@/hooks/useUser'
 import useUserWithRole from '@/hooks/useUserWithRole'
 import HarvestDetails from './Harvest'
+import HarvestDetailsFormat from './Harvest'
 
 const page = () => {
   const user = useUser()
@@ -56,7 +57,7 @@ const page = () => {
     //     : null}
     // </div>
     <div className='container mx-auto'>
-      <HarvestDetails harvest={placeholderHarvest} />
+      <HarvestDetailsFormat harvest={placeholderHarvest} />
     </div>
   )
 }

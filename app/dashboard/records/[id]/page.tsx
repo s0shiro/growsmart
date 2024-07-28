@@ -1,7 +1,7 @@
 import { getPlantingRecordWithHarvest } from '@/lib/harvests'
 import HarvestDetails from './HarvestDetails'
 
-const page = async ({ params }: { params: { id: any } }) => {
+const HarvestDetailsPage = async ({ params }: { params: { id: any } }) => {
   const plantingRecordWithHarvest = await getPlantingRecordWithHarvest(
     params.id,
   )
@@ -18,4 +18,4 @@ const page = async ({ params }: { params: { id: any } }) => {
   )
 }
 
-export default page
+export default HarvestDetailsPage
