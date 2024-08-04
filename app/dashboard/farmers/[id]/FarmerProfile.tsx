@@ -35,9 +35,9 @@ const FarmerProfile = ({
     <div>
       <Card x-chunk='dashboard-06-chunk-0'>
         <div className='flex justify-center p-4'>
-          <Avatar className='w-45 h-45'>
+          <Avatar className='size-48'>
             <AvatarImage
-              src='https://scontent.fmnl25-4.fna.fbcdn.net/v/t39.30808-1/451418027_2164615280578350_86385005731237855_n.jpg?stp=dst-jpg_p200x200&_nc_cat=107&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=q_hkkOSRs_8Q7kNvgE9oXMz&_nc_ht=scontent.fmnl25-4.fna&oh=00_AYD-1c-y97DsoNV1DoSFARyqv284AHwZOSpoC6XSAy7L6g&oe=66A166C2'
+              src='https://img.icons8.com/?size=100&id=tZuAOUGm9AuS&format=png&color=000000'
               alt='@shadcn'
             />
             <AvatarFallback>CN</AvatarFallback>

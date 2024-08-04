@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -41,8 +43,28 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import ToggleThemeButton from '@/components/MyComponents/shadcn/ToggleThemeButton'
+import { usePathname } from 'next/navigation'
+
+// Remove the redefinition of BreadcrumbSeparator
+// const BreadcrumbSeparator = () => <span className='mx-2'>/</span>
+
+const formatPathname = (pathname: string) => {
+  return pathname
+    .replace(/^\//, '') // Remove leading slash
+    .split('/') // Split by slashes
+    .map((segment, index, array) => (
+      <>
+        <Link href={`/${array.slice(0, index + 1).join('/')}`}>
+          {segment.charAt(0).toUpperCase() + segment.slice(1)}
+        </Link>
+        {index < array.length - 1 && <BreadcrumbSeparator />}
+      </>
+    )) // Capitalize each segment and add BreadcrumbSeparator between segments
+}
 
 const SheetNav = () => {
+  const pathname = usePathname()
+  const formattedPathname = formatPathname(pathname)
   return (
     <div className='flex flex-col sm:gap-4 sm:py-4 sm:pl-14'>
       <header className='sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6'>
@@ -102,21 +124,9 @@ const SheetNav = () => {
         </Sheet>
         <Breadcrumb className='hidden md:flex'>
           <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href='#'>Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href='#'>Products</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>All Products</BreadcrumbPage>
-            </BreadcrumbItem>
+            {formattedPathname.map((segment, index) => (
+              <BreadcrumbItem key={index}>{segment}</BreadcrumbItem>
+            ))}
           </BreadcrumbList>
         </Breadcrumb>
         <div className='relative ml-auto flex-1 md:grow-0'>

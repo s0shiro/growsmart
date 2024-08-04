@@ -64,10 +64,17 @@ const AllPlantingsByFarmers = async () => {
 
   if (allPlantingRecords.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center mt-24'>
-        <div className='text-center'>
-          <p className='text-xl font-semibold'>No records found.</p>
-          <p className='mt-2'>Please add some record to get started.</p>
+      <div
+        className='flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm p-6'
+        x-chunk='dashboard-02-chunk-1'
+      >
+        <div className='flex flex-col items-center gap-2 text-center'>
+          <h3 className='text-2xl font-bold tracking-tight'>
+            You have no planting records.
+          </h3>
+          <p className='text-sm text-muted-foreground'>
+            You can view as soon as you add a planting record.
+          </p>
         </div>
       </div>
     )
