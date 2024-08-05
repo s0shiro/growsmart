@@ -81,121 +81,127 @@ const AllPlantingsByFarmers = async () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Planting Records</CardTitle>
-        <CardDescription>
-          View planting records for all farmers.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Crop Type</TableHead>
-              <TableHead className='hidden sm:table-cell'>Variety</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className='hidden sm:table-cell'>
-                Planting Date
-              </TableHead>
-              <TableHead className='hidden sm:table-cell'>
-                Field Location
-              </TableHead>
-              <TableHead className='hidden sm:table-cell'>
-                Area Planted
-              </TableHead>
-              <TableHead className='hidden sm:table-cell'>Quantity</TableHead>
-              <TableHead className='hidden sm:table-cell'>
-                Weather Condition
-              </TableHead>
-              <TableHead className='hidden sm:table-cell'>Expenses</TableHead>
-              <TableHead>Harvest Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {allPlantingRecords.map((record) => (
-              <TableRow key={record.id}>
-                <TableCell>{record.crop_type}</TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  {record.variety}
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${
-                      record.status === 'planted'
-                        ? 'bg-green-100 text-green-800'
-                        : record.status === 'harvested'
-                          ? 'bg-red-100 text-red-800 line-through'
-                          : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {record.status.charAt(0).toUpperCase() +
-                      record.status.slice(1)}
-                  </span>
-                </TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  {formatDate(record.planting_date)}
-                </TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  {record.field_location}
-                </TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  {record.area_planted} sqm
-                </TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  {record.quantity}
-                </TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  {record.weather_condition}
-                </TableCell>
-                <TableCell className='hidden sm:table-cell'>
-                  ₱{record.expenses}
-                </TableCell>
-                <TableCell>{formatDate(record.harvest_date)}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup='true' size='icon' variant='ghost'>
-                        <MoreHorizontal className='h-4 w-4' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <Link href={`/dashboard/farmers/${record.farmer_id}`}>
-                          View Farmer
-                        </Link>
-                      </DropdownMenuItem>
-
-                      <DailogForm
-                        id='create-harvest'
-                        title='Record Harvest'
-                        description={`Record harvest`}
-                        Trigger={
-                          <DropdownMenuItem
-                            onSelect={(e) => e.preventDefault()}
-                          >
-                            Record Harvest
-                          </DropdownMenuItem>
-                        }
-                        form={
-                          <HarvestForm
-                            plantingID={record.id}
-                            farmerID={record.farmer_id}
-                          />
-                        }
-                      />
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+    <div className='container mx-auto px-1 py-3'>
+      <Card>
+        <CardHeader>
+          <CardTitle>Planting Records</CardTitle>
+          <CardDescription>
+            View planting records for all farmers.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Crop Type</TableHead>
+                <TableHead className='hidden sm:table-cell'>Variety</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className='hidden sm:table-cell'>
+                  Planting Date
+                </TableHead>
+                <TableHead className='hidden sm:table-cell'>
+                  Field Location
+                </TableHead>
+                <TableHead className='hidden sm:table-cell'>
+                  Area Planted
+                </TableHead>
+                <TableHead className='hidden sm:table-cell'>Quantity</TableHead>
+                <TableHead className='hidden sm:table-cell'>
+                  Weather Condition
+                </TableHead>
+                <TableHead className='hidden sm:table-cell'>Expenses</TableHead>
+                <TableHead>Harvest Date</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {allPlantingRecords.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell>{record.crop_type}</TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    {record.variety}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${
+                        record.status === 'planted'
+                          ? 'bg-green-100 text-green-800'
+                          : record.status === 'harvested'
+                            ? 'bg-red-100 text-red-800 line-through'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {record.status.charAt(0).toUpperCase() +
+                        record.status.slice(1)}
+                    </span>
+                  </TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    {formatDate(record.planting_date)}
+                  </TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    {record.field_location}
+                  </TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    {record.area_planted} sqm
+                  </TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    {record.quantity}
+                  </TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    {record.weather_condition}
+                  </TableCell>
+                  <TableCell className='hidden sm:table-cell'>
+                    ₱{record.expenses}
+                  </TableCell>
+                  <TableCell>{formatDate(record.harvest_date)}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          aria-haspopup='true'
+                          size='icon'
+                          variant='ghost'
+                        >
+                          <MoreHorizontal className='h-4 w-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <Link href={`/dashboard/farmers/${record.farmer_id}`}>
+                            View Farmer
+                          </Link>
+                        </DropdownMenuItem>
+
+                        <DailogForm
+                          id='create-harvest'
+                          title='Record Harvest'
+                          description={`Record harvest`}
+                          Trigger={
+                            <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              Record Harvest
+                            </DropdownMenuItem>
+                          }
+                          form={
+                            <HarvestForm
+                              plantingID={record.id}
+                              farmerID={record.farmer_id}
+                            />
+                          }
+                        />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 

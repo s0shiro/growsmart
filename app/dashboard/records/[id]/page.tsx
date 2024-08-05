@@ -7,13 +7,11 @@ const HarvestDetailsPage = async ({ params }: { params: { id: any } }) => {
   )
   return (
     <div>
-      <div className='container mx-auto'>
-        {plantingRecordWithHarvest ? (
-          <HarvestDetails harvest={plantingRecordWithHarvest} />
-        ) : (
-          <p>No harvest record available.</p>
-        )}
-      </div>
+      {plantingRecordWithHarvest ? (
+        <HarvestDetails harvest={plantingRecordWithHarvest} />
+      ) : (
+        <p>No harvest record available.</p>
+      )}
     </div>
   )
 }

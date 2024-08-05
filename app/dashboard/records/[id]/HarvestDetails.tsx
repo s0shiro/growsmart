@@ -8,6 +8,13 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
+import {
+  Edit3,
+  Trash2,
+  ArrowLeftCircle,
+  FileText,
+  UploadCloud,
+} from 'lucide-react'
 
 interface HarvestRecords {
   profit: number
@@ -17,7 +24,6 @@ interface HarvestRecords {
   damaged_quantity: number
 }
 
-// Define an interface for the harvest record
 interface HarvestData {
   crop_type: string
   variety: string
@@ -40,78 +46,167 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
   } = harvest
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Harvest Details</CardTitle>
-        <CardDescription>
-          {crop_type} - {variety}
-        </CardDescription>
-        <div className='flex justify-end space-x-2'>
-          <Button>Edit Harvest</Button>
-          <Button variant='destructive'>Delete Harvest</Button>
-          <Button variant='secondary'>Back to Harvest List</Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div>
-            <h2 className='font-semibold text-lg'>Summary</h2>
-            <p>
-              <strong>Planting Date:</strong> {formatDate(planting_date)}
-            </p>
-            <p>
-              <strong>Field Location:</strong> {field_location}
-            </p>
-            <p>
-              <strong>Weather Condition:</strong> {weather_condition}
-            </p>
-            <p>
-              <strong>Expenses:</strong> ₱{expenses}
-            </p>
+    <div className='container mx-auto px-1 py-3'>
+      <Card className='p-6 shadow-lg rounded-lg'>
+        <CardHeader className='border-b pb-6'>
+          <CardTitle className='text-3xl font-bold mb-2'>
+            Harvest Details
+          </CardTitle>
+          <CardDescription className='text-xl text-gray-500 mb-4'>
+            {crop_type} - {variety}
+          </CardDescription>
+          <div className='flex flex-wrap justify-end space-x-2'>
+            <Button className='mb-2 md:mb-0'>
+              <div className='hidden sm:block'>Edit Harvest</div>
+              <div className='block sm:hidden'>
+                <Edit3 />
+              </div>
+            </Button>
+            <Button variant='destructive' className='mb-2 md:mb-0'>
+              <div className='hidden sm:block'>Delete Harvest</div>
+              <div className='block sm:hidden'>
+                <Trash2 />
+              </div>
+            </Button>
+            <Button variant='secondary'>
+              <div className='hidden sm:block'>Back to Harvest List</div>
+              <div className='block sm:hidden'>
+                <ArrowLeftCircle />
+              </div>
+            </Button>
           </div>
-          {harvest_records.length > 0 && (
-            <div>
-              <h2 className='font-semibold text-lg'>Harvest Records</h2>
-              {harvest_records.map((record, index) => (
-                <div key={index} className='mt-2'>
-                  <p>
-                    <strong>Harvest Date:</strong>{' '}
-                    {formatDate(record.harvest_date)}
-                  </p>
-                  <p>
-                    <strong>Yield Quantity:</strong> {record.yield_quantity} kg
-                  </p>
-                  <p>
-                    <strong>Damaged Quantity:</strong> {record.damaged_quantity}{' '}
-                    kg
-                  </p>
-                  <p>
-                    <strong>Damaged Reason:</strong> {record.damaged_reason}
-                  </p>
-                  <p>
-                    <strong>Profit:</strong> ₱{record.profit}
-                  </p>
+        </CardHeader>
+        <CardContent className='mt-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <Card className='p-4 shadow-md rounded-lg'>
+              <CardTitle className='text-2xl font-semibold mb-4'>
+                Summary
+              </CardTitle>
+              <div className='text-lg space-y-2'>
+                <div className='flex justify-between'>
+                  <span className='font-medium text-gray-500'>
+                    Planting Date:
+                  </span>{' '}
+                  <span className='font-semibold foreground'>
+                    {formatDate(planting_date)}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className='mt-4'>
-          <h2 className='font-semibold text-lg'>Actions</h2>
-          <Button className='mr-2'>Add Note</Button>
-          <Button>Upload Photo</Button>
-        </div>
-        <div className='mt-4'>
-          <h2 className='font-semibold text-lg'>Related Records</h2>
-          <p>
-            <strong>Previous Harvests:</strong>{' '}
-            <a href={`/harvests?crop=${crop_type}&field=${field_location}`}>
-              View Previous Harvests
-            </a>
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+                <div className='flex justify-between'>
+                  <span className='font-medium text-gray-500'>
+                    Field Location:
+                  </span>{' '}
+                  <span className='font-semibold foreground'>
+                    {field_location}
+                  </span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='font-medium text-gray-500'>
+                    Weather Condition:
+                  </span>{' '}
+                  <span className='font-semibold foreground'>
+                    {weather_condition || 'N/A'}
+                  </span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='font-medium text-gray-500'>Expenses:</span>{' '}
+                  <span className='font-semibold foreground'>₱{expenses}</span>
+                </div>
+              </div>
+            </Card>
+            {harvest_records.length > 0 && (
+              <Card className='p-4 shadow-md rounded-lg'>
+                <CardTitle className='text-2xl font-semibold mb-4'>
+                  Harvest Records
+                </CardTitle>
+                {harvest_records.map((record, index) => (
+                  <div key={index} className='mt-4 border-t pt-4 space-y-2'>
+                    <div className='flex justify-between'>
+                      <span className='font-medium text-gray-500'>
+                        Harvest Date:
+                      </span>{' '}
+                      <span className='font-semibold foreground'>
+                        {formatDate(record.harvest_date)}
+                      </span>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span className='font-medium text-gray-500'>
+                        Yield Quantity:
+                      </span>{' '}
+                      <span className='font-semibold foreground'>
+                        {record.yield_quantity} kg
+                      </span>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span className='font-medium text-gray-500'>
+                        Damaged Quantity:
+                      </span>{' '}
+                      <span className='font-semibold foreground'>
+                        {record.damaged_quantity} kg
+                      </span>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span className='font-medium text-gray-500'>
+                        Damaged Reason:
+                      </span>{' '}
+                      <span className='font-semibold foreground'>
+                        {record.damaged_reason}
+                      </span>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span className='font-medium text-gray-500'>Profit:</span>{' '}
+                      <span className='font-semibold foreground'>
+                        ₱{record.profit}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            )}
+          </div>
+          <div className='mt-8'>
+            <Card className='p-4 shadow-md rounded-lg'>
+              <CardTitle className='text-2xl font-semibold mb-4'>
+                Actions
+              </CardTitle>
+              <div className='flex space-x-2'>
+                <Button className='mr-2'>
+                  <div className='hidden sm:block'>Add Note</div>
+                  <div className='block sm:hidden'>
+                    <FileText />
+                  </div>
+                </Button>
+                <Button>
+                  <div className='hidden sm:block'>Upload Photo</div>
+                  <div className='block sm:hidden'>
+                    <UploadCloud />
+                  </div>
+                </Button>
+              </div>
+            </Card>
+          </div>
+          <div className='mt-8'>
+            <Card className='p-4 shadow-md rounded-lg'>
+              <CardTitle className='text-2xl font-semibold mb-4'>
+                Related Records
+              </CardTitle>
+              <div className='text-lg'>
+                <p>
+                  <strong className='font-medium text-gray-700'>
+                    Previous Harvests:
+                  </strong>{' '}
+                  <a
+                    href={`/harvests?crop=${crop_type}&field=${field_location}`}
+                    className='text-blue-600 underline'
+                  >
+                    View Previous Harvests
+                  </a>
+                </p>
+              </div>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
