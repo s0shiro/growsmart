@@ -6,7 +6,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
+  BreadcrumbSeparator as DefaultBreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 
 import {
@@ -44,22 +44,23 @@ import Link from 'next/link'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import ToggleThemeButton from '@/components/MyComponents/shadcn/ToggleThemeButton'
 import { usePathname } from 'next/navigation'
-
-// Remove the redefinition of BreadcrumbSeparator
-// const BreadcrumbSeparator = () => <span className='mx-2'>/</span>
+import CustomBreadcrumbSeparator from './CustomBreadcrumbSeparator'
 
 const formatPathname = (pathname: string) => {
   return pathname
     .replace(/^\//, '') // Remove leading slash
     .split('/') // Split by slashes
     .map((segment, index, array) => (
-      <>
+      <span
+        key={index}
+        className={index === array.length - 1 ? 'text-white font-bold' : ''}
+      >
         <Link href={`/${array.slice(0, index + 1).join('/')}`}>
           {segment.charAt(0).toUpperCase() + segment.slice(1)}
         </Link>
-        {index < array.length - 1 && <BreadcrumbSeparator />}
-      </>
-    )) // Capitalize each segment and add BreadcrumbSeparator between segments
+        {index < array.length - 1 && <CustomBreadcrumbSeparator />}
+      </span>
+    )) // Capitalize each segment and add CustomBreadcrumbSeparator between segments
 }
 
 const SheetNav = () => {
