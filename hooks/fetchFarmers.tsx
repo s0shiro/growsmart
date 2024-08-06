@@ -1,6 +1,6 @@
+import { useQuery } from '@tanstack/react-query'
 import { getListOfFarmers } from '@/lib/farmer'
 import { createClient } from '@/utils/supabase/client'
-import { useQuery } from '@tanstack/react-query'
 
 const initFarmer = {
   id: '',
@@ -23,7 +23,7 @@ export default function useFetchFarmers() {
         const farmers = await getListOfFarmers(data.session.user.id)
         return farmers
       }
-      return initFarmer
+      return [initFarmer]
     },
   })
 }

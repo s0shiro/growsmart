@@ -7,14 +7,13 @@ import PlantingRecords from './PlantingRecords'
 const FarmerProfileTabs = async ({ id }: { id: any }) => {
   const farmer = await getOneFarmer(id)
 
-  console.log(farmer)
   return (
     <Tabs defaultValue='profile'>
       <div className='flex items-center'>
         <TabsList>
           <TabsTrigger value='profile'>Profile</TabsTrigger>
           <TabsTrigger value='planting'>Planting Records</TabsTrigger>
-          <TabsTrigger value='harvests'>Harvests</TabsTrigger>
+          <TabsTrigger value='harvests'>Harvests Report</TabsTrigger>
           <TabsTrigger value='damages' className='hidden sm:flex'>
             Damages
           </TabsTrigger>

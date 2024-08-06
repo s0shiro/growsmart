@@ -13,36 +13,27 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { addPlantingRecord } from '@/lib/planting'
+import { addHarvest } from '@/lib/harvests'
+import { updateStatusWhenAddHarvest } from '@/lib/planting'
 
 const FormSchema = z.object({
-  cropType: z.string(),
-  variety: z.string(),
-  plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+  harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for plantingDate',
   }),
-  fieldLocation: z.string(),
-  areaPlanted: z.string(),
-  quantity: z.string(),
-  weatherCondition: z.string(),
-  expenses: z.string(),
-  harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid date format for harvestDate',
-  }),
-  status: z.string(),
+  yieldQuantity: z.string(),
+  profit: z.string(),
+  areaHarvested: z.string(),
+  damagedQuantity: z.string(),
+  damagedReason: z.string(),
 })
 
 type CropFormFieldName =
-  | 'cropType'
-  | 'variety'
-  | 'plantingDate'
-  | 'fieldLocation'
-  | 'areaPlanted'
-  | 'quantity'
-  | 'weatherCondition'
-  | 'expenses'
   | 'harvestDate'
-  | 'status'
+  | 'yieldQuantity'
+  | 'profit'
+  | 'areaHarvested'
+  | 'damagedQuantity'
+  | 'damagedReason'
 
 const fieldConfigs: {
   name: CropFormFieldName
@@ -51,68 +42,50 @@ const fieldConfigs: {
   type: string
 }[] = [
   {
-    name: 'cropType',
-    placeholder: 'Crop Type',
-    label: 'Crop Type',
-    type: 'text',
-  },
-  {
-    name: 'variety',
-    placeholder: 'Variety',
-    label: 'Variety',
-    type: 'text',
-  },
-  {
-    name: 'plantingDate',
-    placeholder: 'Planting Date',
-    label: 'Planting Date',
-    type: 'date',
-  },
-  {
-    name: 'fieldLocation',
-    placeholder: 'Field Location',
-    label: 'Field Location',
-    type: 'text',
-  },
-  {
-    name: 'areaPlanted',
-    placeholder: 'Area Planted',
-    label: 'Area Planted',
-    type: 'number',
-  },
-  {
-    name: 'quantity',
-    placeholder: 'Quantity',
-    label: 'Quantity',
-    type: 'number',
-  },
-  {
-    name: 'weatherCondition',
-    placeholder: 'Weather Condition',
-    label: 'Weather Condition',
-    type: 'text',
-  },
-  {
-    name: 'expenses',
-    placeholder: 'Expenses',
-    label: 'Expenses',
-    type: 'number',
-  },
-  {
     name: 'harvestDate',
     placeholder: 'Harvest Date',
     label: 'Harvest Date',
     type: 'date',
   },
   {
-    name: 'status',
-    placeholder: 'planted',
-    label: 'Status',
+    name: 'yieldQuantity',
+    placeholder: 'Yield',
+    label: 'Yield',
+    type: 'number',
+  },
+  {
+    name: 'profit',
+    placeholder: 'Profit',
+    label: 'Profit',
+    type: 'number',
+  },
+  {
+    name: 'areaHarvested',
+    placeholder: 'Area Harvested',
+    label: 'Area',
+    type: 'number',
+  },
+  {
+    name: 'damagedQuantity',
+    placeholder: 'Damage Quantity',
+    label: 'Damaged',
+    type: 'number',
+  },
+  {
+    name: 'damagedReason',
+    placeholder: 'Pest',
+    label: 'Reason',
     type: 'text',
   },
 ]
 
-function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
+function HarvestForm({
+  plantingID,
+  farmerID,
+}: {
+  plantingID: string
+  farmerID: string | undefined
+}) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -120,20 +93,18 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      // Modify the code here to handle the form submission
-      await addPlantingRecord({
+      await addHarvest({
+        plantingId: plantingID,
         farmerId: farmerID,
-        cropType: data.cropType,
-        variety: data.variety,
-        plantingDate: data.plantingDate,
-        fieldLocation: data.fieldLocation,
-        areaPlanted: data.areaPlanted,
-        quantity: data.quantity,
-        weatherCondition: data.weatherCondition,
-        expenses: data.expenses,
         harvestDate: data.harvestDate,
-        status: data.status,
+        yieldQuantity: data.yieldQuantity,
+        profit: data.profit,
+        areaHarvested: data.areaHarvested,
+        damagedQuantity: data.damagedQuantity,
+        damagedReason: data.damagedReason,
       })
+
+      await updateStatusWhenAddHarvest(plantingID)
       console.log('Form submitted successfully', data)
       form.reset()
     } catch (error) {
@@ -182,4 +153,4 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
   )
 }
 
-export default PlantingForm
+export default HarvestForm

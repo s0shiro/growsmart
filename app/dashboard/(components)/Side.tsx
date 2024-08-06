@@ -21,10 +21,12 @@ import clsx from 'clsx'
 
 const links = [
   { href: '/dashboard', Icon: Home, label: 'Dashboard' },
-  { href: '/dashboard/farmers', Icon: Users2, label: 'Farmers' },
-  { href: '#', Icon: Package, label: 'Products' },
-  { href: '#', Icon: Users2, label: 'Customers' },
-  { href: '#', Icon: LineChart, label: 'Analytics' },
+  {
+    href: '/dashboard/farmers',
+    Icon: Users2,
+    label: 'View and manage Farmers',
+  },
+  { href: '/dashboard/records', Icon: LineChart, label: 'Manage Records' },
 ]
 
 const isActive = (path: string, route: string) => {

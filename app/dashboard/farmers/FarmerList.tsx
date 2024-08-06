@@ -60,6 +60,17 @@ const FarmerList = async () => {
     return <div>Loading...</div>
   }
 
+  if (farmers.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center mt-24'>
+        <div className='text-center'>
+          <p className='text-xl font-semibold'>No farmers available.</p>
+          <p className='mt-2'>Please add some farmers to get started.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <Card x-chunk='dashboard-06-chunk-0'>
       <CardHeader>
@@ -75,10 +86,7 @@ const FarmerList = async () => {
               </TableHead>
               <TableHead>Farmer Name</TableHead>
               <TableHead>Gender</TableHead>
-              <TableHead className='hidden md:table-cell'>Address</TableHead>
-              {/* <TableHead className='hidden md:table-cell'>
-                Contact No.
-              </TableHead>  */}
+
               <TableHead>
                 <span className='sr-only'>Actions</span>
               </TableHead>
@@ -109,12 +117,7 @@ const FarmerList = async () => {
                     {firstname} {lastname}
                   </TableCell>
                   <TableCell className='font-medium'>{gender}</TableCell>
-                  <TableCell className='hidden md:table-cell'>
-                    {barangay}, {municipality}
-                  </TableCell>
-                  {/* <TableCell className='hidden md:table-cell'>
-                    {phone}
-                  </TableCell>  */}
+
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
