@@ -53,7 +53,7 @@ const formatPathname = (pathname: string) => {
     .map((segment, index, array) => (
       <span
         key={index}
-        className={index === array.length - 1 ? 'text-white font-bold' : ''}
+        className={index === array.length - 1 ? 'foreground font-bold' : ''}
       >
         <Link href={`/${array.slice(0, index + 1).join('/')}`}>
           {segment.charAt(0).toUpperCase() + segment.slice(1)}
