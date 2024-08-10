@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MoreHorizontal, Search } from 'lucide-react'
 import useFetchPlantings from '@/hooks/useFetchPlantings'
@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import DailogForm from '../(components)/DialogForm'
+import DialogForm from '../(components)/DialogForm'
 import HarvestForm from './HarvestForm'
+import HarvestNotificationIcon from './HarvestNotificationIcon'
 
 type PlantingRecords = {
   area_planted: number
@@ -45,16 +46,35 @@ const PlantingsTable = () => {
     setFilteredUsers(allPlantingRecords)
   }, [allPlantingRecords])
 
-  const handleSearch = (e: any) => {
+  const handleSearch = useCallback(
+    (term: string) => {
+      const filtered = allPlantingRecords.filter(
+        (record) =>
+          record.crop_type.toLowerCase().includes(term) ||
+          record.field_location.toLowerCase().includes(term),
+      )
+      setFilteredUsers(filtered)
+    },
+    [allPlantingRecords],
+  )
+
+  const onSearchChange = (e: any) => {
     const term = e.target.value.toLowerCase()
     setSearchTerm(term)
-    const filtered = allPlantingRecords.filter(
-      (record) =>
-        record.crop_type.toLowerCase().includes(term) ||
-        record.field_location.toLowerCase().includes(term),
-    )
-    setFilteredUsers(filtered)
+    handleSearch(term)
   }
+
+  const currentDate = new Date().toISOString().split('T')[0] // Get current date in YYYY-MM-DD format
+
+  const totalAvailableCrops = useMemo(
+    () =>
+      filteredUsers.filter(
+        (record) =>
+          new Date(record.harvest_date).toISOString().split('T')[0] <=
+          currentDate,
+      ).length,
+    [filteredUsers, currentDate],
+  )
 
   return (
     <motion.div
@@ -64,20 +84,34 @@ const PlantingsTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-foreground'>Plantings</h2>
-        <div className='relative'>
-          <input
-            type='text'
-            placeholder='Search plantings...'
-            className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-          <Search
-            className='absolute left-3 top-2.5 text-muted-foreground'
-            size={18}
-          />
+        <h2 className='lg:text-xl font-semibold text-foreground'>Plantings</h2>
+
+        <div className='relative flex items-center'>
+          <div className='relative'>
+            <HarvestNotificationIcon
+              totalAvailableCrops={totalAvailableCrops}
+            />
+          </div>
+          <div className='relative flex items-center ml-4'>
+            <input
+              type='text'
+              placeholder='Search plantings...'
+              className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
+              value={searchTerm}
+              onChange={onSearchChange}
+            />
+            <Search
+              className='absolute left-3 top-2.5 text-muted-foreground'
+              size={18}
+            />
+          </div>
         </div>
+      </div>
+
+      <div className='mb-4'>
+        <span className='text-sm font-medium text-foreground'>
+          Total Available Crops for Harvest: {totalAvailableCrops}
+        </span>
       </div>
 
       <div className='overflow-x-auto'>
@@ -96,7 +130,7 @@ const PlantingsTable = () => {
                   Field Location
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell'>
-                  Planting Date
+                  Harvest Date
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Status
@@ -108,85 +142,101 @@ const PlantingsTable = () => {
             </thead>
 
             <tbody className='divide-y divide-border'>
-              {filteredUsers.map((record) => (
-                <motion.tr
-                  key={record.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm font-medium text-foreground'>
-                      {record.crop_type}
-                    </div>
-                  </td>
+              {filteredUsers.map((record) => {
+                const harvestDate = new Date(record.harvest_date)
+                  .toISOString()
+                  .split('T')[0] // Format harvest_date
 
-                  <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
-                    <div className='text-sm text-muted-foreground'>
-                      {record.field_location}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
-                    <div className='text-sm text-muted-foreground'>
-                      {record.planting_date}
-                    </div>
-                  </td>
+                const isButtonDisabled = harvestDate > currentDate
 
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        record.status === 'planted'
-                          ? 'bg-green-800 text-green-100'
-                          : 'bg-red-800 text-red-100'
-                      }`}
-                    >
-                      {record.status}
-                    </span>
-                  </td>
+                return (
+                  <motion.tr
+                    key={record.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <div className='text-sm font-medium text-foreground'>
+                        {record.crop_type}
+                      </div>
+                    </td>
 
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup='true'
-                          size='icon'
-                          variant='ghost'
-                        >
-                          <MoreHorizontal className='h-4 w-4' />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align='end'>
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Link href={`/dashboard/farmers/${record.farmer_id}`}>
-                            View Farmer
-                          </Link>
-                        </DropdownMenuItem>
+                    <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
+                      <div className='text-sm text-muted-foreground'>
+                        {record.field_location}
+                      </div>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
+                      <div className='text-sm text-muted-foreground'>
+                        {record.harvest_date}
+                      </div>
+                    </td>
 
-                        <DailogForm
-                          id='create-harvest'
-                          title='Record Harvest'
-                          description={`Record harvest`}
-                          Trigger={
-                            <DropdownMenuItem
-                              onSelect={(e) => e.preventDefault()}
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          record.status === 'planted'
+                            ? 'bg-green-800 text-green-100'
+                            : 'bg-red-800 text-red-100'
+                        }`}
+                      >
+                        {record.status}
+                      </span>
+                    </td>
+
+                    <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup='true'
+                            size='icon'
+                            variant='ghost'
+                          >
+                            <div className='relative'>
+                              <MoreHorizontal className='h-4 w-4' />
+                              {!isButtonDisabled && (
+                                <span className='absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-green-500'></span>
+                              )}
+                            </div>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end'>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>
+                            <Link
+                              href={`/dashboard/farmers/${record.farmer_id}`}
                             >
-                              Record Harvest
-                            </DropdownMenuItem>
-                          }
-                          form={
-                            <HarvestForm
-                              plantingID={record.id}
-                              farmerID={record.farmer_id}
-                            />
-                          }
-                        />
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </motion.tr>
-              ))}
+                              View Farmer
+                            </Link>
+                          </DropdownMenuItem>
+
+                          <DialogForm
+                            id='create-harvest'
+                            title='Record Harvest'
+                            description={`Record harvest`}
+                            Trigger={
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                                disabled={isButtonDisabled}
+                              >
+                                Record Harvest
+                              </DropdownMenuItem>
+                            }
+                            form={
+                              <HarvestForm
+                                plantingID={record.id}
+                                farmerID={record.farmer_id}
+                              />
+                            }
+                          />
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </motion.tr>
+                )
+              })}
             </tbody>
           </table>
         )}
@@ -194,4 +244,5 @@ const PlantingsTable = () => {
     </motion.div>
   )
 }
+
 export default PlantingsTable

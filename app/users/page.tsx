@@ -12,6 +12,7 @@ import {
 import { getCurrentUser, getUserRole } from '@/lib/users '
 import HarvestDetails from '../test/Harvest'
 import HarvestDetailsTest from '../test/Harvest'
+import { readUserSession } from '@/lib/actions'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
@@ -37,6 +38,8 @@ const UserRole = async () => {
     '4fe832ba-f91d-4643-92bf-01db433e3c02',
   )
 
+  const userData = await readUserSession()
+
   // console.log(`User email: ${email}`)
 
   // console.log('------------------------------------------')
@@ -56,7 +59,9 @@ const UserRole = async () => {
   // console.log(`Planted status Data: ${JSON.stringify(harvestedStatus)}`)
 
   // console.log(`Harvest Record: ${JSON.stringify(harvestRecord)}`)
-  console.log(`data: ${JSON.stringify(plantingRecordWithHarvest)}`)
+  //
+
+  console.log(JSON.stringify(userData))
 
   return (
     <div>

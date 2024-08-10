@@ -62,7 +62,7 @@ const HarvestedCropsTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-foreground'>Harvested</h2>
+        <h2 className='lg:text-xl font-semibold text-foreground'>Harvested</h2>
         <div className='relative'>
           <input
             type='text'

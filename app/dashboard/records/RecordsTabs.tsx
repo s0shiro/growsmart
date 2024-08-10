@@ -3,8 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import AllPlantingsByFarmers from './AllPlantingsByFarmers'
-import HarvestedStatus from './Harvested'
+
 import PlantingsTable from './PlantingsTable'
 import HarvestedCropsTable from './HarvestedCropsTable'
 

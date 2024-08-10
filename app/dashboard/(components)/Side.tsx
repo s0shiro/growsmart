@@ -15,11 +15,14 @@ import {
   Package2,
   Settings,
   Users2,
+  UserPlus,
+  UserCheck,
+  Megaphone,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 
-const links = [
+const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Dashboard' },
   {
     href: '/dashboard/farmers',
@@ -29,9 +32,17 @@ const links = [
   { href: '/dashboard/records', Icon: LineChart, label: 'Manage Records' },
 ]
 
+const adminLinks = [
+  { href: '/dashboard', Icon: Home, label: 'Dashboard' },
+  { href: '/dashboard/create-user', Icon: UserPlus, label: 'Create User' },
+  { href: '/dashboard/manage-users', Icon: UserCheck, label: 'Manage Users' },
+]
+
+const defaultLinks = [
+  { href: '/dashboard/announcement', Icon: Megaphone, label: 'Announcement' },
+]
+
 const isActive = (path: string, route: string) => {
-  // all routes other than auth routes include "/dashboard"
-  // so handle that first
   if (route === '/dashboard') {
     return path === '/dashboard'
   } else {
@@ -39,7 +50,15 @@ const isActive = (path: string, route: string) => {
   }
 }
 
-const Side = () => {
+const Side = ({ userSession }: { userSession: any }) => {
+  const role = userSession?.user?.user_metadata?.role
+  const links =
+    role === 'admin'
+      ? adminLinks
+      : role === 'technician'
+        ? technicianLinks
+        : defaultLinks
+
   const activeClass =
     'flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
   const path = usePathname()
