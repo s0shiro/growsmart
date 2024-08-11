@@ -9,7 +9,7 @@ import {
 
 import React, { ReactNode } from 'react'
 
-export default function DailogForm({
+export default function DialogForm({
   Trigger,
   id,
   title,
@@ -27,7 +27,7 @@ export default function DailogForm({
       <DialogTrigger asChild id={id}>
         {Trigger}
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[525px] dark:bg-graident-dark'>
+      <DialogContent className='sm:max-w-[700px] w-full sm:w-auto max-h-[90vh] max-w-[65vh] overflow-y-auto rounded-md p-6 sm:max-h-[650px]'>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

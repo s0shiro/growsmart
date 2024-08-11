@@ -15,6 +15,7 @@ import Link from 'next/link'
 import DialogForm from '../(components)/DialogForm'
 import HarvestForm from './HarvestForm'
 import HarvestNotificationIcon from './HarvestNotificationIcon'
+import HarvestUploader from './HarvestUploader'
 
 type PlantingRecords = {
   area_planted: number
@@ -230,6 +231,21 @@ const PlantingsTable = () => {
                                 farmerID={record.farmer_id}
                               />
                             }
+                          />
+
+                          <DialogForm
+                            id='upload-harvest'
+                            title='Record Harvest'
+                            description={`Record harvest`}
+                            Trigger={
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                                disabled={isButtonDisabled}
+                              >
+                                Harvest Uploader
+                              </DropdownMenuItem>
+                            }
+                            form={<HarvestUploader />}
                           />
                         </DropdownMenuContent>
                       </DropdownMenu>
