@@ -28,14 +28,15 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-import { Input } from '@/components/ui/input'
-
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import ToggleThemeButton from '@/components/MyComponents/shadcn/ToggleThemeButton'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import CustomBreadcrumbSeparator from './CustomBreadcrumbSeparator'
+
+import { useQueryClient } from '@tanstack/react-query'
+import { supabaseBrowser } from '@/utils/supabase/browser'
 
 const formatPathname = (pathname: string) => {
   return pathname
@@ -55,8 +56,22 @@ const formatPathname = (pathname: string) => {
 }
 
 const SheetNav = () => {
+  const queryClient = useQueryClient()
   const pathname = usePathname()
+  const router = useRouter()
   const formattedPathname = formatPathname(pathname)
+
+  const handleLogout = async () => {
+    const supabase = supabaseBrowser()
+    queryClient.clear()
+    await supabase.auth.signOut()
+    router.refresh()
+    router.replace('/login')
+    // if (protectedPaths.includes(pathname)) {
+    //   router.replace('/auth?next=' + pathname)
+    // }
+  }
+
   return (
     <div className='flex flex-col sm:gap-4 sm:py-4 sm:pl-14'>
       <header className='sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6'>
@@ -139,7 +154,7 @@ const SheetNav = () => {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
