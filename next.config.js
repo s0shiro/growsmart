@@ -6,6 +6,10 @@ const nextConfig = {
         hostname: 'i.pinimg.com',
         protocol: 'https',
       },
+      {
+        hostname: 'lzbjbeovjpnaktxpdfcn.supabase.co',
+        protocol: 'https',
+      },
     ],
   },
 }

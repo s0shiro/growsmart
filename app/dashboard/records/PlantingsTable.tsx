@@ -245,7 +245,12 @@ const PlantingsTable = () => {
                                 Harvest Uploader
                               </DropdownMenuItem>
                             }
-                            form={<HarvestUploader />}
+                            form={
+                              <HarvestUploader
+                                farmerID={record.farmer_id}
+                                plantingID={record.id}
+                              />
+                            }
                           />
                         </DropdownMenuContent>
                       </DropdownMenu>

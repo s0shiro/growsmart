@@ -35,7 +35,7 @@ const UserRole = async () => {
   const harvestedStatus = await getHarvestedStatusRecords(id)
 
   const plantingRecordWithHarvest = await getPlantingRecordWithHarvest(
-    '4fe832ba-f91d-4643-92bf-01db433e3c02',
+    '8bd72222-b659-4980-93dc-e73fd6fbd6bf',
   )
 
   const userData = await readUserSession()
@@ -61,42 +61,44 @@ const UserRole = async () => {
   // console.log(`Harvest Record: ${JSON.stringify(harvestRecord)}`)
   //
 
-  console.log(JSON.stringify(userData))
+  //   console.log(JSON.stringify(userData))
 
-  return (
-    <div>
-      <div className='container mx-auto'>
-        {plantingRecordWithHarvest ? (
-          <HarvestDetailsTest harvestData={plantingRecordWithHarvest} />
-        ) : (
-          <p>No harvest record available.</p>
-        )}
-      </div>
-      <ul>
-        {plantedStatus?.map((record, index) => (
-          <p key={index}>
-            {/* Display desired data from the record. Example: */}
-            Record ID: {record.id}, Status: {record.status}, Created At:{' '}
-            {record.created_at}
-          </p>
-        ))}
-      </ul>
-      {user.map((userInfo) => (
-        <div key={userInfo.id}>
-          <div>{userInfo.id}</div>
-          <div>{userInfo.email}</div>
-          <div>
-            {userInfo.permissions.map((permission, index) => (
-              <div key={index}>
-                <div>{permission.id}</div>
-                <div>{permission.role}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
+  console.log(plantingRecordWithHarvest)
+
+  return
+  ;<p>Hello</p>
+  //     <div>
+  //       <div className='container mx-auto'>
+  //         {plantingRecordWithHarvest ? (
+  //           <HarvestDetailsTest harvestData={plantingRecordWithHarvest} />
+  //         ) : (
+  //           <p>No harvest record available.</p>
+  //         )}
+  //       </div>
+  //       <ul>
+  //         {plantedStatus?.map((record, index) => (
+  //           <p key={index}>
+  //             {/* Display desired data from the record. Example: */}
+  //             Record ID: {record.id}, Status: {record.status}, Created At:{' '}
+  //             {record.created_at}
+  //           </p>
+  //         ))}
+  //       </ul>
+  //       {user.map((userInfo) => (
+  //         <div key={userInfo.id}>
+  //           <div>{userInfo.id}</div>
+  //           <div>{userInfo.email}</div>
+  //           <div>
+  //             {userInfo.permissions.map((permission, index) => (
+  //               <div key={index}>
+  //                 <div>{permission.id}</div>
+  //                 <div>{permission.role}</div>
+  //               </div>
+  //             ))}
+  //           </div>
+  //         </div>
+  //       ))}
+  //     </div>
 }
 
 export default UserRole
