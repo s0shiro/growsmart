@@ -2,6 +2,7 @@ import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import QueryProvider from '@/providers/QueryProvider'
+import { Toaster } from 'sonner'
 
 export const metadata = {
   title: 'GrowSmart',
@@ -25,6 +26,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <Toaster />
             </ThemeProvider>
           </QueryProvider>
         </main>

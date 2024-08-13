@@ -23,6 +23,7 @@ import { BarChart2, ShoppingBag, Users, Zap } from 'lucide-react'
 import SalesOverviewChart from './(components)/SalesOverviewChart'
 import CategoryDistributionChart from './(components)/CategoryDistributionChart'
 import SalesChannelChart from './(components)/SalesChannelChart'
+import FarmersCountCard from './(components)/FarmersCountCard'
 
 export default async function Dashboard() {
   //   const user = await getCurrentUser()
@@ -37,12 +38,7 @@ export default async function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <StatCard
-              name='New Farmers'
-              icon={Users}
-              value='1,234'
-              color='#8B5CF6'
-            />
+            <FarmersCountCard />
             <StatCard
               name='Pending Harvest'
               icon={ShoppingBag}

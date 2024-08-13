@@ -3,8 +3,9 @@
 import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import AllPlantingsByFarmers from './AllPlantingsByFarmers'
-import HarvestedStatus from './Harvested'
+
+import PlantingsTable from './PlantingsTable'
+import HarvestedCropsTable from './HarvestedCropsTable'
 
 const RecordsTabs = () => {
   const pathname = usePathname()
@@ -40,21 +41,15 @@ const RecordsTabs = () => {
     >
       <div className='flex items-center'>
         <TabsList>
-          <TabsTrigger value='recent-plantings'>
-            Recent Planting Records
-          </TabsTrigger>
-          <TabsTrigger value='harvests'>Recent Harvest</TabsTrigger>
-          <TabsTrigger value='damages'>Damages</TabsTrigger>
+          <TabsTrigger value='recent-plantings'>Plantings</TabsTrigger>
+          <TabsTrigger value='harvests'>Harvested</TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value='recent-plantings'>
-        <AllPlantingsByFarmers />
+        <PlantingsTable />
       </TabsContent>
       <TabsContent value='harvests'>
-        <HarvestedStatus />
-      </TabsContent>
-      <TabsContent value='damages'>
-        <p>I'm tired w/ this shit.</p>
+        <HarvestedCropsTable />
       </TabsContent>
     </Tabs>
   )

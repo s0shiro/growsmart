@@ -17,6 +17,11 @@ interface HarvestRecords {
   damaged_reason: string
   yield_quantity: number
   damaged_quantity: number
+  name: string
+  added_by: string
+  farmer_id: string
+  planting_id: string
+  id: string
 }
 
 interface HarvestData {
@@ -26,39 +31,9 @@ interface HarvestData {
   weather_condition: string | null
   expenses: number
   field_location: string
-  harvest_records: HarvestRecords[]
+  harvests_report: HarvestRecords[]
 }
 
-const imageUrls = [
-  'https://i.pinimg.com/564x/82/94/06/8294067876886bc637296e28dd117ab7.jpg',
-  'https://i.pinimg.com/564x/a8/f4/5f/a8f45fb2a56124805eab9dbc19b4076a.jpg',
-  'https://i.pinimg.com/736x/6b/72/96/6b729623625de022d2e4c69e83119bf4.jpg',
-  'https://i.pinimg.com/736x/0c/f0/a8/0cf0a8a15f7a74127ff18eafa21f79dd.jpg',
-]
-
-;<Card className='p-4 shadow-md rounded-lg'>
-  <CardTitle className='text-2xl font-semibold mb-4'>Photos</CardTitle>
-  <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
-    {imageUrls.map((url, index) => (
-      <Card key={index} className='p-1'>
-        <CardContent className='relative aspect-square items-center justify-center p-6'>
-          <div className='relative w-full h-full'>
-            <Image
-              src={url}
-              alt={`Harvest Photo ${index + 1}`}
-              fill
-              className='rounded-lg object-cover'
-            />
-          </div>
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-  <Button className='mt-4'>
-    <UploadCloud className='mr-2' />
-    <span>Upload Photos</span>
-  </Button>
-</Card>
 const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
   const {
     crop_type,
@@ -67,8 +42,15 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
     weather_condition,
     expenses,
     field_location,
-    harvest_records,
+    harvests_report,
   } = harvest
+
+  const imageUrlHost =
+    'https://lzbjbeovjpnaktxpdfcn.supabase.co/storage/v1/object/public/crops-images/'
+
+  const imageUrls = harvest.harvests_report.map((report) => {
+    return `${imageUrlHost}${report.added_by}/${report.farmer_id}/${report.planting_id}/${report.id}/${report.name}`
+  })
 
   return (
     <div className='container mx-auto px-1 py-1'>
@@ -139,17 +121,17 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
                 <div className='flex justify-between'>
                   <span className='font-medium text-gray-500'>Profit:</span>
                   <span className='font-semibold foreground'>
-                    ₱{harvest_records[0].profit}
+                    ₱{harvests_report[0].profit}
                   </span>
                 </div>
               </div>
             </Card>
-            {harvest_records.length > 0 && (
+            {harvests_report.length > 0 && (
               <Card className='p-4 shadow-md rounded-lg'>
                 <CardTitle className='text-2xl font-semibold mb-4'>
                   Harvest Records
                 </CardTitle>
-                {harvest_records.map((record, index) => (
+                {harvests_report.map((record, index) => (
                   <div key={index} className='mt-4 border-t pt-4 space-y-2'>
                     <div className='flex justify-between'>
                       <span className='font-medium text-gray-500'>
