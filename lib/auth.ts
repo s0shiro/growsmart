@@ -37,7 +37,7 @@ export const signUp = async (prevState: any, formData: FormData) => {
     options: {
       emailRedirectTo: `${origin}/auth/callback`,
       data: {
-        role: 'admin',
+        role: 'technician',
       },
     },
   })
