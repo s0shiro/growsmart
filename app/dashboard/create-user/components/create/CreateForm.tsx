@@ -36,7 +36,7 @@ const FormSchema = z
     name: z.string().min(2, {
       message: 'Username must be at least 2 characters.',
     }),
-    role: z.enum(['user', 'admin']),
+    role: z.enum(['technician', 'admin']),
     status: z.enum(['active', 'resigned']),
     email: z.string().email(),
     password: z.string().min(6, { message: 'Password should be 6 characters' }),
@@ -50,14 +50,14 @@ const FormSchema = z
 export default function MemberForm() {
   const [isPending, startTransition] = useTransition()
 
-  const roles = ['admin', 'user']
+  const roles = ['admin', 'technician']
   const status = ['active', 'resigned']
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
-      role: 'user',
+      role: 'technician',
       status: 'active',
       email: '',
     },

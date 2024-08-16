@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MoreHorizontal, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,48 +16,44 @@ import { cn } from '@/lib/utils'
 import DialogForm from '../../(components)/DialogForm'
 import EditForm from './edit/EditorForm'
 
+type User = {
+  id: string
+  email: string
+  full_name: string | null
+  created_at: string
+}
+
+type Member = {
+  id: string
+  created_at: string
+  user_id: string
+  role: 'technician' | 'admin'
+  status: 'active' | 'resigned' | null
+  users: User
+}
+
 export default function ListOfMembers() {
-  const members = [
-    {
-      name: 'Niel',
-      role: 'admin',
-      created_at: new Date().toDateString(),
-      status: 'active',
-    },
-    {
-      name: 'Niel',
-      role: 'user',
-      created_at: new Date().toDateString(),
-      status: 'active',
-    },
-    {
-      name: 'Niel',
-      role: 'admin',
-      created_at: new Date().toDateString(),
-      status: 'resigned',
-    },
-    {
-      name: 'Niel',
-      role: 'user',
-      created_at: new Date().toDateString(),
-      status: 'active',
-    },
-  ]
-
+  const [members, setMembers] = useState<Member[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredMembers, setFilteredMembers] = useState(members)
+  const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
 
-  //   useEffect(() => {
-  //     setFilteredMembers(members)
-  //   }, [members])
+  useEffect(() => {
+    async function fetchMembers() {
+      const response = await fetch('/api/members')
+      const data: Member[] = await response.json()
+      setMembers(data)
+      setFilteredMembers(data)
+    }
+    fetchMembers()
+  }, [])
 
   const handleSearch = useCallback(
     (term: string) => {
       const filtered = members.filter(
         (member) =>
-          member.name.toLowerCase().includes(term) ||
+          member.users.full_name?.toLowerCase().includes(term) ||
           member.role.toLowerCase().includes(term) ||
-          member.status.toLowerCase().includes(term),
+          member.status?.toLowerCase().includes(term),
       )
       setFilteredMembers(filtered)
     },
@@ -133,12 +129,12 @@ export default function ListOfMembers() {
                     <div className='flex items-center'>
                       <div className='flex-shrink-0 h-10 w-10'>
                         <div className='h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold'>
-                          {member.name.charAt(0)}
+                          {member.users.full_name?.charAt(0)}
                         </div>
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm font-medium text-foreground'>
-                          {member.name}
+                          {member.users.full_name}
                         </div>
                       </div>
                     </div>
@@ -148,10 +144,10 @@ export default function ListOfMembers() {
                       className={cn(
                         'px-2 py-1 rounded-full shadow capitalize text-sm border',
                         {
-                          'border-green-500 text-green-600 bg-green-200':
+                          'border-green-500 text-foreground background':
                             member.role === 'admin',
-                          'border-zinc-300 dark:text-yellow-300 dark:border-yellow-700 px-4 bg-yellow-50':
-                            member.role === 'user',
+                          'border-yellow-700 dark:text-foreground dark:border-yellow-700 px-4 background':
+                            member.role === 'technician',
                         },
                       )}
                     >
@@ -159,7 +155,7 @@ export default function ListOfMembers() {
                     </span>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell text-sm text-muted-foreground'>
-                    {member.created_at}
+                    {new Date(member.created_at).toDateString()}
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <span
@@ -194,7 +190,7 @@ export default function ListOfMembers() {
                         <DialogForm
                           id='edit-member'
                           title='Record Planting'
-                          description={`Edit memeber`}
+                          description={`Edit member`}
                           Trigger={
                             <DropdownMenuItem
                               onSelect={(e) => e.preventDefault()}

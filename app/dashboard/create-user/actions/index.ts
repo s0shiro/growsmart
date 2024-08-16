@@ -1,10 +1,11 @@
 'use server'
 
-import { createSupabaseAdmin } from '@/utils/supabase/server'
+import { createClient, createSupabaseAdmin } from '@/utils/supabase/server'
+import { unstable_noStore } from 'next/cache'
 
 export async function createMember(data: {
   name: string
-  role: 'user' | 'admin'
+  role: 'technician' | 'admin'
   status: 'active' | 'resigned'
   email: string
   password: string
@@ -20,6 +21,7 @@ export async function createMember(data: {
     user_metadata: {
       role: data.role,
       full_name: data.name,
+      status: data.status,
     },
   })
 
@@ -61,4 +63,10 @@ export async function updateMemberById(id: string) {
 
 export async function deleteMemberById(id: string) {}
 
-export async function readMembers() {}
+export async function readMembers() {
+  unstable_noStore()
+
+  const supabase = await createClient()
+
+  return await supabase.from('permissions').select('*, users(*)')
+}
