@@ -1,7 +1,8 @@
 'use server'
 
+import { readUserSession } from '@/lib/actions'
 import { createClient, createSupabaseAdmin } from '@/utils/supabase/server'
-import { unstable_noStore } from 'next/cache'
+import { revalidatePath, unstable_noStore } from 'next/cache'
 
 export async function createMember(data: {
   name: string
@@ -61,7 +62,34 @@ export async function updateMemberById(id: string) {
   console.log('update member')
 }
 
-export async function deleteMemberById(id: string) {}
+export async function deleteMemberById(id: string) {
+  const { data: userSession } = await readUserSession()
+
+  if (userSession.user?.user_metadata.role !== 'admin') {
+    return JSON.stringify({
+      error: { message: 'You are not allowed to perform this action.' },
+    })
+  }
+
+  const supabaseAdmin = await createSupabaseAdmin()
+
+  const deleteResult = await supabaseAdmin.auth.admin.deleteUser(id)
+
+  if (deleteResult.error?.message) {
+    return JSON.stringify(deleteResult)
+  }
+
+  //   else {
+  //     const supabase = await createClient()
+
+  //     const res = await supabase.from('users').delete().eq('id', id)
+
+  //     return JSON.stringify(res)
+  //   }
+
+  // Revalidate the path after successful deletion
+  revalidatePath('/dashboard/create-user')
+}
 
 export async function readMembers() {
   unstable_noStore()

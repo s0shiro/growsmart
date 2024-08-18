@@ -10,8 +10,6 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
     return redirect('/login')
   }
 
-  console.log(`USER ROlE: ${userSession.user.user_metadata.role}`)
-
   return (
     <div className='flex min-h-screen w-full flex-col bg-muted/40'>
       <SidebarWithUserSession />

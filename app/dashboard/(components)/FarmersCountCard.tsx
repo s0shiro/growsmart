@@ -21,7 +21,7 @@ const FarmersCountCard = () => {
   return (
     <div>
       <StatCard
-        name='New Farmers'
+        name='My Farmers'
         icon={Users}
         value={farmersCount !== null ? farmersCount : 'Loading...'}
         color='#8B5CF6'

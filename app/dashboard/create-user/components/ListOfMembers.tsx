@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 import DialogForm from '../../(components)/DialogForm'
 import EditForm from './edit/EditorForm'
+import DeleteUser from './DeleteUser'
 
 type User = {
   id: string
@@ -186,7 +187,9 @@ export default function ListOfMembers() {
                       <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <DeleteUser userId={member.user_id} />
+                        </DropdownMenuItem>
                         <DialogForm
                           id='edit-member'
                           title='Record Planting'
