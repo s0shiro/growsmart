@@ -16,22 +16,7 @@ import { cn } from '@/lib/utils'
 import DialogForm from '../../(components)/DialogForm'
 import EditForm from './edit/EditorForm'
 import DeleteUser from './DeleteUser'
-
-type User = {
-  id: string
-  email: string
-  full_name: string | null
-  created_at: string
-}
-
-type Member = {
-  id: string
-  created_at: string
-  user_id: string
-  role: 'technician' | 'admin'
-  status: 'active' | 'resigned' | null
-  users: User
-}
+import { Member } from '@/lib/types'
 
 export default function ListOfMembers() {
   const [members, setMembers] = useState<Member[]>([])
@@ -65,6 +50,19 @@ export default function ListOfMembers() {
     const term = e.target.value.toLowerCase()
     setSearchTerm(term)
     handleSearch(term)
+  }
+
+  const updateMember = (updatedMember: Member) => {
+    setMembers((prevMembers) =>
+      prevMembers.map((member) =>
+        member.user_id === updatedMember.user_id ? updatedMember : member,
+      ),
+    )
+    setFilteredMembers((prevFilteredMembers) =>
+      prevFilteredMembers.map((member) =>
+        member.user_id === updatedMember.user_id ? updatedMember : member,
+      ),
+    )
   }
 
   return (
@@ -201,7 +199,12 @@ export default function ListOfMembers() {
                               Edit
                             </DropdownMenuItem>
                           }
-                          form={<EditForm />}
+                          form={
+                            <EditForm
+                              permission={member}
+                              updateMember={updateMember}
+                            />
+                          }
                         />
                       </DropdownMenuContent>
                     </DropdownMenu>

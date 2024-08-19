@@ -18,6 +18,9 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
 import { toast } from 'sonner'
+import { Member } from '@/lib/types'
+import { useTransition } from 'react'
+import { updateAccountById } from '../../actions'
 
 const FormSchema = z
   .object({
@@ -30,24 +33,38 @@ const FormSchema = z
     path: ['confirm'],
   })
 
-export default function AccountForm() {
+export default function AccountForm({ permission }: { permission: Member }) {
+  const [isPending, startTransition] = useTransition()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: '',
+      email: permission.users.email,
       password: '',
       confirm: '',
     },
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    startTransition(async () => {
+      const response = JSON.parse(
+        await updateAccountById(permission.user_id, {
+          password: data.password,
+          confirm: data.confirm,
+        }),
+      )
+
+      if (response.error?.message) {
+        toast('Error', {
+          description: (
+            <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+              <code className='text-white'>{response.error.message}</code>
+            </pre>
+          ),
+        })
+      } else {
+        toast('Success', { description: 'Successfully updated.' })
+      }
     })
   }
 
@@ -65,7 +82,8 @@ export default function AccountForm() {
                   placeholder='email@gmail.com'
                   type='email'
                   {...field}
-                  onChange={field.onChange}
+                  //   onChange={field.onChange}
+                  readOnly
                 />
               </FormControl>
               <FormMessage />

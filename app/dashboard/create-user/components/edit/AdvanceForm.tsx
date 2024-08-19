@@ -25,32 +25,68 @@ import {
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
 import { toast } from 'sonner'
+import { Member } from '@/lib/types'
+import { updateMemberAdvanceAndMetadataById } from '../../actions'
+import { useTransition } from 'react'
 
 const FormSchema = z.object({
-  role: z.enum(['admin', 'user']),
+  role: z.enum(['admin', 'technician']),
   status: z.enum(['active', 'resigned']),
 })
 
-export default function AdvanceForm() {
-  const roles = ['admin', 'user']
+export default function AdvanceForm({
+  permission,
+  onUpdate,
+}: {
+  permission: Member
+  onUpdate: (updatedMember: Member) => void
+}) {
+  const [isPending, startTransition] = useTransition()
+
+  const roles = ['admin', 'technician']
   const status = ['active', 'resigned']
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      role: 'user',
-      status: 'active',
+      role: permission.role,
+      status: permission.status,
     },
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    startTransition(async () => {
+      const response = JSON.parse(
+        await updateMemberAdvanceAndMetadataById(
+          permission.id,
+          permission.user_id,
+          {
+            role: data.role,
+            status: data.status,
+          },
+        ),
+      )
+
+      if (
+        response.permissionsRes.error?.message ||
+        response.metadataRes.error?.message
+      ) {
+        const errorMessage =
+          response.permissionsRes.error?.message ||
+          response.metadataRes.error?.message
+        toast({
+          title: 'You submitted the following values:',
+          description: (
+            <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+              <code className='text-white'>{errorMessage}</code>
+            </pre>
+          ),
+        })
+      } else {
+        toast('Successfully updated.')
+        // Call the onUpdate function with the updated member data
+        onUpdate({ ...permission, role: data.role, status: data.status })
+      }
     })
   }
 
@@ -118,8 +154,10 @@ export default function AdvanceForm() {
           type='submit'
           className='flex gap-2 items-center w-full'
           variant='outline'
+          disabled={isPending}
         >
-          Update <Loader className={cn(' animate-spin', 'hidden')} />
+          Update{' '}
+          <Loader className={cn('animate-spin', { hidden: !isPending })} />
         </Button>
       </form>
     </Form>
