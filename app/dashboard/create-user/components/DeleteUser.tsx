@@ -2,7 +2,13 @@ import { useTransition } from 'react'
 import { deleteMemberById } from '../actions'
 import { toast } from 'sonner'
 
-const DeleteUser = ({ userId }: { userId: string }) => {
+const DeleteUser = ({
+  userId,
+  onDelete,
+}: {
+  userId: string
+  onDelete: (userId: string) => void
+}) => {
   const [isPending, startTransition] = useTransition()
 
   const onSubmit = () => {
@@ -16,6 +22,7 @@ const DeleteUser = ({ userId }: { userId: string }) => {
         }
       } else {
         toast('Success to delete.')
+        onDelete(userId) // Call the onDelete callback
       }
     })
   }

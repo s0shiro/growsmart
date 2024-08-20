@@ -65,6 +65,15 @@ export default function ListOfMembers() {
     )
   }
 
+  const deleteMember = (userId: string) => {
+    setMembers((prevMembers) =>
+      prevMembers.filter((member) => member.user_id !== userId),
+    )
+    setFilteredMembers((prevFilteredMembers) =>
+      prevFilteredMembers.filter((member) => member.user_id !== userId),
+    )
+  }
+
   return (
     <motion.div
       className='bg-card bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border'
@@ -186,7 +195,10 @@ export default function ListOfMembers() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                          <DeleteUser userId={member.user_id} />
+                          <DeleteUser
+                            userId={member.user_id}
+                            onDelete={deleteMember}
+                          />
                         </DropdownMenuItem>
                         <DialogForm
                           id='edit-member'
