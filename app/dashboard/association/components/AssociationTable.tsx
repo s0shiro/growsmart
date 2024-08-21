@@ -30,6 +30,8 @@ export default function ListOfAssociations() {
     Association[]
   >([])
 
+  console.log(data)
+
   useEffect(() => {
     if (data) {
       setFilteredAssociations(data)

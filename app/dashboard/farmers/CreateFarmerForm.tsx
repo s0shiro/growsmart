@@ -16,6 +16,14 @@ import { Button } from '@/components/ui/button'
 
 import { useTransition } from 'react'
 import { useAddFarmer } from '@/hooks/useAddFarmer'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import useReadAssociation from '@/hooks/useReadAssociations'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -26,6 +34,8 @@ const FormSchema = z.object({
   phoneNumber: z
     .string()
     .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
+  association: z.string(), // Assuming it's a string, update if different
+  position: z.string(), // Assuming it's a string, update if different
 })
 
 type FarmerFieldNames =
@@ -35,6 +45,8 @@ type FarmerFieldNames =
   | 'municipality'
   | 'barangay'
   | 'phoneNumber'
+  | 'association'
+  | 'position'
 
 const fieldConfigs: {
   name: FarmerFieldNames
@@ -73,6 +85,18 @@ const fieldConfigs: {
     label: 'PhoneNumber',
     type: 'number',
   },
+  {
+    name: 'association',
+    placeholder: 'Select an association',
+    label: 'Association',
+    type: 'select', // We'll handle the select type specifically
+  },
+  {
+    name: 'position',
+    placeholder: 'Position',
+    label: 'Position',
+    type: 'text',
+  },
 ]
 
 function CreateFarmerForm() {
@@ -83,6 +107,7 @@ function CreateFarmerForm() {
 
   const addFarmerMutation = useAddFarmer()
   const [isPending, startTransition] = useTransition()
+  const { data: associations, error, isLoading } = useReadAssociation()
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(() => {
@@ -94,6 +119,8 @@ function CreateFarmerForm() {
           municipality: data.municipality,
           barangay: data.barangay,
           phoneNumber: data.phoneNumber,
+          association: data.association,
+          position: data.position,
         },
         {
           onSuccess: () => {
@@ -112,28 +139,66 @@ function CreateFarmerForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6'>
-          {fieldConfigs.map(({ name, placeholder, label, type }) => (
-            <FormField
-              key={name}
-              control={form.control}
-              name={name}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{label}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={placeholder}
-                      type={type}
-                      {...field}
-                      onChange={field.onChange}
-                      className='mt-1 block w-full'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+          {fieldConfigs.map(({ name, placeholder, label, type }) => {
+            if (type === 'select' && name === 'association') {
+              return (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{label}</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={placeholder} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {associations?.map((association: any) => (
+                            <SelectItem
+                              value={association.id}
+                              key={association.id}
+                            >
+                              {association.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )
+            } else {
+              return (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{label}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={placeholder}
+                          type={type}
+                          {...field}
+                          onChange={field.onChange}
+                          className='mt-1 block w-full'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )
+            }
+          })}
         </div>
 
         <Button
