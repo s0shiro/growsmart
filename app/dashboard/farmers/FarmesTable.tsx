@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import DailogForm from '../(components)/DialogForm'
+import DialogForm from '../(components)/DialogForm'
 import PlantingForm from './PlantingForm'
 
 type Farmer = {
@@ -44,7 +44,7 @@ const FarmersTable = () => {
     }
   }, [farmers])
 
-  const handleSearch = (e: any) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase()
     setSearchTerm(term)
     const filtered = farmers.filter(
@@ -146,7 +146,6 @@ const FarmersTable = () => {
                     {farmer.barangay}
                   </div>
                 </td>
-                "//TODO: render the name of the association instead of id
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
                   <div className='text-sm text-muted-foreground'>
                     {farmer.association}
@@ -172,7 +171,7 @@ const FarmersTable = () => {
                         <DropdownMenuItem>View Farmer</DropdownMenuItem>
                       </Link>
                       <DropdownMenuItem>Delete</DropdownMenuItem>
-                      <DailogForm
+                      <DialogForm
                         id='create-record'
                         title='Record Planting'
                         description={`Record planting data to ${farmer.firstname}`}
