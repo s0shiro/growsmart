@@ -18,15 +18,17 @@ import DailogForm from '../(components)/DialogForm'
 import PlantingForm from './PlantingForm'
 
 type Farmer = {
-  barangay: string
-  created_at: string
-  firstname: string
-  gender: string
   id: string
-  lastname: string
-  municipality: string
-  phone: string
   user_id: string
+  firstname: string
+  lastname: string
+  gender: string
+  municipality: string
+  barangay: string
+  phone: string
+  created_at: string
+  association: string // New field
+  position: string // New field
 }
 
 const FarmersTable = () => {
@@ -57,7 +59,7 @@ const FarmersTable = () => {
   return (
     <motion.div
       className='bg-background bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-border
-               sm:p-4 md:p-6 lg:p-8 xl:p-10'
+                 sm:p-4 md:p-6 lg:p-8 xl:p-10'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
@@ -95,6 +97,12 @@ const FarmersTable = () => {
               <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell'>
                 Barangay
               </th>
+              <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell'>
+                Association
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell'>
+                Position
+              </th>
               <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                 Actions
               </th>
@@ -123,25 +131,33 @@ const FarmersTable = () => {
                     </div>
                   </div>
                 </td>
-
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
                   <div className='text-sm text-muted-foreground'>
                     {farmer.phone}
                   </div>
                 </td>
-
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
                   <div className='text-sm text-muted-foreground'>
                     {farmer.municipality}
                   </div>
                 </td>
-
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
                   <div className='text-sm text-muted-foreground'>
                     {farmer.barangay}
                   </div>
                 </td>
 
+                {/* TODO: render the name of the association instead of id */}
+                <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
+                  <div className='text-sm text-muted-foreground'>
+                    {farmer.association}
+                  </div>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
+                  <div className='text-sm text-muted-foreground'>
+                    {farmer.position}
+                  </div>
+                </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
