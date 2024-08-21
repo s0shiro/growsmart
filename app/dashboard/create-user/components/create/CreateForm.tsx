@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { createMember, updateMemberById } from '../../actions'
+import { createMember } from '../../actions'
 
 import { cn } from '@/lib/utils'
 

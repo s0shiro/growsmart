@@ -18,6 +18,7 @@ import {
   UserPlus,
   UserCheck,
   Megaphone,
+  Building2,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -29,13 +30,13 @@ const technicianLinks = [
     Icon: Users2,
     label: 'View and manage Farmers',
   },
-  { href: '/dashboard/records', Icon: LineChart, label: 'Manage Records' },
+  { href: '/dashboard/records', Icon: LineChart, label: 'Productions' },
 ]
 
 const adminLinks = [
   { href: '/dashboard', Icon: Home, label: 'Dashboard' },
   { href: '/dashboard/create-user', Icon: UserPlus, label: 'Create User' },
-  { href: '/dashboard/manage-users', Icon: UserCheck, label: 'Manage Users' },
+  { href: '/dashboard/association', Icon: Building2, label: 'Associations' },
 ]
 
 const defaultLinks = [

@@ -6,6 +6,9 @@ import useUser from '@/hooks/useUser'
 import useUserWithRole from '@/hooks/useUserWithRole'
 import HarvestDetails from './Harvest'
 import HarvestDetailsFormat from './Harvest'
+import { readAssociations } from '../dashboard/association/actions'
+import AssociationList from './AssociationList'
+import useReadAssociation from '@/hooks/useReadAssociations'
 
 const page = () => {
   //   const user = useUser()
@@ -36,36 +39,29 @@ const page = () => {
   //     damage_reason: 'Pest Infestation',
   //     notes: 'Harvest was successful overall with minimal losses.',
   //   }
-  const { data, error, isLoading } = useUserSession()
+  //   const { data, error, isLoading } = useUserSession()
+
+  const { data, error, isLoading } = useReadAssociation()
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
 
   if (error) {
-    console.log(error.message)
-  } else {
-    console.log(data)
+    return <div>Error: {error.message}</div>
   }
-  return (
-    // <div>
-    //   <p>{user.data?.id}</p>
-    //   {Array.isArray(data)
-    //     ? data.map((user) => (
-    //         <div key={user.id}>
-    //           <p>{user.email}</p>
-    //           <div>
-    //             {user.permissions.map((permission, index) => (
-    //               <div key={index}>
-    //                 <div>{permission.id}</div>
-    //                 <div>{permission.role}</div>
-    //               </div>
-    //             ))}
-    //           </div>
-    //         </div>
-    //       ))
-    //     : null}
-    // </div>
-    <div className='container mx-auto'>
-      {/* <HarvestDetailsFormat harvest={placeholderHarvest} /> */}
 
-      {JSON.stringify(data)}
+  // Ensure data is a plain object and not null or undefined
+  const associations = data ? JSON.parse(JSON.stringify(data)) : []
+
+  return (
+    <div>
+      <h1>Associations</h1>
+      <ul>
+        {associations.map((association: any) => (
+          <li key={association.id}>{association.name}</li>
+        ))}
+      </ul>
     </div>
   )
 }
