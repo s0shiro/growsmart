@@ -11,7 +11,7 @@ export const createNewFarmer = async (data: {
   municipality: string
   barangay: string
   phoneNumber: string
-  association: string
+  association_id: string
   position: string
 }) => {
   const supabase = createClient()
@@ -25,7 +25,7 @@ export const createNewFarmer = async (data: {
     municipality: data.municipality,
     barangay: data.barangay,
     phone: data.phoneNumber,
-    association: data.association,
+    association_id: data.association_id,
     position: data.position,
   })
 

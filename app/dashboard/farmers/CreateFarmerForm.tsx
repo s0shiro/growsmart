@@ -119,7 +119,7 @@ function CreateFarmerForm() {
           municipality: data.municipality,
           barangay: data.barangay,
           phoneNumber: data.phoneNumber,
-          association: data.association,
+          association_id: data.association,
           position: data.position,
         },
         {

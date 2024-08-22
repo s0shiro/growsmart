@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import DialogForm from '../(components)/DialogForm'
 import PlantingForm from './PlantingForm'
+import AssociationName from './AssociationName'
 
 type Farmer = {
   id: string
@@ -148,7 +149,7 @@ const FarmersTable = () => {
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
                   <div className='text-sm text-muted-foreground'>
-                    {farmer.association_id}
+                    <AssociationName associationID={farmer.association_id} />
                   </div>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>

@@ -9,6 +9,15 @@ import HarvestDetailsFormat from './Harvest'
 import { readAssociations } from '../dashboard/association/actions'
 import AssociationList from './AssociationList'
 import useReadAssociation from '@/hooks/useReadAssociations'
+import { getAssociation } from '../dashboard/farmers/actions'
+import { useState } from 'react'
+import { QueryClient, useQuery } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
+const fetchAssociation = async () => {
+  return await getAssociation('7ce65826-f68c-4055-bfcc-ff8f8070df08')
+}
 
 const page = () => {
   //   const user = useUser()
@@ -41,29 +50,22 @@ const page = () => {
   //   }
   //   const { data, error, isLoading } = useUserSession()
 
-  const { data, error, isLoading } = useReadAssociation()
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['single-association'],
+    queryFn: fetchAssociation,
+  })
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <p>Loading...</p>
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>
+    return <p>Error: {error.message}</p>
   }
 
-  // Ensure data is a plain object and not null or undefined
-  const associations = data ? JSON.parse(JSON.stringify(data)) : []
+  console.log(data)
 
-  return (
-    <div>
-      <h1>Associations</h1>
-      <ul>
-        {associations.map((association: any) => (
-          <li key={association.id}>{association.name}</li>
-        ))}
-      </ul>
-    </div>
-  )
+  return <div>{data?.name}</div>
 }
 
 export default page
