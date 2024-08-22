@@ -27,7 +27,7 @@ type Farmer = {
   barangay: string
   phone: string
   created_at: string
-  association: string // New field
+  association_id: string // New field
   position: string // New field
 }
 
@@ -148,7 +148,7 @@ const FarmersTable = () => {
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>
                   <div className='text-sm text-muted-foreground'>
-                    {farmer.association}
+                    {farmer.association_id}
                   </div>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap hidden sm:table-cell'>

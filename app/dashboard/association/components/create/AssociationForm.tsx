@@ -79,7 +79,7 @@ export default function AssociationForm() {
 
         <Button
           type='submit'
-          className='w-full flex gap-2 items-center'
+          className='w-full flex gap-2 items-center dark:bg-green-500'
           variant='outline'
         >
           Submit{' '}
