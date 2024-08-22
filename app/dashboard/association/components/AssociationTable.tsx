@@ -17,6 +17,7 @@ import DialogForm from '../../(components)/DialogForm'
 // import EditAssociationForm from './edit/EditAssociationForm'
 // import DeleteAssociation from './DeleteAssociation'
 import useReadAssociation from '@/hooks/useReadAssociations'
+import MembersCount from './MembersCount'
 
 type Association = {
   id: string
@@ -105,6 +106,9 @@ export default function ListOfAssociations() {
                   Name
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Members Count
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Actions
                 </th>
               </tr>
@@ -121,6 +125,11 @@ export default function ListOfAssociations() {
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='text-sm font-medium text-foreground'>
                       {association.name}
+                    </div>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='text-sm font-medium text-foreground'>
+                      <MembersCount associationID={association.id} />
                     </div>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>

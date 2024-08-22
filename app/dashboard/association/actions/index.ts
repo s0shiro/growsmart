@@ -34,3 +34,21 @@ export async function readAssociations() {
 
   return data
 }
+
+export const getFarmerCountByAssociation = async (
+  associationId: string,
+): Promise<number> => {
+  const supabase = createClient()
+
+  const { count, error } = await supabase
+    .from('technician_farmers')
+    .select('*', { count: 'exact' })
+    .eq('association_id', associationId)
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return 0
+  }
+
+  return count ?? 0
+}
