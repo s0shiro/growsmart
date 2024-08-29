@@ -14,10 +14,10 @@ import {
 const COLORS = ['#6366F1', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B']
 
 const SALES_CHANNEL_DATA = [
-  { name: 'Website', value: 45600 },
-  { name: 'Mobile App', value: 38200 },
-  { name: 'Marketplace', value: 29800 },
-  { name: 'Social Media', value: 18700 },
+  { name: 'Palay', value: 45600 },
+  { name: 'Corn', value: 38200 },
+  { name: 'Vegetables', value: 29800 },
+  { name: 'Fruits', value: 18700 },
 ]
 
 const SalesChannelChart = () => {
@@ -28,7 +28,9 @@ const SalesChannelChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <h2 className='text-lg font-medium mb-4 foreground'>Sales by Channel</h2>
+      <h2 className='text-lg font-medium mb-4 foreground'>
+        Production Per Month
+      </h2>
 
       <div className='h-80'>
         <ResponsiveContainer>

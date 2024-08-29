@@ -35,6 +35,23 @@ export async function readAssociations() {
   return data
 }
 
+export async function readAssociationById(id: string) {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('association')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return { error: error.message }
+  }
+
+  return data
+}
+
 export const getFarmerCountByAssociation = async (
   associationId: string,
 ): Promise<number> => {
@@ -51,4 +68,19 @@ export const getFarmerCountByAssociation = async (
   }
 
   return count ?? 0
+}
+
+export const getAssociationDetails = async (associationId: string) => {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('technician_farmers')
+    .select('*') // Assuming there is a relationship to fetch user details
+    .eq('association_id', associationId)
+
+  if (error) {
+    console.error('Error fetching association details:', error.message)
+    return null
+  }
+
+  return data
 }

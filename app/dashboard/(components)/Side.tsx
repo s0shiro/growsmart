@@ -19,6 +19,7 @@ import {
   UserCheck,
   Megaphone,
   Building2,
+  Users,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'

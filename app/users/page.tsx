@@ -13,6 +13,10 @@ import { getCurrentUser, getUserRole } from '@/lib/users '
 import HarvestDetails from '../test/Harvest'
 import HarvestDetailsTest from '../test/Harvest'
 import { readUserSession } from '@/lib/actions'
+import {
+  getAssociationDetails,
+  readAssociationById,
+} from '../dashboard/association/actions'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
@@ -27,18 +31,22 @@ const UserRole = async () => {
   //   '70968d8a-3fde-4a6b-a53c-fc141681a852',
   // )
 
-  const { id, email } = user[0]
-  const { role, user_id } = user[0].permissions[0]
+  //   const { id, email } = user[0]
+  //   const { role, user_id } = user[0].permissions[0]
 
-  const plantedStatus = await getPlantedStatusRecords(id)
+  //   const plantedStatus = await getPlantedStatusRecords(id)
 
-  const harvestedStatus = await getHarvestedStatusRecords(id)
+  //   const harvestedStatus = await getHarvestedStatusRecords(id)
 
-  const plantingRecordWithHarvest = await getPlantingRecordWithHarvest(
-    '8bd72222-b659-4980-93dc-e73fd6fbd6bf',
+  //   const plantingRecordWithHarvest = await getPlantingRecordWithHarvest(
+  //     '8bd72222-b659-4980-93dc-e73fd6fbd6bf',
+  //   )
+
+  const associationDetails = await readAssociationById(
+    '26a6f119-156e-43fc-9f0e-013b2ece408a',
   )
 
-  const userData = await readUserSession()
+  //   const userData = await readUserSession()
 
   // console.log(`User email: ${email}`)
 
@@ -63,42 +71,22 @@ const UserRole = async () => {
 
   //   console.log(JSON.stringify(userData))
 
-  console.log(plantingRecordWithHarvest)
+  //   console.log(plantingRecordWithHarvest)
 
-  return
-  ;<p>Hello</p>
-  //     <div>
-  //       <div className='container mx-auto'>
-  //         {plantingRecordWithHarvest ? (
-  //           <HarvestDetailsTest harvestData={plantingRecordWithHarvest} />
-  //         ) : (
-  //           <p>No harvest record available.</p>
-  //         )}
-  //       </div>
-  //       <ul>
-  //         {plantedStatus?.map((record, index) => (
-  //           <p key={index}>
-  //             {/* Display desired data from the record. Example: */}
-  //             Record ID: {record.id}, Status: {record.status}, Created At:{' '}
-  //             {record.created_at}
-  //           </p>
-  //         ))}
-  //       </ul>
-  //       {user.map((userInfo) => (
-  //         <div key={userInfo.id}>
-  //           <div>{userInfo.id}</div>
-  //           <div>{userInfo.email}</div>
-  //           <div>
-  //             {userInfo.permissions.map((permission, index) => (
-  //               <div key={index}>
-  //                 <div>{permission.id}</div>
-  //                 <div>{permission.role}</div>
-  //               </div>
-  //             ))}
-  //           </div>
-  //         </div>
-  //       ))}
-  //     </div>
+  console.log(associationDetails)
+
+  return (
+    <div>
+      {/* <div>Association Details</div>
+      <ul>
+        {associationDetails?.map((member) => (
+          <li key={member.id}>
+            <p>{member.firstname}</p>
+          </li>
+        ))}
+      </ul> */}
+    </div>
+  )
 }
 
 export default UserRole

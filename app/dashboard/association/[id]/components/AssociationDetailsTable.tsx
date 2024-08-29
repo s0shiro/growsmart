@@ -13,45 +13,61 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import DialogForm from '../../(components)/DialogForm'
-// import EditAssociationForm from './edit/EditAssociationForm'
-// import DeleteAssociation from './DeleteAssociation'
-import useReadAssociation from '@/hooks/useReadAssociations'
-import MembersCount from './MembersCount'
+import useAssociationDetails from '@/hooks/useAssociationDetails'
 import Link from 'next/link'
 
-type Association = {
+type AssociationDetail = {
   id: string
-  name: string | null
+  user_id: string
+  firstname: string
+  lastname: string
+  gender: string
+  phone: string
+  barangay: string
+  municipality: string
+  created_at: string
+  position: string | null // Allow null
+  association_id: string | null // Allow null
 }
 
-export default function ListOfAssociations() {
-  const { data, error, isLoading } = useReadAssociation()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filteredAssociations, setFilteredAssociations] = useState<
-    Association[]
-  >([])
+type AssociationDetailsTableProps = {
+  associationId: string
+  associationName: string // Add the associationName prop
+}
 
-  console.log(data)
+export default function AssociationDetailsTable({
+  associationId,
+  associationName,
+}: AssociationDetailsTableProps) {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredDetails, setFilteredDetails] = useState<AssociationDetail[]>(
+    [],
+  )
+
+  const {
+    data: details,
+    error,
+    isLoading,
+  } = useAssociationDetails(associationId)
 
   useEffect(() => {
-    if (data) {
-      setFilteredAssociations(data)
+    if (details) {
+      setFilteredDetails(details)
     }
-  }, [data])
+  }, [details])
 
   const handleSearch = useCallback(
     (term: string) => {
-      if (data) {
-        const filtered = data.filter((association) =>
-          (association.name ?? 'Unnamed Association')
+      if (details) {
+        const filtered = details.filter((detail) =>
+          `${detail.firstname ?? ''} ${detail.lastname ?? ''}`
             .toLowerCase()
             .includes(term),
         )
-        setFilteredAssociations(filtered)
+        setFilteredDetails(filtered)
       }
     },
-    [data],
+    [details],
   )
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,13 +92,14 @@ export default function ListOfAssociations() {
       transition={{ delay: 0.2 }}
     >
       <div className='flex justify-between items-center mb-6'>
+        {/* Dynamic title with association name */}
         <h2 className='lg:text-xl font-semibold text-foreground'>
-          Associations
+          {/* {associationName} */}
         </h2>
         <div className='relative flex items-center'>
           <input
             type='text'
-            placeholder='Search associations...'
+            placeholder='Search members...'
             className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
             value={searchTerm}
             onChange={onSearchChange}
@@ -95,9 +112,9 @@ export default function ListOfAssociations() {
       </div>
 
       <div className='overflow-x-auto'>
-        {filteredAssociations.length === 0 ? (
+        {filteredDetails.length === 0 ? (
           <div className='text-center text-muted-foreground py-6'>
-            No associations found.
+            No members found.
           </div>
         ) : (
           <table className='min-w-full divide-y divide-border'>
@@ -107,7 +124,19 @@ export default function ListOfAssociations() {
                   Name
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Members Count
+                  Gender
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Barangay
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Position
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Municipality
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Association
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Actions
@@ -115,9 +144,9 @@ export default function ListOfAssociations() {
               </tr>
             </thead>
             <tbody className='divide-y divide-border'>
-              {filteredAssociations.map((association, index) => (
+              {filteredDetails.map((detail) => (
                 <motion.tr
-                  key={index}
+                  key={detail.id}
                   className='bg-white dark:bg-inherit'
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -125,12 +154,32 @@ export default function ListOfAssociations() {
                 >
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='text-sm font-medium text-foreground'>
-                      {association.name}
+                      {detail.firstname} {detail.lastname}
                     </div>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm font-medium text-foreground'>
-                      <MembersCount associationID={association.id} />
+                    <div className='text-sm text-foreground'>
+                      {detail.gender}
+                    </div>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='text-sm text-foreground'>
+                      {detail.barangay}
+                    </div>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='text-sm text-foreground'>
+                      {detail.position}
+                    </div>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='text-sm text-foreground'>
+                      {detail.municipality}
+                    </div>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='text-sm text-foreground'>
+                      {associationName}
                     </div>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>
@@ -147,33 +196,17 @@ export default function ListOfAssociations() {
                       <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <Link href={`/dashboard/association/${association.id}`}>
-                          <DropdownMenuItem>Details</DropdownMenuItem>
+                        <Link href={`/dashboard/farmers/${detail.id}`}>
+                          <DropdownMenuItem>Farmer</DropdownMenuItem>
                         </Link>
-                        <DropdownMenuItem>
-                          {/* <DeleteAssociation
-                            id={association.id}
-                            onDelete={deleteAssociation}
-                          /> */}
+                        <DropdownMenuItem onClick={() => alert('Edit action')}>
+                          Edit
                         </DropdownMenuItem>
-                        {/* <DialogForm
-                          id='edit-association'
-                          title='Edit Association'
-                          description={`Edit association`}
-                          Trigger={
-                            <DropdownMenuItem
-                              onSelect={(e) => e.preventDefault()}
-                            >
-                              Edit
-                            </DropdownMenuItem>
-                          }
-                          form={
-                            <EditAssociationForm
-                              association={association}
-                              updateAssociation={updateAssociation}
-                            />
-                          }
-                        /> */}
+                        <DropdownMenuItem
+                          onClick={() => alert('Delete action')}
+                        >
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
