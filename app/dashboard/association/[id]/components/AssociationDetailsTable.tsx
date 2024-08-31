@@ -94,7 +94,7 @@ export default function AssociationDetailsTable({
       <div className='flex justify-between items-center mb-6'>
         {/* Dynamic title with association name */}
         <h2 className='lg:text-xl font-semibold text-foreground'>
-          {/* {associationName} */}
+          Members{/* {associationName} */}
         </h2>
         <div className='relative flex items-center'>
           <input
