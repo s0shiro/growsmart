@@ -6,6 +6,7 @@ import {
 import {
   getAllPlantingRecords,
   getHarvestedStatusRecords,
+  getInspectionStatusRecords,
   getPlantedStatusRecords,
   getPlantingRecordsByCurrentUser,
 } from '@/lib/planting'
@@ -31,6 +32,10 @@ const UserRole = async () => {
   //   '70968d8a-3fde-4a6b-a53c-fc141681a852',
   // )
 
+  const inspectionPlantings = await getInspectionStatusRecords(
+    '925d0d23-e96b-4263-bfdd-86d2f62830e4',
+  )
+
   //   const { id, email } = user[0]
   //   const { role, user_id } = user[0].permissions[0]
 
@@ -42,9 +47,9 @@ const UserRole = async () => {
   //     '8bd72222-b659-4980-93dc-e73fd6fbd6bf',
   //   )
 
-  const associationDetails = await readAssociationById(
-    '26a6f119-156e-43fc-9f0e-013b2ece408a',
-  )
+  //   const associationDetails = await readAssociationById(
+  //     '26a6f119-156e-43fc-9f0e-013b2ece408a',
+  //   )
 
   //   const userData = await readUserSession()
 
@@ -73,8 +78,9 @@ const UserRole = async () => {
 
   //   console.log(plantingRecordWithHarvest)
 
-  console.log(associationDetails)
+  //   console.log(associationDetails)
 
+  console.log(inspectionPlantings)
   return (
     <div>
       {/* <div>Association Details</div>

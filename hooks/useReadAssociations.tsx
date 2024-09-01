@@ -5,7 +5,7 @@ const fetchAssociations = async () => {
   return await readAssociations()
 }
 
-export const useReadAssociation = () => {
+const useReadAssociation = () => {
   return useQuery({
     queryKey: ['associations'],
     queryFn: fetchAssociations,
