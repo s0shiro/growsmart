@@ -3,8 +3,9 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from './users '
+import { isToday } from 'date-fns'
 
-interface PlantingRecordData {
+type PlantingRecordData = {
   farmerId: string | undefined
   cropType: string
   variety: string
@@ -18,7 +19,7 @@ interface PlantingRecordData {
   status: string
 }
 
-interface PlantingRecord {
+type PlantingRecord = {
   user_id: string
   farmer_id: string
   crop_type: string
@@ -118,7 +119,7 @@ export const getPlantedStatusRecords = async (userID: string) => {
   const { data, error } = await supabase
     .from('planting_records')
     .select('*') // Selects all fields; you can specify fields if needed
-    .eq('status', 'planted') // Filters records where status is "planted"
+    .or('status.eq.harvest,status.eq.inspection') // Filters records where status is "planted" or "inspection"
     .eq('user_id', userID) // Filters records by the provided userID
     .order('created_at', { ascending: false }) // Orders the records by created_at in descending order
 

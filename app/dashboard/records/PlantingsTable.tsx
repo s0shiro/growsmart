@@ -177,9 +177,9 @@ const PlantingsTable = () => {
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          record.status === 'planted'
+                          record.status === 'harvest'
                             ? 'bg-green-800 text-green-100'
-                            : 'bg-red-800 text-red-100'
+                            : 'bg-yellow-800 text-red-100'
                         }`}
                       >
                         {record.status}

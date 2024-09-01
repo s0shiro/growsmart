@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { addPlantingRecord } from '@/lib/planting'
+import { isToday } from 'date-fns'
 
 const FormSchema = z.object({
   cropType: z.string(),
@@ -29,7 +30,8 @@ const FormSchema = z.object({
   harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for harvestDate',
   }),
-  status: z.string(),
+  // Remove the status field from the schema
+  // status: z.string(),
 })
 
 type CropFormFieldName =
@@ -42,7 +44,6 @@ type CropFormFieldName =
   | 'weatherCondition'
   | 'expenses'
   | 'harvestDate'
-  | 'status'
 
 const fieldConfigs: {
   name: CropFormFieldName
@@ -104,12 +105,13 @@ const fieldConfigs: {
     label: 'Harvest Date',
     type: 'date',
   },
-  {
-    name: 'status',
-    placeholder: 'planted',
-    label: 'Status',
-    type: 'text',
-  },
+  // Remove the status field from the field configurations
+  // {
+  //   name: 'status',
+  //   placeholder: 'planted',
+  //   label: 'Status',
+  //   type: 'text',
+  // },
 ]
 
 function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
@@ -120,6 +122,12 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
+      // Parse the harvest date
+      const harvestDate = new Date(data.harvestDate)
+
+      // Determine the status based on the harvest date
+      const status = isToday(harvestDate) ? 'harvest' : 'inspection'
+
       // Modify the code here to handle the form submission
       await addPlantingRecord({
         farmerId: farmerID,
@@ -132,7 +140,7 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
         weatherCondition: data.weatherCondition,
         expenses: data.expenses,
         harvestDate: data.harvestDate,
-        status: data.status,
+        status: status, // Set the status based on the harvest date
       })
       console.log('Form submitted successfully', data)
       form.reset()
