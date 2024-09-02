@@ -8,11 +8,11 @@ const fetchInpectionStatus = async () => {
   return await getInspectionStatusRecords(user?.id ?? '')
 }
 
-export const useReadInpections = () => {
+export const useReadInspections = () => {
   return useQuery({
     queryKey: ['inspections'],
     queryFn: fetchInpectionStatus,
   })
 }
 
-export default useReadInpections
+export default useReadInspections

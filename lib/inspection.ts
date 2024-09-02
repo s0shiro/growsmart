@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/server'
 export const recordInspection = async (data: {
   plantingID: string
   dateOfInspection: string
-  damagedQuantity: string
+  damagedQuantity: number
   damagedReason: string
   findings: string
 }) => {
@@ -24,4 +24,20 @@ export const recordInspection = async (data: {
   if (error) {
     console.error('Supabase error:', error.message)
   }
+}
+
+export const getInspectionsByPlantingID = async (plantingID: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('inspections')
+    .select('*')
+    .eq('planting_id', plantingID)
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return []
+  }
+
+  return data
 }

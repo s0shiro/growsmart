@@ -189,6 +189,11 @@ export default function InspectionCropsTable() {
                           }
                           form={<InspectionForm plantingID={crop.id} />}
                         />
+                        <Link href={`/dashboard/inspection/${crop.id}`}>
+                          <DropdownMenuItem>
+                            Inspections History
+                          </DropdownMenuItem>
+                        </Link>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
