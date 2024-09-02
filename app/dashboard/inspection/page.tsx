@@ -1,9 +1,9 @@
-import CropTable from './components/InspectionCropsTable'
+import InspectionCropsTable from './components/InspectionCropsTable'
 
 const InspectionPage = () => {
   return (
     <div className='space-y-5 w-full overflow-y-auto px-3'>
-      <CropTable />
+      <InspectionCropsTable />
     </div>
   )
 }

@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 import useReadInspections from '@/hooks/useReadInspection'
+import DialogForm from '../../(components)/DialogForm'
+import InspectionForm from './InpectionForm'
 
 type CropData = {
   id: string
@@ -23,7 +25,7 @@ type CropData = {
   status: string
 }
 
-export default function CropTable() {
+export default function InspectionCropsTable() {
   const { data, error, isLoading } = useReadInspections()
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredCrops, setFilteredCrops] = useState<CropData[]>([])
@@ -174,9 +176,19 @@ export default function CropTable() {
                       <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <Link href={`/dashboard/crop/${crop.id}`}>
-                          <DropdownMenuItem>Details</DropdownMenuItem>
-                        </Link>
+                        <DialogForm
+                          id='create-harvest'
+                          title='Inspection Form'
+                          description={`Record inspection.`}
+                          Trigger={
+                            <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              Inspect
+                            </DropdownMenuItem>
+                          }
+                          form={<InspectionForm />}
+                        />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
