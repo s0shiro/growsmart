@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { recordInspection } from '@/lib/inspection'
 
 const FormSchema = z.object({
   dateOfInspection: z.string().refine((val) => !isNaN(Date.parse(val)), {
@@ -29,7 +30,7 @@ const FormSchema = z.object({
   findings: z.string(),
 })
 
-function InspectionForm() {
+function InspectionForm({ plantingID }: { plantingID: string }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -37,8 +38,13 @@ function InspectionForm() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      console.log('Form submitted successfully', data)
-      form.reset()
+      await recordInspection({
+        plantingID: plantingID,
+        dateOfInspection: data.dateOfInspection,
+        damagedQuantity: data.damagedQuantity,
+        damagedReason: data.damagedReason,
+        findings: data.findings,
+      })
     } catch (error) {
       console.error('Failed to submit form:', error)
     }

@@ -187,7 +187,7 @@ export default function InspectionCropsTable() {
                               Inspect
                             </DropdownMenuItem>
                           }
-                          form={<InspectionForm />}
+                          form={<InspectionForm plantingID={crop.id} />}
                         />
                       </DropdownMenuContent>
                     </DropdownMenu>
