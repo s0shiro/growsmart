@@ -3,11 +3,27 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { readUserSession } from './actions'
+import { z } from 'zod'
 
-export const login = async (prevState: any, formData: FormData) => {
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+export const login = async (formData: {
+  message: string | null
+  formData: FormData
+}) => {
+  const email = formData.formData.get('email') as string
+  const password = formData.formData.get('password') as string
   const supabase = createClient()
+
+  // Validation using Zod
+  const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+  })
+
+  const validationResult = loginSchema.safeParse({ email, password })
+
+  if (!validationResult.success) {
+    return { message: 'Invalid email or password format.' }
+  }
 
   // Attempt to sign in the user with email and password
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -17,7 +33,7 @@ export const login = async (prevState: any, formData: FormData) => {
 
   // If there's an error during login, redirect to login with a message
   if (error) {
-    return redirect('/login?message=Invalid email or password.')
+    return { message: 'Invalid email or password.' }
   }
 
   // After login, get the updated session data
@@ -27,17 +43,17 @@ export const login = async (prevState: any, formData: FormData) => {
     // Extract the user metadata
     const status = userSession.user.user_metadata.status
 
-    console.log(status)
-
     // If the user's status is not active, sign them out and redirect to /unauthorized
     if (status !== 'active') {
       await supabase.auth.signOut()
-      return redirect(`/unauthorized?user=${status}`)
+      redirect(`/unauthorized?user=${status}`)
+      return { message: 'User is not authorized.' }
     }
   }
 
   // If everything is fine, redirect to the homepage
   redirect('/')
+  return { message: null }
 }
 
 export const signUp = async (prevState: any, formData: FormData) => {

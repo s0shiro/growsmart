@@ -122,12 +122,17 @@ const FarmersTable = () => {
                   <div className='flex items-center'>
                     <div className='flex-shrink-0 h-10 w-10'>
                       <div className='h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold'>
-                        {farmer.firstname.charAt(0)}
+                        <Link href={`/dashboard/farmers/${farmer.id}`}>
+                          {' '}
+                          {farmer.firstname.charAt(0)}
+                        </Link>
                       </div>
                     </div>
                     <div className='ml-4'>
                       <div className='text-sm font-medium text-foreground'>
-                        {farmer.firstname} {farmer.lastname}
+                        <Link href={`/dashboard/farmers/${farmer.id}`}>
+                          {farmer.firstname} {farmer.lastname}
+                        </Link>
                       </div>
                     </div>
                   </div>

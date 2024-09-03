@@ -1,9 +1,13 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { login } from '@/lib/auth'
+import Image from 'next/image'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { login } from '@/lib/auth'
 import { useFormState } from 'react-dom'
+import { useTransition } from 'react'
 
 const initState = { message: null }
 
@@ -12,62 +16,88 @@ export default function Login({
 }: {
   searchParams: { message: string }
 }) {
-  const [formState, action] = useFormState<{ message: string | null }>(
-    login,
+  const [formState, action] = useFormState(
+    async (state: any, formData: any) => {
+      const newState = await login({ message: state.message, formData })
+      return newState
+    },
     initState,
   )
 
+  const [isPending, startTransition] = useTransition()
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    startTransition(() => {
+      action(formData)
+    })
+  }
+
   return (
-    <div className='flex items-center justify-center w-full h-screen'>
-      <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
-        <form
-          action={action}
-          className='flex flex-col justify-center flex-1 w-full gap-2 mb-4 animate-in text-foreground'
-        >
-          <label className='text-md' htmlFor='email'>
-            Email
-          </label>
-          <input
-            className='px-4 py-2 mb-6 border rounded-md bg-inherit'
-            name='email'
-            placeholder='you@example.com'
-            required
+    <div className='w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[720px]'>
+      <div className='hidden bg-muted lg:block'>
+        <div className='relative h-full'>
+          <Image
+            src='/resize.png'
+            alt='Image'
+            layout='fill'
+            objectFit='cover'
+            className='h-full w-full object-cover'
           />
-          <label className='text-md' htmlFor='password'>
-            Password
-          </label>
-          <input
-            className='px-4 py-2 mb-6 border rounded-md bg-inherit'
-            type='password'
-            name='password'
-            placeholder='••••••••'
-            required
-          />
-          <Button className='px-4 py-2 mb-2'>Sign In</Button>
+        </div>
+      </div>
+      <div className='flex items-center justify-center py-12'>
+        <div className='mx-auto grid w-[350px] gap-6'>
+          <div className='grid gap-2 text-center'>
+            <h1 className='text-3xl font-bold'>GrowSmart</h1>
+          </div>
+          <form onSubmit={handleSubmit} className='grid gap-4'>
+            <div className='grid gap-2'>
+              <Label htmlFor='email'>Email</Label>
+              <Input
+                id='email'
+                type='email'
+                name='email'
+                placeholder='m@example.com'
+                required
+              />
+            </div>
+            <div className='grid gap-2'>
+              <div className='flex items-center'>
+                <Label htmlFor='password'>Password</Label>
+                <Link
+                  href='/forgot-password'
+                  className='ml-auto inline-block text-sm underline'
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <Input
+                id='password'
+                type='password'
+                name='password'
+                placeholder='••••••••'
+                required
+              />
+            </div>
+            <Button type='submit' className='w-full' disabled={isPending}>
+              {isPending ? 'Logging in...' : 'Login'}
+            </Button>
 
-          {searchParams?.message && (
-            <p className='p-4 mt-4 text-center bg-foreground/10 text-foreground'>
-              {searchParams.message}
-            </p>
-          )}
-        </form>
-
-        <Link
-          href='/forgot-password'
-          className='text-sm text-indigo-400 no-underline rounded-md'
-        >
-          Forgot Password?
-        </Link>
-
-        <br />
-        <br />
-
-        <Link
-          href='/signup'
-          className='text-sm no-underline rounded-md text-foreground'
-        >
-          Don't have an Account? Sign Up
-        </Link>
+            {searchParams?.message && (
+              <p className='p-4 mt-4 text-center bg-foreground/10 text-foreground'>
+                {searchParams.message}
+              </p>
+            )}
+          </form>
+          <div className='mt-4 text-center text-sm'>
+            Don&apos;t have an account?{' '}
+            <Link href='/signup' className='underline'>
+              Sign up
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )

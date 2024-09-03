@@ -26,13 +26,13 @@ import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 
 const technicianLinks = [
-  { href: '/dashboard', Icon: Home, label: 'Dashboard' },
+  { href: '/dashboard', Icon: Home, label: 'Overview' },
   { href: '/dashboard/inspection', Icon: Search, label: 'Inspection' },
   { href: '/dashboard/records', Icon: LineChart, label: 'Productions' },
   {
     href: '/dashboard/farmers',
     Icon: Users2,
-    label: 'View and manage Farmers',
+    label: 'My Farmers',
   },
 ]
 
