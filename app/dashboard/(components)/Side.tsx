@@ -7,20 +7,15 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip'
 import Link from 'next/link'
-
 import {
   Home,
   LineChart,
   Package,
-  Package2,
   Settings,
   Users2,
   UserPlus,
-  UserCheck,
   Megaphone,
   Building2,
-  Users,
-  Search,
   Sprout,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -29,13 +24,9 @@ import Image from 'next/image'
 
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
-  { href: '/dashboard/inspection', Icon: Search, label: 'Inspection' },
-  { href: '/dashboard/records', Icon: LineChart, label: 'Productions' },
-  {
-    href: '/dashboard/farmers',
-    Icon: Users2,
-    label: 'My Farmers',
-  },
+  { href: '/dashboard/inspection', Icon: LineChart, label: 'Inspection' },
+  { href: '/dashboard/records', Icon: Package, label: 'Productions' },
+  { href: '/dashboard/farmers', Icon: Users2, label: 'My Farmers' },
 ]
 
 const adminLinks = [
@@ -67,63 +58,67 @@ const Side = ({ userSession }: { userSession: any }) => {
         : defaultLinks
 
   const activeClass =
-    'flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+    'flex items-center gap-4 rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground p-2'
   const path = usePathname()
 
   return (
-    <aside className='fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex'>
-      <nav className='flex flex-col items-center gap-4 px-2 sm:py-5'>
-        <Link
-          href='/'
-          className='group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-white text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base'
-        >
+    <aside className='fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background px-6 py-4 sm:flex'>
+      <nav className='flex flex-col gap-4'>
+        <Link href='/' className='group flex items-center gap-2 rounded-lg p-2'>
           <Image
-            src='/logo.png' // Replace with the actual path to the logo
+            src='/logo.png'
             alt='Organization Logo'
-            width={33} // Adjust the width as needed
-            height={33} // Adjust the height as needed
+            width={40}
+            height={40}
             className='transition-all group-hover:scale-110'
           />
-          {/* <Package2 className='h-4 w-4 transition-all group-hover:scale-110' /> */}
-          <span className='sr-only'>GrowSmart</span>
+          <span className='text-xl font-semibold text-primary-foreground'>
+            GrowSmart
+          </span>
         </Link>
-        <TooltipProvider>
-          {links.map(({ href, Icon, label }) => (
-            <Tooltip key={label}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={href}
-                  className={clsx(
-                    'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-                    isActive(path, href) && activeClass,
-                  )}
-                >
-                  <Icon className='h-5 w-5' />
-                  <span className='sr-only'>{label}</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side='right'>{label}</TooltipContent>
-            </Tooltip>
-          ))}
-        </TooltipProvider>
+
+        {links.map(({ href, Icon, label }) => (
+          <Link
+            key={label}
+            href={href}
+            className={clsx(
+              'flex items-center gap-4 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground',
+              isActive(path, href) && activeClass,
+            )}
+          >
+            <Icon className='h-5 w-5' />
+            <span>{label}</span>
+          </Link>
+        ))}
       </nav>
 
-      <nav className='mt-auto flex flex-col items-center gap-4 px-2 sm:py-5'>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
-              >
-                <Settings className='h-5 w-5' />
-                <span className='sr-only'>Settings</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side='right'>Settings</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </nav>
+      <div className='mt-auto flex flex-col items-center gap-4'>
+        <Link
+          href='#'
+          className='flex items-center gap-4 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground'
+        >
+          <Settings className='h-5 w-5' />
+          <span>Settings</span>
+        </Link>
+
+        <div className='flex items-center gap-2 mt-8'>
+          <Image
+            src='https://i.pinimg.com/originals/7c/af/16/7caf16ffec532599adf6c6a9ee863754.jpg' // Replace with the actual path to the user's avatar
+            alt='User Avatar'
+            width={40}
+            height={40}
+            className='rounded-full'
+          />
+          <div>
+            <p className='text-sm font-semibold text-primary-foreground'>
+              {userSession?.user?.user_metadata?.name || 'User Name'}
+            </p>
+            <p className='text-xs text-muted-foreground'>
+              {role.charAt(0).toUpperCase() + role.slice(1)}
+            </p>
+          </div>
+        </div>
+      </div>
     </aside>
   )
 }

@@ -39,7 +39,7 @@ export default function Login({
       <div className='hidden bg-white lg:block'>
         <div className='relative h-full'>
           <Image
-            src='/no-bg.png'
+            src='/logo.png'
             alt='Image'
             fill
             className='h-full w-full object-cover'

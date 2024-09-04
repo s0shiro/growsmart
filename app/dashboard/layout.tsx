@@ -11,20 +11,22 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className='relative flex min-h-screen w-full bg-muted/40'>
-      <div className='relative z-40'>
+    <div className='relative min-h-screen bg-muted'>
+      {/* Sidebar - Fixed on desktop, off-canvas on mobile */}
+      <div className='fixed inset-y-0 left-0 z-40 w-64 bg-background sm:block hidden'>
         <SidebarWithUserSession />
       </div>
 
-      <div className='flex flex-1 flex-col'>
+      {/* Main content area */}
+      <div className='sm:ml-64 flex flex-col min-h-screen'>
         {/* Sticky header */}
-        <div className='sticky top-0 z-30'>
+        <div className='sticky top-0 z-30 bg-background shadow'>
           <SheetNav />
         </div>
-        <div className='flex flex-col sm:gap-4 sm:py-4 sm:pl-14'>
-          <main className='grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8'>
-            {children}
-          </main>
+
+        {/* Main content */}
+        <div className='flex-1 p-6 overflow-x-auto'>
+          <main className='flex-1 bg-muted/20 rounded-lg p-4'>{children}</main>
         </div>
       </div>
     </div>
