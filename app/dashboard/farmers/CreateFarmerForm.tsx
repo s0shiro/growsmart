@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import useReadAssociation from '@/hooks/useReadAssociations'
+import SelectField from '../(components)/CustomSelectField'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -142,36 +143,16 @@ function CreateFarmerForm() {
           {fieldConfigs.map(({ name, placeholder, label, type }) => {
             if (type === 'select' && name === 'association') {
               return (
-                <FormField
-                  key={name}
+                <SelectField
                   control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={placeholder} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {associations?.map((association: any) => (
-                            <SelectItem
-                              value={association.id}
-                              key={association.id}
-                            >
-                              {association.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  key={name}
+                  name='association'
+                  label='Association'
+                  placeholder='Select Association'
+                  options={associations?.map((assoc) => ({
+                    id: assoc.id,
+                    name: assoc.name,
+                  }))}
                 />
               )
             } else {

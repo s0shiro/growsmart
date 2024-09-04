@@ -19,16 +19,22 @@ import {
   readAssociationById,
 } from '../dashboard/association/actions'
 import { getInspectionsByPlantingID } from '@/lib/inspection'
+import {
+  getAllCropCategory,
+  getCropNameById,
+  getCropsByCategory,
+  getVarietiesByCrop,
+} from '@/lib/crop'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
-  const user = await getUserRole(currentUser?.id ?? '')
-  const farmers = await getListOfFarmers(currentUser?.id ?? '')
-  const farmersCount = await getCountOfFarmers(currentUser?.id ?? '')
+  const crops = await getCropsByCategory('8a9b1e79-ac83-417d-92ab-a9ae19c9a4f3')
 
-  const inspectionsHistory = await getInspectionsByPlantingID(
-    'cd23f15d-f748-43fc-9917-f2c465c9588b',
+  const varieties = await getVarietiesByCrop(
+    'c06c4b48-040a-4205-92ea-4736952e6d28',
   )
+
+  const cropName = await getCropNameById('c06c4b48-040a-4205-92ea-4736952e6d28')
   // const plantingRecords = await getAllPlantingRecords(
   //   'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
   // )
@@ -87,7 +93,9 @@ const UserRole = async () => {
 
   //   console.log(inspectionPlantings)
 
-  console.log(inspectionsHistory)
+  console.log(cropName)
+
+  //   console.log(inspectionsHistory)
   return (
     <div>
       {/* <div>Association Details</div>

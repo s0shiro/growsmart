@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import CropName from '../inspection/components/CropName'
 
 type PlantingRecords = {
   area_planted: number
@@ -110,7 +111,7 @@ const HarvestedCropsTable = () => {
               >
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <div className='text-sm font-medium text-foreground'>
-                    {record.crop_type}
+                    <CropName cropId={record.crop_type} />
                   </div>
                 </td>
 

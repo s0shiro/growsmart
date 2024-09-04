@@ -12,6 +12,8 @@ import useReadAssociation from '@/hooks/useReadAssociations'
 import { getAssociation } from '../dashboard/farmers/actions'
 import { useState } from 'react'
 import { QueryClient, useQuery } from '@tanstack/react-query'
+import useGetCropCategory from '@/hooks/useGetCropCategory'
+import { useFetchCrops, useFetchVarieties } from '@/hooks/useCrops'
 
 const queryClient = new QueryClient()
 
@@ -20,6 +22,13 @@ const fetchAssociation = async () => {
 }
 
 const page = () => {
+  const { data: crops } = useFetchCrops('1ed7957a-4680-4d46-9a7c-bfb00404262a')
+  const { data: varieties } = useFetchVarieties(
+    'cb6532c9-c615-4882-a51e-c59526640195',
+  )
+
+  console.log(crops)
+  console.log(varieties)
   //   const user = useUser()
 
   //   // const { data, isFetching } = useUserWithRole()
@@ -49,23 +58,6 @@ const page = () => {
   //     notes: 'Harvest was successful overall with minimal losses.',
   //   }
   //   const { data, error, isLoading } = useUserSession()
-
-  const { data, error, isLoading } = useQuery({
-    queryKey: ['single-association'],
-    queryFn: fetchAssociation,
-  })
-
-  if (isLoading) {
-    return <p>Loading...</p>
-  }
-
-  if (error) {
-    return <p>Error: {error.message}</p>
-  }
-
-  console.log(data)
-
-  return <div>{data?.name}</div>
 }
 
 export default page

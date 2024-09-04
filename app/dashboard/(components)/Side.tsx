@@ -21,9 +21,11 @@ import {
   Building2,
   Users,
   Search,
+  Sprout,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
+import Image from 'next/image'
 
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
@@ -38,6 +40,7 @@ const technicianLinks = [
 
 const adminLinks = [
   { href: '/dashboard', Icon: Home, label: 'Dashboard' },
+  { href: '/dashboard/crops', Icon: Sprout, label: 'Crops' },
   { href: '/dashboard/create-user', Icon: UserPlus, label: 'Create User' },
   { href: '/dashboard/association', Icon: Building2, label: 'Associations' },
 ]
@@ -72,10 +75,17 @@ const Side = ({ userSession }: { userSession: any }) => {
       <nav className='flex flex-col items-center gap-4 px-2 sm:py-5'>
         <Link
           href='/'
-          className='group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base'
+          className='group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-white text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base'
         >
-          <Package2 className='h-4 w-4 transition-all group-hover:scale-110' />
-          <span className='sr-only'>Acme Inc</span>
+          <Image
+            src='/logo.png' // Replace with the actual path to the logo
+            alt='Organization Logo'
+            width={33} // Adjust the width as needed
+            height={33} // Adjust the height as needed
+            className='transition-all group-hover:scale-110'
+          />
+          {/* <Package2 className='h-4 w-4 transition-all group-hover:scale-110' /> */}
+          <span className='sr-only'>GrowSmart</span>
         </Link>
         <TooltipProvider>
           {links.map(({ href, Icon, label }) => (

@@ -36,18 +36,17 @@ export default function Login({
 
   return (
     <div className='w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[720px]'>
-      <div className='hidden bg-muted lg:block'>
+      <div className='hidden bg-white lg:block'>
         <div className='relative h-full'>
           <Image
-            src='/resize.png'
+            src='/no-bg.png'
             alt='Image'
-            layout='fill'
-            objectFit='cover'
+            fill
             className='h-full w-full object-cover'
           />
         </div>
       </div>
-      <div className='flex items-center justify-center py-12'>
+      <div className='border-l border-gray-300 flex items-center justify-center py-12'>
         <div className='mx-auto grid w-[350px] gap-6'>
           <div className='grid gap-2 text-center'>
             <h1 className='text-3xl font-bold'>GrowSmart</h1>

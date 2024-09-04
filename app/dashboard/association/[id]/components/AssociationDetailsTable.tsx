@@ -96,18 +96,22 @@ export default function AssociationDetailsTable({
         <h2 className='lg:text-xl font-semibold text-foreground'>
           Members{/* {associationName} */}
         </h2>
-        <div className='relative flex items-center'>
-          <input
-            type='text'
-            placeholder='Search members...'
-            className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
-            value={searchTerm}
-            onChange={onSearchChange}
-          />
-          <Search
-            className='absolute left-3 top-2.5 text-muted-foreground'
-            size={18}
-          />
+
+        <div className='flex items-center space-x-4'>
+          {/* Search bar */}
+          <div className='relative'>
+            <input
+              type='text'
+              placeholder='Search members...'
+              className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
+              value={searchTerm}
+              onChange={onSearchChange}
+            />
+            <Search
+              className='absolute left-3 top-2.5 text-muted-foreground'
+              size={18}
+            />
+          </div>
         </div>
       </div>
 

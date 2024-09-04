@@ -16,6 +16,7 @@ import Link from 'next/link'
 import useReadInspections from '@/hooks/useReadInspection'
 import DialogForm from '../../(components)/DialogForm'
 import InspectionForm from './InpectionForm'
+import CropName from './CropName'
 
 type CropData = {
   id: string
@@ -109,7 +110,7 @@ export default function InspectionCropsTable() {
             <thead>
               <tr>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Crop Type
+                  Crop Name
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Field Location
@@ -136,7 +137,7 @@ export default function InspectionCropsTable() {
                 >
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='text-sm font-medium text-foreground'>
-                      {crop.crop_type}
+                      <CropName cropId={crop.crop_type} />
                     </div>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
