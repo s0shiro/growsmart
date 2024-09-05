@@ -5,7 +5,14 @@ import {
   BreadcrumbItem,
   BreadcrumbList,
 } from '@/components/ui/breadcrumb'
-import { Home, LineChart, Package2, PanelLeft, Users2 } from 'lucide-react'
+import {
+  Home,
+  LineChart,
+  Menu,
+  Package2,
+  PanelLeft,
+  Users2,
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +30,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import CustomBreadcrumbSeparator from './CustomBreadcrumbSeparator'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabaseBrowser } from '@/utils/supabase/browser'
+import NotificationIcon from './NotificationIcon'
 
 // Helper function to format breadcrumb segments
 const formatPathname = (pathname: string): JSX.Element[] => {
@@ -62,7 +70,7 @@ const SheetNav = () => {
       <Sheet>
         <SheetTrigger asChild>
           <Button size='icon' variant='outline' className='sm:hidden'>
-            <PanelLeft className='h-5 w-5' />
+            <Menu className='h-5 w-10' />
             <span className='sr-only'>Toggle Menu</span>
           </Button>
         </SheetTrigger>
@@ -73,7 +81,9 @@ const SheetNav = () => {
               className='group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base'
             >
               <Package2 className='h-5 w-5 transition-all group-hover:scale-110' />
-              <span className='sr-only'>Acme Inc</span>
+              <span className='sr-only'>
+                Provicial Agriculture Office Marinduque
+              </span>
             </Link>
             <Link
               href='/dashboard'
@@ -113,6 +123,7 @@ const SheetNav = () => {
 
         {/* Right-aligned Section with User Actions */}
         <div className='relative ml-auto flex items-center gap-4'>
+          <NotificationIcon />
           <ToggleThemeButton />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
