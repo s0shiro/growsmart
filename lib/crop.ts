@@ -2,6 +2,80 @@
 
 import { createClient } from '@/utils/supabase/server'
 
+interface CropData {
+  cropName: string
+  cropVariety?: string
+  cropCategory: string
+}
+
+interface SupabaseResponse {
+  success?: boolean
+  error?: string
+}
+
+//TODO:fix when adding new crop it getting ann error
+// Function to add a crop and its variety
+export const addCrop = async ({
+  cropCategory,
+  cropName,
+  cropVariety,
+}: CropData): Promise<SupabaseResponse> => {
+  const supabase = createClient()
+
+  try {
+    let cropId = cropName
+
+    // Check if the crop already exists
+    if (!cropId) {
+      const { data: existingCrop, error: cropFetchError } = await supabase
+        .from('crops')
+        .select('id')
+        .eq('name', cropName)
+        .eq('category_id', cropCategory)
+        .single()
+
+      if (cropFetchError && cropFetchError.code !== 'PGRST116') {
+        return {
+          error: `Error checking existing crops: ${cropFetchError.message}`,
+        }
+      }
+
+      if (existingCrop) {
+        cropId = existingCrop.id
+      } else {
+        // Insert the crop into the Crops table
+        const { data: newCrop, error: cropInsertError } = await supabase
+          .from('crops')
+          .insert([{ name: cropName, category_id: cropCategory }])
+          .select()
+          .single()
+
+        if (cropInsertError) {
+          return { error: `Crop creation error: ${cropInsertError.message}` }
+        }
+
+        cropId = newCrop.id
+      }
+    }
+
+    // If cropVariety is provided, insert it into the Varieties table
+    if (cropVariety) {
+      const { error: varietyError } = await supabase
+        .from('crop_varieties')
+        .insert([{ name: cropVariety, crop_id: cropId }])
+
+      if (varietyError) {
+        return { error: `Variety creation error: ${varietyError.message}` }
+      }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error adding crop:', error)
+    return { error: (error as Error).message }
+  }
+}
+
 export const getAllCropCategory = async () => {
   const supabase = createClient()
 

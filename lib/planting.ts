@@ -32,7 +32,7 @@ type PlantingRecord = {
   expenses: number
   harvest_date: string
   status: string
-  cropCategory: string
+  crop_categoryId: string
 }
 
 export const addPlantingRecord = async (data: PlantingRecordData) => {

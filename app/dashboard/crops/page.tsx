@@ -1,5 +1,11 @@
+import CropsTabs from './components/CropsTabs'
+
 const CropsPage = () => {
-  return <div>Please do this!!😒</div>
+  return (
+    <div>
+      <CropsTabs />
+    </div>
+  )
 }
 
 export default CropsPage
