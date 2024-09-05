@@ -1,10 +1,5 @@
 const CropsPage = () => {
-  return (
-    <div>
-      Grindd!!
-      <div></div>
-    </div>
-  )
+  return <div>Please do this!!😒</div>
 }
 
 export default CropsPage

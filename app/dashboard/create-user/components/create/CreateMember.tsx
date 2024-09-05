@@ -9,7 +9,7 @@ export default function CreateMember() {
       id='create-trigger'
       description='This is description'
       title='Create Member'
-      Trigger={<Button variant='outline'>Create+</Button>}
+      Trigger={<Button variant='outline'>+ Add User</Button>}
       form={<CreateForm />}
     />
   )
