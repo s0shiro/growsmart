@@ -17,9 +17,11 @@ import useReadInspections from '@/hooks/useReadInspection'
 import DialogForm from '../../(components)/DialogForm'
 import InspectionForm from './InpectionForm'
 import CropName from './CropName'
+import FarmerName from './FarmerName'
 
 type CropData = {
   id: string
+  farmer_id: string
   crop_type: string
   field_location: string
   harvest_date: string
@@ -31,10 +33,13 @@ export default function InspectionCropsTable() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredCrops, setFilteredCrops] = useState<CropData[]>([])
 
+  console.log(filteredCrops)
+
   useEffect(() => {
     if (data) {
       const mappedData = data.map((item: any) => ({
         id: item.id,
+        farmer_id: item.farmer_id,
         crop_type: item.crop_type,
         field_location: item.field_location,
         harvest_date: item.harvest_date,
@@ -109,6 +114,10 @@ export default function InspectionCropsTable() {
           <table className='min-w-full divide-y divide-border'>
             <thead>
               <tr>
+                {' '}
+                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Farmer Name
+                </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Crop Name
                 </th>
@@ -135,6 +144,11 @@ export default function InspectionCropsTable() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='text-sm font-medium text-foreground'>
+                      <FarmerName farmerId={crop.farmer_id} />
+                    </div>
+                  </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='text-sm font-medium text-foreground'>
                       <CropName cropId={crop.crop_type} />

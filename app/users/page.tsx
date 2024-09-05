@@ -25,6 +25,7 @@ import {
   getCropsByCategory,
   getVarietiesByCrop,
 } from '@/lib/crop'
+import { getFarmerNameById } from '@/lib/association'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
@@ -34,7 +35,11 @@ const UserRole = async () => {
     'c06c4b48-040a-4205-92ea-4736952e6d28',
   )
 
-  const cropName = await getCropNameById('c06c4b48-040a-4205-92ea-4736952e6d28')
+  //   const cropName = await getCropNameById('c06c4b48-040a-4205-92ea-4736952e6d28')
+
+  const farmerName = await getFarmerNameById(
+    'e1ba1633-b231-4d67-a365-db2fc1d6914e',
+  )
   // const plantingRecords = await getAllPlantingRecords(
   //   'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
   // )
@@ -93,7 +98,7 @@ const UserRole = async () => {
 
   //   console.log(inspectionPlantings)
 
-  console.log(cropName)
+  console.log(farmerName)
 
   //   console.log(inspectionsHistory)
   return (

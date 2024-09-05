@@ -1,11 +1,5 @@
 'use client'
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from '@/components/ui/tooltip'
 import Link from 'next/link'
 import {
   Home,

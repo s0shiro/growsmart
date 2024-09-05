@@ -1,4 +1,4 @@
-import { useFetchCropName } from '@/hooks/useFetchCropName'
+import { useFetchCropName } from '@/hooks/useUtils'
 
 const CropName = ({ cropId }: { cropId: string }) => {
   const { data: cropName, isLoading, error } = useFetchCropName(cropId)

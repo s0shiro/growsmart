@@ -1,5 +1,13 @@
+'use client'
+
+import HarvestedCropsTable from '../records/HarvestedCropsTable'
+
 const HarvestedPage = () => {
-  return <div>To be fix!T_T</div>
+  return (
+    <div>
+      <HarvestedCropsTable />
+    </div>
+  )
 }
 
 export default HarvestedPage
