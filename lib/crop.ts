@@ -10,7 +10,7 @@ type CropData = {
 
 type SupabaseResponse = {
   success?: boolean
-  error?: string
+  error?: { message: string } | string
 }
 
 // Function to add a crop and its variety
@@ -140,13 +140,12 @@ export const getCropNameById = async (cropId: string) => {
   return data
 }
 
-export const getCropsWithVarietiesByCategory = async (categoryId: string) => {
+export const getAllCategoriesWithCropsAndVarieties = async () => {
   const supabase = createClient()
 
   const { data, error } = await supabase
-    .from('crops')
-    .select('id, name, crop_varieties (id, name)')
-    .eq('category_id', categoryId)
+    .from('crop_categories')
+    .select('*, crops (*, crop_varieties (*))')
 
   if (error) {
     console.error('Supabase error:', error.message)

@@ -18,6 +18,10 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { addCrop } from '@/lib/crop'
 import { toast } from 'sonner'
+import { useTransition } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const FormSchema = z.object({
   cropCategory: z.string(),
@@ -66,28 +70,40 @@ const CropForm = () => {
   const isNewCrop = form.watch('isNewCrop') // Track if the user wants to add a new crop
   const { data: crops } = useFetchCrops(selectedCategory)
 
+  const [isPending, startTransition] = useTransition()
+  const queryClient = useQueryClient()
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     if (isNewCrop && !data.newCropName) {
       toast.error('Please enter a new crop name.')
       return
     }
 
-    try {
-      const res = await addCrop({
-        cropCategory: data.cropCategory,
-        cropName: isNewCrop ? (data.newCropName ?? '') : (data.cropName ?? ''), // If adding a new crop, use the newCropName
-        cropVariety: data.cropVariety,
-      })
+    startTransition(async () => {
+      try {
+        const res = await addCrop({
+          cropCategory: data.cropCategory,
+          cropName: isNewCrop
+            ? (data.newCropName ?? '')
+            : (data.cropName ?? ''), // If adding a new crop, use the newCropName
+          cropVariety: data.cropVariety,
+        })
 
-      if (res.error) {
-        toast.error(`Failed to save crop: ${res.error}`)
-      } else {
-        toast.success('Crop added successfully!')
-        form.reset()
+        if (res.error) {
+          const errorMessage =
+            typeof res.error === 'string' ? res.error : res.error.message
+          toast.error(`Failed to save crop: ${errorMessage}`)
+        } else {
+          document.getElementById('create-trigger')?.click()
+          toast.success('Crop added successfully!')
+          form.reset()
+          // Refetch crops after adding a new one
+          queryClient.invalidateQueries({ queryKey: ['registered-crops'] })
+        }
+      } catch (error) {
+        toast.error('Unexpected error occurred.')
       }
-    } catch (error) {
-      toast.error('Unexpected error occurred.')
-    }
+    })
   }
 
   return (
@@ -189,12 +205,12 @@ const CropForm = () => {
         </div>
 
         <Button
-          disabled={form.formState.isSubmitting}
           type='submit'
+          className='w-full flex gap-2 items-center dark:bg-green-500'
           variant='outline'
-          className='w-full'
         >
-          {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
+          Submit
+          <Loader2 className={cn('animate-spin', { hidden: !isPending })} />
         </Button>
       </form>
     </Form>

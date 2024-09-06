@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import useGetCropCategory from '@/hooks/useGetCropCategory'
 import { useFetchCrops, useFetchVarieties } from '@/hooks/useCrops'
+import { useFetchCropsByCategoryId } from '@/hooks/useFetchCropByCategoryId'
 
 const queryClient = new QueryClient()
 
@@ -27,7 +28,11 @@ const page = () => {
     'cb6532c9-c615-4882-a51e-c59526640195',
   )
 
-  console.log(crops)
+  const { data: registeredCrops } = useFetchCropsByCategoryId(
+    '8a9b1e79-ac83-417d-92ab-a9ae19c9a4f3',
+  )
+
+  console.log(registeredCrops)
   console.log(varieties)
   //   const user = useUser()
 

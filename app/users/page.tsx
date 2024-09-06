@@ -20,6 +20,7 @@ import {
 } from '../dashboard/association/actions'
 import { getInspectionsByPlantingID } from '@/lib/inspection'
 import {
+  getAllCategoriesWithCropsAndVarieties,
   getAllCropCategory,
   getCropNameById,
   getCropsByCategory,
@@ -41,6 +42,8 @@ const UserRole = async () => {
   const crops = await getCropsWithVarietiesByCategory(
     '274f40c3-33ca-405b-9346-95e583feeae4',
   )
+
+  const allCrops = await getAllCategoriesWithCropsAndVarieties()
   // const plantingRecords = await getAllPlantingRecords(
   //   'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
   // )
@@ -99,7 +102,7 @@ const UserRole = async () => {
 
   //   console.log(inspectionPlantings)
 
-  console.log(crops)
+  console.log(JSON.stringify(allCrops))
 
   //   console.log(inspectionsHistory)
   return (

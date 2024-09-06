@@ -1,11 +1,9 @@
-import CropsTabs from './components/CropsTabs'
-import CropTable from './components/CropTable'
+import CropTableContainer from './components/CropTableContainer'
 
 const CropsPage = () => {
   return (
     <div>
-      {/* <CropsTabs /> */}
-      <CropTable />
+      <CropTableContainer />
     </div>
   )
 }
