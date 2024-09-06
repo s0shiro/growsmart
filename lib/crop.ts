@@ -13,7 +13,6 @@ interface SupabaseResponse {
   error?: string
 }
 
-//TODO:fix when adding new crop it getting ann error
 // Function to add a crop and its variety
 export const addCrop = async ({
   cropCategory,
@@ -22,11 +21,17 @@ export const addCrop = async ({
 }: CropData): Promise<SupabaseResponse> => {
   const supabase = createClient()
 
-  try {
-    let cropId = cropName
+  console.log(cropName)
 
-    // Check if the crop already exists
-    if (!cropId) {
+  try {
+    let cropId: string | null = null
+
+    // Check if the cropName is an existing crop ID (when it's already selected from the dropdown)
+    if (cropName && cropName.length === 36) {
+      // UUIDs are 36 characters long including dashes
+      cropId = cropName
+    } else {
+      // Check if the crop already exists based on the name and category
       const { data: existingCrop, error: cropFetchError } = await supabase
         .from('crops')
         .select('id')
@@ -43,7 +48,7 @@ export const addCrop = async ({
       if (existingCrop) {
         cropId = existingCrop.id
       } else {
-        // Insert the crop into the Crops table
+        // Insert the crop into the crops table since it doesn't exist
         const { data: newCrop, error: cropInsertError } = await supabase
           .from('crops')
           .insert([{ name: cropName, category_id: cropCategory }])
@@ -58,7 +63,7 @@ export const addCrop = async ({
       }
     }
 
-    // If cropVariety is provided, insert it into the Varieties table
+    // If cropVariety is provided, insert it into the crop_varieties table
     if (cropVariety) {
       const { error: varietyError } = await supabase
         .from('crop_varieties')
