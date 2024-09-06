@@ -23,13 +23,14 @@ import {
   getAllCropCategory,
   getCropNameById,
   getCropsByCategory,
+  getCropsWithVarietiesByCategory,
   getVarietiesByCrop,
 } from '@/lib/crop'
 import { getFarmerNameById } from '@/lib/association'
 
 const UserRole = async () => {
   const currentUser = await getCurrentUser()
-  const crops = await getCropsByCategory('8a9b1e79-ac83-417d-92ab-a9ae19c9a4f3')
+  //   const crops = await getCropsByCategory('8a9b1e79-ac83-417d-92ab-a9ae19c9a4f3')
 
   const varieties = await getVarietiesByCrop(
     'c06c4b48-040a-4205-92ea-4736952e6d28',
@@ -37,8 +38,8 @@ const UserRole = async () => {
 
   //   const cropName = await getCropNameById('c06c4b48-040a-4205-92ea-4736952e6d28')
 
-  const farmerName = await getFarmerNameById(
-    'e1ba1633-b231-4d67-a365-db2fc1d6914e',
+  const crops = await getCropsWithVarietiesByCategory(
+    '274f40c3-33ca-405b-9346-95e583feeae4',
   )
   // const plantingRecords = await getAllPlantingRecords(
   //   'f4ca3f7d-f57b-47b7-91df-78c08d19fa93',
@@ -98,7 +99,7 @@ const UserRole = async () => {
 
   //   console.log(inspectionPlantings)
 
-  console.log(farmerName)
+  console.log(crops)
 
   //   console.log(inspectionsHistory)
   return (

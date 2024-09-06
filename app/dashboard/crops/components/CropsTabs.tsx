@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CropForm from '../add-crops/CropForm'
 import { PlusCircle } from 'lucide-react'
 import DialogForm from '../../(components)/DialogForm'
+import CropsTable from './CropTable'
 
 const CropsTabs = () => {
   return (
@@ -33,7 +34,7 @@ const CropsTabs = () => {
         </div>
       </div>
       <TabsContent value='all'>
-        <p>Please do this!</p>
+        <CropsTable />
       </TabsContent>
       <TabsContent value='palay'>
         <p>To be fix</p>

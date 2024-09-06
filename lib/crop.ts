@@ -2,13 +2,13 @@
 
 import { createClient } from '@/utils/supabase/server'
 
-interface CropData {
+type CropData = {
   cropName: string
   cropVariety?: string
   cropCategory: string
 }
 
-interface SupabaseResponse {
+type SupabaseResponse = {
   success?: boolean
   error?: string
 }
@@ -131,6 +131,22 @@ export const getCropNameById = async (cropId: string) => {
     .select('id, name') // Select only the id and name fields
     .eq('id', cropId) // Match the provided crop ID
     .single()
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return null
+  }
+
+  return data
+}
+
+export const getCropsWithVarietiesByCategory = async (categoryId: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('crops')
+    .select('id, name, crop_varieties (id, name)')
+    .eq('category_id', categoryId)
 
   if (error) {
     console.error('Supabase error:', error.message)
