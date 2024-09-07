@@ -65,7 +65,7 @@ const SheetNav = () => {
   }
 
   return (
-    <header className='sticky top-0 z-30 flex h-14 w-full items-center gap-4 border-b bg-background px-4 sm:h-auto sm:px-6'>
+    <header className='sticky top-0 z-30 flex h-14 w-full items-center gap-4 border-b bg-background px-4 sm:h-auto sm:px-4'>
       {/* Sheet and Menu Button */}
       <Sheet>
         <SheetTrigger asChild>
@@ -111,7 +111,7 @@ const SheetNav = () => {
       </Sheet>
 
       {/* Breadcrumb and Actions */}
-      <div className='flex w-full items-center justify-between p-4 border-0'>
+      <div className='flex w-full items-center justify-between py-4 border-0'>
         {/* Breadcrumb Navigation */}
         <Breadcrumb className='hidden md:flex'>
           <BreadcrumbList>
@@ -134,7 +134,7 @@ const SheetNav = () => {
               >
                 <Avatar>
                   <AvatarImage
-                    src='https://github.com/shadcn.png'
+                    src='https://i.pinimg.com/originals/7c/af/16/7caf16ffec532599adf6c6a9ee863754.jpg'
                     alt='@shadcn'
                   />
                   <AvatarFallback>CN</AvatarFallback>

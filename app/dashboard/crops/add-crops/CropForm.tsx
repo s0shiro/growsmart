@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 
 const FormSchema = z.object({
   cropCategory: z.string(),
-  cropName: z.string().optional(), // cropName is optional if the user wants to add a new crop
+  cropName: z.string(), // cropName is optional if the user wants to add a new crop
   cropVariety: z.string(),
   isNewCrop: z.boolean().optional(), // Boolean to track whether the user is adding a new crop
   newCropName: z.string().optional(), // Field for the new crop name, only needed if isNewCrop is true

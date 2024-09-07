@@ -29,7 +29,7 @@ const DeleteUser = ({
 
   return (
     <form action={onSubmit}>
-      <button className='cursor-pointer'>Delete</button>
+      <button className='cursor-pointer'></button>
     </form>
   )
 }

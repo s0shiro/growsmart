@@ -180,5 +180,7 @@ export async function readMembers() {
 
   const supabase = await createClient()
 
-  return await supabase.from('permissions').select('*, users(*)')
+  const data = await supabase.from('permissions').select('*, users(*)')
+
+  return data
 }

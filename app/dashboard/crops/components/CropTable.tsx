@@ -19,7 +19,7 @@ interface CropTableProps {
 
 const CropTable: React.FC<CropTableProps> = ({ crops }) => {
   return (
-    <Card className='overflow-y-auto'>
+    <Card>
       <ScrollArea className='h-[calc(100vh-350px)]'>
         <Table className='min-w-[800px] table-auto divide-y divide-border'>
           <TableHeader>
@@ -32,7 +32,7 @@ const CropTable: React.FC<CropTableProps> = ({ crops }) => {
           </TableHeader>
           <TableBody>
             {crops.map((crop) => (
-              <TableRow key={crop.id} className='bg-white dark:bg-inherit'>
+              <TableRow key={crop.id}>
                 <TableCell className='whitespace-nowrap text-sm'>
                   {crop.name}
                 </TableCell>

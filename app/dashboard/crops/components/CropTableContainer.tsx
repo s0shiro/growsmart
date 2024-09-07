@@ -9,6 +9,13 @@ import CropForm from '../add-crops/CropForm'
 import { useFetchAllRegisteredCrops } from '@/hooks/useFetchAllRegisteredCrops'
 import CropTable from './CropTable'
 import Pagination from './Pagination'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 // Define types for the data structure
 interface CropVariety {
@@ -135,7 +142,7 @@ export default function CropTableContainer() {
           ))}
         </div>
 
-        <div className='relative flex items-center mb-4'>
+        <div className='relative flex items-center mb-4 space-x-2'>
           <Input
             type='search'
             placeholder='Search crops...'
@@ -147,6 +154,22 @@ export default function CropTableContainer() {
             className='absolute left-3 top-2.5 text-muted-foreground'
             size={18}
           />
+          <Select
+          // value={filterStatus}
+          // onValueChange={(value) =>
+          //   setFilterStatus(value as Production['status'] | 'All')
+          // }
+          >
+            <SelectTrigger className='w-[180px]'>
+              <SelectValue placeholder='Filter by crops' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='All'>All crops</SelectItem>
+              <SelectItem value='Planting'>palay</SelectItem>
+              <SelectItem value='Growing'>corn</SelectItem>
+              <SelectItem value='Inspection'>high-value</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <CropTable crops={paginatedCrops} />

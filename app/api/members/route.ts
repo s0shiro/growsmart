@@ -1,5 +1,5 @@
 // app/api/members/route.ts
-import { readMembers } from '@/app/dashboard/create-user/actions'
+import { readMembers } from '@/app/dashboard/users/actions'
 import { NextResponse } from 'next/server'
 
 export async function GET() {

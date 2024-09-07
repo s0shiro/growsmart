@@ -1,8 +1,5 @@
 import { createNewFarmer } from '@/lib/farmer'
-import { Database, Tables } from '@/utils/types/supabase'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
-type Farmer = Tables<'technician_farmers'>
 
 export function useAddFarmer() {
   const queryClient = useQueryClient()

@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import { Member } from '@/lib/types'
 import { updateMemberBasicById } from '../../actions'
 import { useTransition } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 const FormSchema = z.object({
   full_name: z.string().min(2, {
@@ -36,6 +37,7 @@ export default function BasicForm({
   onUpdate: (updatedMember: Member) => void
 }) {
   const [isPending, startTransition] = useTransition()
+  const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -66,6 +68,8 @@ export default function BasicForm({
           ...permission,
           users: { ...permission.users, full_name: data.full_name },
         })
+        // Invalidate the relevant query
+        queryClient.invalidateQueries({ queryKey: ['users'] })
       }
     })
   }
@@ -90,8 +94,10 @@ export default function BasicForm({
           type='submit'
           className='flex gap-2 items-center w-full'
           variant='outline'
+          disabled={isPending}
         >
-          Update <Loader className={cn(' animate-spin', 'hidden')} />
+          Update{' '}
+          <Loader className={cn('animate-spin', { hidden: !isPending })} />
         </Button>
       </form>
     </Form>
