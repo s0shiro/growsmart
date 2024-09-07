@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getAssociation } from './actions'
+import { getAssociation } from '../actions'
 
 const AssociationName = ({ associationID }: { associationID: string }) => {
   const { data, error, isLoading } = useQuery({

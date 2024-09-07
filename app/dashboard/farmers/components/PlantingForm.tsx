@@ -18,7 +18,7 @@ import { isToday } from 'date-fns'
 
 import useGetCropCategory from '@/hooks/useGetCropCategory'
 import { useFetchCrops, useFetchVarieties } from '@/hooks/useCrops'
-import SelectField from '../(components)/CustomSelectField'
+import SelectField from '../../(components)/CustomSelectField'
 
 const FormSchema = z.object({
   cropCategory: z.string(),

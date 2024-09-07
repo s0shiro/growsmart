@@ -33,3 +33,15 @@ export async function getFarmerNameById(farmerId: string) {
 
   return data
 }
+
+export const getAllAssociations = async () => {
+  const supabase = createClient()
+  const { data, error } = await supabase.from('association').select('id, name') // Select only the id and name fields
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return []
+  }
+
+  return data
+}

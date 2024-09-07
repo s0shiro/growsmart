@@ -24,7 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import useReadAssociation from '@/hooks/useReadAssociations'
-import SelectField from '../(components)/CustomSelectField'
+import SelectField from '../../(components)/CustomSelectField'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -126,10 +129,12 @@ function CreateFarmerForm() {
         {
           onSuccess: () => {
             console.log('Farmer created successfully', data)
-            form.reset()
+            toast.success('Farmer created successfully!')
+            document.getElementById('create-trigger')?.click()
           },
           onError: (error: any) => {
             console.error('Failed to create farmer:', error)
+            toast.error('Failed to create farmer.')
           },
         },
       )
@@ -183,14 +188,13 @@ function CreateFarmerForm() {
         </div>
 
         <Button
-          disabled={form.formState.isSubmitting || isPending}
           type='submit'
+          className='w-full flex gap-2 items-center dark:bg-green-500'
           variant='outline'
-          className='w-full'
+          disabled={isPending}
         >
-          {form.formState.isSubmitting || isPending
-            ? 'Submitting...'
-            : 'Submit'}
+          Add
+          <Loader2 className={cn('animate-spin', { hidden: !isPending })} />
         </Button>
       </form>
     </Form>

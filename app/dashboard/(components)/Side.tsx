@@ -51,7 +51,7 @@ const productionLinks = [
 const adminLinks = [
   { href: '/dashboard', Icon: Home, label: 'Dashboard' },
   { href: '/dashboard/crops', Icon: Sprout, label: 'Crops' },
-  { href: '/dashboard/users', Icon: UserPlus, label: 'Create User' },
+  { href: '/dashboard/users', Icon: UserPlus, label: 'Users' },
   { href: '/dashboard/association', Icon: Building2, label: 'Associations' },
 ]
 
