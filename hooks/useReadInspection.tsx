@@ -1,17 +1,39 @@
 import { getInspectionStatusRecords } from '@/lib/planting'
-import { getCurrentUser } from '@/lib/users '
+import { createClient } from '@/utils/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 
-const fetchInpectionStatus = async () => {
-  const user = await getCurrentUser()
-
-  return await getInspectionStatusRecords(user?.id ?? '')
+const initInspections = {
+  id: '',
+  created_at: '',
+  farmer_id: '',
+  crop_type: '',
+  variety: '',
+  planting_date: '',
+  field_location: '',
+  area_planted: 0,
+  quantity: 0,
+  weather_condition: '',
+  expenses: 0,
+  harvest_date: '',
+  technician_id: '',
+  status: '',
 }
 
-export const useReadInspections = () => {
+const useReadInspections = () => {
   return useQuery({
     queryKey: ['inspections'],
-    queryFn: fetchInpectionStatus,
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase.auth.getSession()
+
+      if (data.session?.user) {
+        const inspections = await getInspectionStatusRecords(
+          data.session.user.id,
+        )
+        return inspections
+      }
+      return initInspections
+    },
   })
 }
 

@@ -54,6 +54,7 @@ import DialogForm from '../../(components)/DialogForm'
 import PlantingForm from './PlantingForm'
 import AssociationName from './AssociationName'
 import CreateFarmerForm from './CreateFarmerForm'
+import Link from 'next/link'
 
 type Farmer = {
   id: string
@@ -128,7 +129,7 @@ const FarmersTable = () => {
   return (
     <div>
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-foreground'>Farmers</h2>
+        <h2 className='text-xl font-semibold text-foreground'>My Farmers</h2>
         <DialogForm
           id='create-trigger'
           title='Add Farmer'
@@ -260,6 +261,12 @@ const FarmersTable = () => {
                         <Eye className='mr-2 h-4 w-4' />
                         View Details
                       </DropdownMenuItem>
+                      <Link href={`/dashboard/farmers/${farmer.id}`}>
+                        <DropdownMenuItem>
+                          <Eye className='mr-2 h-4 w-4' />
+                          View Profile
+                        </DropdownMenuItem>
+                      </Link>
                       <DropdownMenuItem>
                         <Edit className='mr-2 h-4 w-4' />
                         Edit
@@ -268,19 +275,20 @@ const FarmersTable = () => {
                         <Trash className='mr-2 h-4 w-4' />
                         Delete
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault()
-                        }}
-                      >
-                        <DialogForm
-                          id='create-record'
-                          title='Record Planting'
-                          description={`Record planting data to ${farmer.firstname}`}
-                          Trigger={<span>Record Planting</span>}
-                          form={<PlantingForm farmerID={farmer.id} />}
-                        />
-                      </DropdownMenuItem>
+
+                      <DialogForm
+                        id='create-record'
+                        title='Record Planting'
+                        description={`Record planting data to ${farmer.firstname}`}
+                        Trigger={
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Record Planting
+                          </DropdownMenuItem>
+                        }
+                        form={<PlantingForm farmerID={farmer.id} />}
+                      />
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

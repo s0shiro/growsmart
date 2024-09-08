@@ -84,6 +84,7 @@ export default function AdvanceForm({
         })
       } else {
         toast('Successfully updated.')
+        document.getElementById('edit-member')?.click()
         // Call the onUpdate function with the updated member data
         onUpdate({ ...permission, role: data.role, status: data.status })
       }

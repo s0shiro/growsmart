@@ -112,7 +112,7 @@ export default function CropTableContainer() {
   )
 
   return (
-    <div className='flex flex-col sm:flex-row h-screen bg-background text-foreground'>
+    <div className='flex flex-col sm:flex-row bg-background text-foreground'>
       <div className='flex-1'>
         <div className='flex justify-between items-center mb-6'>
           <h1 className='text-2xl font-bold'>Crops</h1>

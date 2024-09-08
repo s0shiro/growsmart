@@ -64,6 +64,7 @@ export default function AccountForm({ permission }: { permission: Member }) {
         })
       } else {
         toast('Success', { description: 'Successfully updated.' })
+        document.getElementById('edit-member')?.click()
       }
     })
   }
@@ -128,9 +129,10 @@ export default function AccountForm({ permission }: { permission: Member }) {
           type='submit'
           className='flex gap-2 items-center w-full'
           variant='outline'
+          disabled={isPending}
         >
-          Update
-          <Loader className={cn(' animate-spin', 'hidden')} />
+          Update{' '}
+          <Loader className={cn('animate-spin', { hidden: !isPending })} />
         </Button>
       </form>
     </Form>

@@ -68,6 +68,7 @@ export default function BasicForm({
           ...permission,
           users: { ...permission.users, full_name: data.full_name },
         })
+        document.getElementById('edit-member')?.click()
         // Invalidate the relevant query
         queryClient.invalidateQueries({ queryKey: ['users'] })
       }

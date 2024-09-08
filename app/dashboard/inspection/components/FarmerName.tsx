@@ -1,10 +1,10 @@
 import { useFetchFarmerName } from '@/hooks/useUtils'
 
-const FarmerName = async ({ farmerId }: { farmerId: string }) => {
+const FarmerName = ({ farmerId }: { farmerId: string }) => {
   const { data: farmerName, isLoading, error } = useFetchFarmerName(farmerId)
 
   if (isLoading) return <span>Loading...</span>
-  if (error) return <span>Error loading crop name</span>
+  if (error) return <span>Error loading farmer name</span>
 
   return (
     <span>

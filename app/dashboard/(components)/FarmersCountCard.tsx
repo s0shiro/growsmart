@@ -1,29 +1,17 @@
-import React, { useEffect, useState } from 'react'
+'use client'
 import StatCard from '@/components/StatCard'
-import { getCountOfFarmers } from '@/lib/farmer'
-
 import { Users } from 'lucide-react'
-import { getCurrentUser } from '@/lib/users '
+import useFarmersCount from '@/hooks/farmer/useFarmerCount'
 
 const FarmersCountCard = () => {
-  const [farmersCount, setFarmersCount] = useState<number | null>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const user = await getCurrentUser()
-      const count = await getCountOfFarmers(user?.id ?? '')
-      setFarmersCount(count)
-    }
-
-    fetchData()
-  }, [])
+  const { farmersCount, isLoading } = useFarmersCount()
 
   return (
     <div>
       <StatCard
         name='My Farmers'
         icon={Users}
-        value={farmersCount !== null ? farmersCount : 'Loading...'}
+        value={isLoading ? 'Loading...' : (farmersCount ?? 0)}
         color='#8B5CF6'
       />
     </div>

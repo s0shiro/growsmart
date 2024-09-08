@@ -1,20 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const FarmerProfile = ({
   firstname,
@@ -32,54 +17,54 @@ const FarmerProfile = ({
   phone?: string
 }) => {
   return (
-    <div>
-      <Card x-chunk='dashboard-06-chunk-0'>
-        <div className='flex justify-center p-4'>
-          <Avatar className='size-48'>
-            <AvatarImage
-              src='https://img.icons8.com/?size=100&id=tZuAOUGm9AuS&format=png&color=000000'
-              alt='@shadcn'
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </div>
-        <CardHeader className='text-center sm:text-left'>
-          <CardTitle>Farmer Details</CardTitle>
-          <CardDescription className='inline-block sm:block'>
-            Details and information about the farmer.
-          </CardDescription>
+    <div className='min-h-screen bg-background text-gray-100 p-8'>
+      <Card className='max-w-3xl mx-auto bg-backgroundtext-gray-100'>
+        <CardHeader>
+          <div className='flex items-center space-x-4'>
+            <Avatar className='w-20 h-20 border-2 border-primary'>
+              <AvatarFallback className='text-2xl'>CN</AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className='text-2xl font-bold'>
+                Farmer Profile
+              </CardTitle>
+              <p className='text-gray-400'>Manage your farmer information</p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            {/* <TableHeader>
-              <TableRow>
-                <TableHead>Attribute</TableHead>
-                <TableHead>Information</TableHead>
-              </TableRow>
-            </TableHeader> */}
-            <TableBody>
-              <TableRow>
-                <TableCell>Fullname</TableCell>
-                <TableCell className='font-medium'>
+          <div className='space-y-4'>
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <label className='text-sm font-medium text-gray-400'>
+                  Full Name
+                </label>
+                <p className='text-lg'>
                   {firstname} {lastname}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Gender</TableCell>
-                <TableCell className='font-medium'>{gender}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Address</TableCell>
-                <TableCell className='font-medium'>
+                </p>
+              </div>
+              <div>
+                <label className='text-sm font-medium text-gray-400'>
+                  Gender
+                </label>
+                <p className='text-lg'>{gender}</p>
+              </div>
+              <div>
+                <label className='text-sm font-medium text-gray-400'>
+                  Address
+                </label>
+                <p className='text-lg'>
                   {barangay}, {municipality}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Contact No.</TableCell>
-                <TableCell className='font-medium'>{phone}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                </p>
+              </div>
+              <div>
+                <label className='text-sm font-medium text-gray-400'>
+                  Contact No.
+                </label>
+                <p className='text-lg'>{phone}</p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

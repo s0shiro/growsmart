@@ -1,11 +1,11 @@
-import InspectionTabs from './components/InspectionTabs'
+import InspectionTable from './components/InspectionTable'
 
-const InspectionPage = () => {
+const page = () => {
   return (
-    <div className='space-y-5 w-full overflow-y-auto px-3'>
-      <InspectionTabs />
+    <div>
+      <InspectionTable />
     </div>
   )
 }
 
-export default InspectionPage
+export default page

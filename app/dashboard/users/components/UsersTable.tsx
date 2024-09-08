@@ -122,7 +122,7 @@ export default function UsersTable() {
   }
 
   return (
-    <div className='bg-background text-foreground min-h-screen'>
+    <div className='bg-background text-foreground'>
       <div className='flex justify-between items-center mb-6'>
         <h1 className='text-3xl font-bold'>Users</h1>
         <DialogForm
