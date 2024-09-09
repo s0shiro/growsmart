@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MoreHorizontal, Search } from 'lucide-react'
@@ -85,7 +87,7 @@ const PlantingsTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='lg:text-xl font-semibold text-foreground'>Plantings</h2>
+        <h2 className='lg:text-xl font-semibold text-foreground'>Harvest</h2>
 
         <div className='relative flex items-center'>
           <div className='relative'>
