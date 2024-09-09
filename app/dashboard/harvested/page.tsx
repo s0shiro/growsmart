@@ -1,7 +1,7 @@
 'use client'
 
-import HarvestedCropsTable from '../records/HarvestedCropsTable'
-import HarvestedTableCrops from './components/HArvestedTableCrop'
+import HarvestedTableCrops from './components/HarvestedTableCrop'
+
 const HarvestedPage = () => {
   return (
     <div>
