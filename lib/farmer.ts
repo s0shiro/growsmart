@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { getCurrentUser } from './users '
-import { revalidatePath } from 'next/cache'
 
 export const createNewFarmer = async (data: {
   firstname: string
@@ -78,4 +77,20 @@ export const getCountOfFarmers = async (userId: string): Promise<number> => {
   }
 
   return count ?? 0 // Return count or 0 if count is null
+}
+
+export const getAllFarmers = async () => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('technician_farmers')
+    .select()
+    .order('created_at', { ascending: false }) // Orders by created_at in descending order
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return [] // Return an empty array or handle the error as needed
+  }
+
+  return data
 }

@@ -1,5 +1,11 @@
+import FarmersTable from './components/FarmersTable'
+
 const page = () => {
-  return <div>Page not available yet.</div>
+  return (
+    <div>
+      <FarmersTable />
+    </div>
+  )
 }
 
 export default page
