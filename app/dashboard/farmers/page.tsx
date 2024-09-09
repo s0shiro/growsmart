@@ -1,11 +1,5 @@
-import FarmersTable from './components/FarmersTable'
-
-const FarmersPage = () => {
-  return (
-    <div>
-      <FarmersTable />
-    </div>
-  )
+const page = () => {
+  return <div>Page not available yet.</div>
 }
 
-export default FarmersPage
+export default page

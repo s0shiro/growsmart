@@ -18,16 +18,19 @@ import {
   ClipboardList,
   CheckSquare,
   CheckCircle,
+  User,
+  UserCheck,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { useState } from 'react'
+import DropdownLinks from './DropdownLinks'
 
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
-  { href: '/dashboard/farmers', Icon: Users2, label: 'My Farmers' },
+  { href: '/dashboard/myfarmers', Icon: Users2, label: 'My Farmers' },
 ]
 
 const productionLinks = [
@@ -48,11 +51,23 @@ const productionLinks = [
   },
 ]
 
+const profilingLinks = [
+  {
+    href: '/dashboard/farmers',
+    Icon: User,
+    label: 'Farmers',
+  },
+  {
+    href: '/dashboard/association',
+    Icon: Building2,
+    label: 'Association',
+  },
+]
+
 const adminLinks = [
   { href: '/dashboard', Icon: Home, label: 'Dashboard' },
   { href: '/dashboard/crops', Icon: Sprout, label: 'Crops' },
   { href: '/dashboard/users', Icon: UserPlus, label: 'Users' },
-  { href: '/dashboard/association', Icon: Building2, label: 'Associations' },
 ]
 
 const defaultLinks = [
@@ -68,7 +83,6 @@ const isActive = (path: string, route: string) => {
 }
 
 const Side = ({ userSession }: { userSession: any }) => {
-  const [isProductionOpen, setProductionOpen] = useState(false)
   const role = userSession?.user?.user_metadata?.role
   const links =
     role === 'admin'
@@ -80,11 +94,6 @@ const Side = ({ userSession }: { userSession: any }) => {
   const activeClass =
     'flex items-center gap-4 rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground p-2'
   const path = usePathname()
-
-  // Check if any of the production links are active
-  const isAnyProductionActive = productionLinks.some(({ href }) =>
-    isActive(path, href),
-  )
 
   return (
     <aside className='fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background px-6 py-4 sm:flex'>
@@ -120,42 +129,24 @@ const Side = ({ userSession }: { userSession: any }) => {
         {/*TODO:fix this don't use hardcoded role in this use .env or the constant */}
         {/* Productions Link */}
         {role === 'technician' && (
-          <>
-            <button
-              onClick={() => setProductionOpen(!isProductionOpen)}
-              className={clsx(
-                'flex items-center gap-4 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground w-full',
-                isAnyProductionActive && activeClass, // Apply active state to the main "Productions" link
-              )}
-            >
-              <Package className='h-5 w-5' />
-              <span>Productions</span>
-              {isProductionOpen ? (
-                <ChevronDown className='ml-auto h-5 w-5' />
-              ) : (
-                <ChevronRight className='ml-auto h-5 w-5' />
-              )}
-            </button>
-
-            {/* Productions Dropdown */}
-            {isProductionOpen && (
-              <div className='ml-6'>
-                {productionLinks.map(({ href, Icon, label }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    className={clsx(
-                      'flex items-center gap-4 rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground',
-                      isActive(path, href) && activeClass, // Apply active state to individual production links
-                    )}
-                  >
-                    <Icon className='h-4 w-4' />
-                    <span>{label}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </>
+          <DropdownLinks
+            title='Productions'
+            Icon={Package}
+            links={productionLinks}
+            isActive={isActive}
+            activeClass={activeClass}
+            path={path}
+          />
+        )}
+        {role === 'admin' && (
+          <DropdownLinks
+            title='Profiling'
+            Icon={UserCheck} // Replace with appropriate icon
+            links={profilingLinks}
+            isActive={isActive}
+            activeClass={activeClass}
+            path={path}
+          />
         )}
       </nav>
 
