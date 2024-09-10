@@ -40,7 +40,7 @@ const productionLinks = [
     label: 'Inspection',
   },
   {
-    href: '/dashboard/records',
+    href: '/dashboard/harvest',
     Icon: CheckSquare,
     label: 'Harvest',
   },
@@ -78,7 +78,7 @@ const isActive = (path: string, route: string) => {
   if (route === '/dashboard') {
     return path === '/dashboard'
   } else {
-    return path.includes(route)
+    return path === route || path.startsWith(route + '/')
   }
 }
 

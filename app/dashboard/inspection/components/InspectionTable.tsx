@@ -32,10 +32,14 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  Eye,
 } from 'lucide-react'
 import useReadInspections from '@/hooks/useReadInspection'
 import CropName from './CropName'
 import FarmerName from './FarmerName'
+import InspectionForm from './InpectionForm'
+import DialogForm from '../../(components)/DialogForm'
+import Link from 'next/link'
 
 interface Crop {
   id: string
@@ -246,8 +250,25 @@ export default function InspectionTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                      <DropdownMenuItem>Inspect</DropdownMenuItem>
-                      <DropdownMenuItem>Inspection History</DropdownMenuItem>
+                      <DialogForm
+                        id='create-record'
+                        title='Record Planting'
+                        description={`Record planting data to ${crop.id}`}
+                        Trigger={
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Inspect
+                          </DropdownMenuItem>
+                        }
+                        form={<InspectionForm plantingID={crop.id} />}
+                      />
+                      <Link href={`/dashboard/inspection/${crop.id}`}>
+                        <DropdownMenuItem>
+                          <Eye className='mr-2 h-4 w-4' />
+                          Inspection History
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -9,7 +9,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react'
-import useFetchHarvestedStatus from '@/hooks/useFetchHarvestedStatus'
+import useFetchPlantings from '@/hooks/useFetchPlantings'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +39,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import FarmerName from '../../inspection/components/FarmerName'
+import DialogForm from '../../(components)/DialogForm'
+import HarvestForm from '../../records/HarvestForm'
+import HarvestUploader from '../../records/HarvestUploader'
 
 type PlantingRecords = {
   area_planted: number
@@ -62,8 +65,8 @@ interface Filters {
   fieldLocation: string
 }
 
-const HarvestedCropsTable = () => {
-  const { data, isFetching } = useFetchHarvestedStatus()
+const HarvestCropTable = () => {
+  const { data, isFetching } = useFetchPlantings()
   const allPlantingRecords: PlantingRecords[] = data
     ? (data as PlantingRecords[])
     : []
@@ -132,23 +135,23 @@ const HarvestedCropsTable = () => {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'harvested':
-        return 'bg-red-800 text-red-100'
-      default:
+      case 'harvest':
         return 'bg-green-800 text-green-100'
+      default:
+        return 'bg-yellow-800 text-red-100'
     }
   }
 
   return (
     <Card className='w-full max-w-6xl mx-auto'>
       <CardHeader>
-        <CardTitle>Harvested Crops</CardTitle>
+        <CardTitle>Plantings</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
         <div className='flex flex-col sm:flex-row gap-2 items-start sm:items-center'>
           <div className='relative flex-grow'>
             <Input
-              placeholder='Search crops...'
+              placeholder='Search plantings...'
               value={searchTerm}
               onChange={handleSearch}
               className='pl-8'
@@ -249,11 +252,44 @@ const HarvestedCropsTable = () => {
                           View Farmer
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Link href={`/dashboard/harvested/${record.id}`}>
-                          Harvest Details
-                        </Link>
-                      </DropdownMenuItem>
+
+                      <DialogForm
+                        id='create-harvest'
+                        title='Record Harvest'
+                        description={`Record harvest`}
+                        Trigger={
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Record Harvest
+                          </DropdownMenuItem>
+                        }
+                        form={
+                          <HarvestForm
+                            plantingID={record.id}
+                            farmerID={record.farmer_id}
+                          />
+                        }
+                      />
+
+                      <DialogForm
+                        id='upload-harvest'
+                        title='Record Harvest'
+                        description={`Record harvest`}
+                        Trigger={
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Harvest Uploader
+                          </DropdownMenuItem>
+                        }
+                        form={
+                          <HarvestUploader
+                            farmerID={record.farmer_id}
+                            plantingID={record.id}
+                          />
+                        }
+                      />
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -299,4 +335,4 @@ const HarvestedCropsTable = () => {
   )
 }
 
-export default HarvestedCropsTable
+export default HarvestCropTable

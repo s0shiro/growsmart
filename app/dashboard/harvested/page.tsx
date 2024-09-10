@@ -1,5 +1,3 @@
-'use client'
-
 import HarvestedTableCrops from './components/HarvestedTableCrop'
 
 const HarvestedPage = () => {
