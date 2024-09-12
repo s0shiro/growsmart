@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 import useAssociationDetails from '@/hooks/useAssociationDetails'
 import Link from 'next/link'
+import DownloadButton from '@/app/dashboard/farmers/components/DownloadButton'
 
 type AssociationDetail = {
   id: string
@@ -96,6 +97,12 @@ export default function AssociationDetailsTable({
         <h2 className='lg:text-xl font-semibold text-foreground'>
           Members{/* {associationName} */}
         </h2>
+
+        <DownloadButton
+          url={`/dashboard/association/${associationId}/pdf`}
+          fileName={`${associationName}_masterlist`}
+          buttonName='Download Association MasterList'
+        />
 
         <div className='flex items-center space-x-4'>
           {/* Search bar */}

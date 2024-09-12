@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
@@ -16,18 +16,16 @@ import { Button } from '@/components/ui/button'
 
 import { useTransition } from 'react'
 import { useAddFarmer } from '@/hooks/useAddFarmer'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import useReadAssociation from '@/hooks/useReadAssociations'
 import SelectField from '../../(components)/CustomSelectField'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  useFetchBarangays,
+  useFetchMunicipalities,
+} from '@/hooks/municipalities/useFetchMunicipalities'
+import useReadAssociation from '@/hooks/useReadAssociations'
+import SelectFieldName from './SelecFieldName'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -38,8 +36,8 @@ const FormSchema = z.object({
   phoneNumber: z
     .string()
     .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
-  association: z.string(), // Assuming it's a string, update if different
-  position: z.string(), // Assuming it's a string, update if different
+  association: z.string(),
+  position: z.string(),
 })
 
 type FarmerFieldNames =
@@ -73,15 +71,15 @@ const fieldConfigs: {
   { name: 'gender', placeholder: 'Male', label: 'Gender', type: 'text' },
   {
     name: 'municipality',
-    placeholder: 'Gasan',
+    placeholder: 'Select a municipality',
     label: 'Municipality',
-    type: 'text',
+    type: 'select',
   },
   {
     name: 'barangay',
-    placeholder: 'Libtangin',
+    placeholder: 'Select a barangay',
     label: 'Barangay',
-    type: 'text',
+    type: 'select',
   },
   {
     name: 'phoneNumber',
@@ -93,7 +91,7 @@ const fieldConfigs: {
     name: 'association',
     placeholder: 'Select an association',
     label: 'Association',
-    type: 'select', // We'll handle the select type specifically
+    type: 'select',
   },
   {
     name: 'position',
@@ -112,28 +110,51 @@ function CreateFarmerForm() {
   const addFarmerMutation = useAddFarmer()
   const [isPending, startTransition] = useTransition()
   const { data: associations, error, isLoading } = useReadAssociation()
+  const { data: municipalities } = useFetchMunicipalities()
+
+  // Watch municipality selection
+  const selectedMunicipality = useWatch({
+    control: form.control,
+    name: 'municipality',
+  })
+
+  // Fetch barangays based on selected municipality
+  const { data: barangays } = useFetchBarangays(selectedMunicipality || '')
+
+  console.log(municipalities)
+  console.log('Selected Municipality:', selectedMunicipality)
+  console.log('Barangays:', barangays)
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // Get the selected municipality name based on its code
+    const selectedMunicipality = municipalities?.find(
+      (mun) => mun.code === data.municipality,
+    )?.name
+
+    // Get the selected barangay name based on its code
+    const selectedBarangay = barangays?.find(
+      (brgy) => brgy.code === data.barangay,
+    )?.name
+
+    // Proceed with form submission, sending the names instead of codes
     startTransition(() => {
       addFarmerMutation.mutate(
         {
           firstname: data.firstname,
           lastname: data.lastname,
           gender: data.gender,
-          municipality: data.municipality,
-          barangay: data.barangay,
+          municipality: selectedMunicipality, // Send name instead of code
+          barangay: selectedBarangay, // Send name instead of code
           phoneNumber: data.phoneNumber,
           association_id: data.association,
           position: data.position,
         },
         {
           onSuccess: () => {
-            console.log('Farmer created successfully', data)
             toast.success('Farmer created successfully!')
             document.getElementById('create-trigger')?.click()
           },
           onError: (error: any) => {
-            console.error('Failed to create farmer:', error)
             toast.error('Failed to create farmer.')
           },
         },
@@ -154,10 +175,45 @@ function CreateFarmerForm() {
                   name='association'
                   label='Association'
                   placeholder='Select Association'
-                  options={associations?.map((assoc) => ({
-                    id: assoc.id,
-                    name: assoc.name,
-                  }))}
+                  options={
+                    associations?.map((assoc) => ({
+                      id: assoc.id,
+                      name: assoc.name,
+                    })) || []
+                  }
+                />
+              )
+            } else if (type === 'select' && name === 'municipality') {
+              return (
+                <SelectField
+                  control={form.control}
+                  key={name}
+                  name='municipality'
+                  label='Municipality'
+                  placeholder='Select Municipality'
+                  options={
+                    municipalities?.map((mun) => ({
+                      id: mun.code,
+                      name: mun.name,
+                    })) || []
+                  }
+                />
+              )
+            } else if (type === 'select' && name === 'barangay') {
+              return (
+                <SelectField
+                  control={form.control}
+                  key={name}
+                  name='barangay'
+                  label='Barangay'
+                  placeholder='Select Barangay'
+                  options={
+                    barangays?.map((brgy) => ({
+                      id: brgy.code,
+                      name: brgy.name,
+                    })) || []
+                  }
+                  disabled={!selectedMunicipality} // Disable until a municipality is selected
                 />
               )
             } else {
@@ -174,7 +230,6 @@ function CreateFarmerForm() {
                           placeholder={placeholder}
                           type={type}
                           {...field}
-                          onChange={field.onChange}
                           className='mt-1 block w-full'
                         />
                       </FormControl>

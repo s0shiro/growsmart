@@ -1,64 +1,110 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { MoreHorizontal, Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import React, { useState, useMemo } from 'react'
+import {
+  MoreHorizontal,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from 'lucide-react'
+import useReadAssociation from '@/hooks/useReadAssociations'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
-import DialogForm from '../../(components)/DialogForm'
-// import EditAssociationForm from './edit/EditAssociationForm'
-// import DeleteAssociation from './DeleteAssociation'
-import useReadAssociation from '@/hooks/useReadAssociations'
-import MembersCount from './MembersCount'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import MembersCount from './MembersCount'
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 type Association = {
   id: string
   name: string | null
 }
 
-export default function ListOfAssociations() {
+interface Filters {
+  associationName: string
+}
+
+const AssociationTable = () => {
   const { data, error, isLoading } = useReadAssociation()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filteredAssociations, setFilteredAssociations] = useState<
-    Association[]
-  >([])
+  const allAssociations: Association[] = data ? (data as Association[]) : []
 
-  console.log(data)
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [filters, setFilters] = useState<Filters>({
+    associationName: 'all',
+  })
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const itemsPerPage = 5
 
-  useEffect(() => {
-    if (data) {
-      setFilteredAssociations(data)
-    }
-  }, [data])
+  const associationNames = useMemo(() => {
+    return [
+      'all',
+      ...new Set(
+        allAssociations.map(
+          (association) => association.name ?? 'Unnamed Association',
+        ),
+      ),
+    ]
+  }, [allAssociations])
 
-  const handleSearch = useCallback(
-    (term: string) => {
-      if (data) {
-        const filtered = data.filter((association) =>
-          (association.name ?? 'Unnamed Association')
-            .toLowerCase()
-            .includes(term),
-        )
-        setFilteredAssociations(filtered)
-      }
-    },
-    [data],
-  )
-
-  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (e: any) => {
     const term = e.target.value.toLowerCase()
     setSearchTerm(term)
-    handleSearch(term)
   }
+
+  const handleFilterChange = (type: keyof Filters, value: string) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [type]: value,
+    }))
+    setCurrentPage(1)
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      associationName: 'all',
+    })
+    setCurrentPage(1)
+  }
+
+  const filteredAssociations = useMemo(() => {
+    return allAssociations.filter((association) => {
+      return (
+        (association.name ?? 'Unnamed Association')
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) &&
+        (filters.associationName === 'all' ||
+          association.name === filters.associationName)
+      )
+    })
+  }, [allAssociations, searchTerm, filters])
+
+  const pageCount = Math.ceil(filteredAssociations.length / itemsPerPage)
+  const paginatedAssociations = filteredAssociations.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  )
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -69,120 +115,130 @@ export default function ListOfAssociations() {
   }
 
   return (
-    <motion.div
-      className='bg-card bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border'
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
-    >
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='lg:text-xl font-semibold text-foreground'>
-          Associations
-        </h2>
-        <div className='relative flex items-center'>
-          <input
-            type='text'
-            placeholder='Search associations...'
-            className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
-            value={searchTerm}
-            onChange={onSearchChange}
-          />
-          <Search
-            className='absolute left-3 top-2.5 text-muted-foreground'
-            size={18}
-          />
-        </div>
-      </div>
-
-      <div className='overflow-x-auto'>
-        {filteredAssociations.length === 0 ? (
-          <div className='text-center text-muted-foreground py-6'>
-            No associations found.
+    <Card className='w-full max-w-6xl mx-auto'>
+      <CardHeader>
+        <CardTitle>Associations</CardTitle>
+      </CardHeader>
+      <CardContent className='space-y-4'>
+        <div className='flex flex-col sm:flex-row gap-2 items-start sm:items-center'>
+          <div className='relative flex-grow'>
+            <Input
+              placeholder='Search associations...'
+              value={searchTerm}
+              onChange={handleSearch}
+              className='pl-8'
+            />
+            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
           </div>
-        ) : (
-          <table className='min-w-full divide-y divide-border'>
-            <thead>
-              <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Name
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Members Count
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-border'>
-              {filteredAssociations.map((association, index) => (
-                <motion.tr
-                  key={index}
-                  className='bg-white dark:bg-inherit'
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm font-medium text-foreground'>
-                      {association.name}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm font-medium text-foreground'>
-                      <MembersCount associationID={association.id} />
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup='true'
-                          size='icon'
-                          variant='ghost'
-                        >
-                          <MoreHorizontal className='h-4 w-4' />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align='end'>
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <Link href={`/dashboard/association/${association.id}`}>
-                          <DropdownMenuItem>Details</DropdownMenuItem>
-                        </Link>
-                        <DropdownMenuItem>
-                          {/* <DeleteAssociation
-                            id={association.id}
-                            onDelete={deleteAssociation}
-                          /> */}
-                        </DropdownMenuItem>
-                        {/* <DialogForm
-                          id='edit-association'
-                          title='Edit Association'
-                          description={`Edit association`}
-                          Trigger={
-                            <DropdownMenuItem
-                              onSelect={(e) => e.preventDefault()}
-                            >
-                              Edit
-                            </DropdownMenuItem>
-                          }
-                          form={
-                            <EditAssociationForm
-                              association={association}
-                              updateAssociation={updateAssociation}
-                            />
-                          }
-                        /> */}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </motion.div>
+          <div className='flex flex-wrap gap-2'>
+            <Select
+              value={filters.associationName}
+              onValueChange={(value) =>
+                handleFilterChange('associationName', value)
+              }
+            >
+              <SelectTrigger className='w-[140px]'>
+                <SelectValue placeholder='All Associations' />
+              </SelectTrigger>
+              <SelectContent>
+                {associationNames.map((name) => (
+                  <SelectItem key={name} value={name}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {Object.values(filters).some((filter) => filter !== 'all') && (
+              <Button
+                variant='outline'
+                onClick={clearFilters}
+                className='flex items-center'
+              >
+                <X className='mr-2 h-4 w-4' /> Clear Filters
+              </Button>
+            )}
+          </div>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Members Count</TableHead>
+              <TableHead className='text-right'>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedAssociations.map((association, index) => (
+              <TableRow
+                key={association.id}
+                className={index % 2 === 0 ? 'bg-muted/50' : ''}
+              >
+                <TableCell className='font-medium'>
+                  {association.name ?? 'Unnamed Association'}
+                </TableCell>
+                <TableCell>
+                  <MembersCount associationID={association.id} />
+                </TableCell>
+                <TableCell className='text-right'>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='ghost' className='h-8 w-8 p-0'>
+                        <span className='sr-only'>Open menu</span>
+                        <MoreHorizontal className='h-4 w-4' />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end'>
+                      <Link href={`/dashboard/association/${association.id}`}>
+                        <DropdownMenuItem>Details</DropdownMenuItem>
+                      </Link>
+
+                      <DropdownMenuItem>
+                        {/* Add other actions here */}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <div className='flex items-center justify-between'>
+          <p className='text-sm text-muted-foreground'>
+            Showing{' '}
+            {Math.min(
+              filteredAssociations.length,
+              (currentPage - 1) * itemsPerPage + 1,
+            )}{' '}
+            to{' '}
+            {Math.min(filteredAssociations.length, currentPage * itemsPerPage)}{' '}
+            of {filteredAssociations.length} entries
+          </p>
+          <div className='flex items-center space-x-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className='h-4 w-4' />
+              Previous
+            </Button>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(pageCount, prev + 1))
+              }
+              disabled={currentPage === pageCount}
+            >
+              Next
+              <ChevronRight className='h-4 w-4' />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
+
+export default AssociationTable
