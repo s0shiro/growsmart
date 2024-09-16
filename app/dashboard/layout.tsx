@@ -8,6 +8,8 @@ import SidebarWithUserSession from './(components)/SideBarWithUserSession'
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const { data: userSession } = await readUserSession()
 
+  console.log(userSession)
+
   if (!userSession.user) {
     return redirect('/login')
   }

@@ -52,7 +52,7 @@ export const login = async (formData: {
   }
 
   // If everything is fine, redirect to the homepage
-  redirect('/')
+  redirect('/dashboard')
   return { message: null }
 }
 

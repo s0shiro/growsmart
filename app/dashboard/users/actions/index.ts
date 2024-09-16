@@ -7,7 +7,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache'
 //Creating account for admin
 export async function createMember(data: {
   name: string
-  role: 'technician' | 'admin'
+  role: 'technician' | 'admin' | 'program coordinator'
   status: 'active' | 'resigned'
   email: string
   password: string
