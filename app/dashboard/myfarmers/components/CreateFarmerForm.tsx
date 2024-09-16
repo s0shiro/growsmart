@@ -68,7 +68,12 @@ const fieldConfigs: {
     label: 'Lastname',
     type: 'text',
   },
-  { name: 'gender', placeholder: 'Male', label: 'Gender', type: 'text' },
+  {
+    name: 'gender',
+    placeholder: 'Select Gender',
+    label: 'Gender',
+    type: 'select',
+  },
   {
     name: 'municipality',
     placeholder: 'Select a municipality',
@@ -95,10 +100,19 @@ const fieldConfigs: {
   },
   {
     name: 'position',
-    placeholder: 'Position',
+    placeholder: 'Select Position',
     label: 'Position',
-    type: 'text',
+    type: 'select',
   },
+]
+
+const positions = [
+  { id: 'member', name: 'Member' },
+  { id: 'president', name: 'President' },
+  { id: 'vice_president', name: 'Vice President' },
+  { id: 'secretary', name: 'Secretary' },
+  { id: 'treasurer', name: 'Treasurer' },
+  { id: 'board_member', name: 'Board Member' },
 ]
 
 function CreateFarmerForm() {
@@ -128,12 +142,12 @@ function CreateFarmerForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     // Get the selected municipality name based on its code
     const selectedMunicipality = municipalities?.find(
-      (mun) => mun.code === data.municipality,
+      (mun: any) => mun.code === data.municipality,
     )?.name
 
     // Get the selected barangay name based on its code
     const selectedBarangay = barangays?.find(
-      (brgy) => brgy.code === data.barangay,
+      (brgy: any) => brgy.code === data.barangay,
     )?.name
 
     // Proceed with form submission, sending the names instead of codes
@@ -192,7 +206,7 @@ function CreateFarmerForm() {
                   label='Municipality'
                   placeholder='Select Municipality'
                   options={
-                    municipalities?.map((mun) => ({
+                    municipalities?.map((mun: any) => ({
                       id: mun.code,
                       name: mun.name,
                     })) || []
@@ -208,12 +222,37 @@ function CreateFarmerForm() {
                   label='Barangay'
                   placeholder='Select Barangay'
                   options={
-                    barangays?.map((brgy) => ({
+                    barangays?.map((brgy: any) => ({
                       id: brgy.code,
                       name: brgy.name,
                     })) || []
                   }
                   disabled={!selectedMunicipality} // Disable until a municipality is selected
+                />
+              )
+            } else if (type === 'select' && name === 'gender') {
+              return (
+                <SelectField
+                  control={form.control}
+                  key={name}
+                  name='gender'
+                  label='Gender'
+                  placeholder='Select Gender'
+                  options={[
+                    { id: 'male', name: 'Male' },
+                    { id: 'female', name: 'Female' },
+                  ]}
+                />
+              )
+            } else if (type === 'select' && name === 'position') {
+              return (
+                <SelectField
+                  control={form.control}
+                  key={name}
+                  name='position'
+                  label='Position'
+                  placeholder='Select Position'
+                  options={positions}
                 />
               )
             } else {
