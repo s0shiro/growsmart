@@ -209,13 +209,15 @@
 //   )
 // }
 import Hero from '@/components/Hero'
+import LandingPage from '@/components/LandingPage'
 import NavBar from '@/components/Navbar'
 
 export default async function Index() {
   return (
     <div>
-      <NavBar />
-      <Hero />
+      <LandingPage />
+      {/* <NavBar />
+      <Hero /> */}
     </div>
   )
 }
