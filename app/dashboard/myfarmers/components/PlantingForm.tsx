@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -19,6 +20,7 @@ import { isToday } from 'date-fns'
 import useGetCropCategory from '@/hooks/useGetCropCategory'
 import { useFetchCrops, useFetchVarieties } from '@/hooks/useCrops'
 import SelectField from '../../(components)/CustomSelectField'
+import MapComponent from './MapComponent' // Import the MapComponent
 
 const FormSchema = z.object({
   cropCategory: z.string(),
@@ -27,7 +29,7 @@ const FormSchema = z.object({
   plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for plantingDate',
   }),
-  fieldLocation: z.string(),
+  fieldLocation: z.string().nonempty({ message: 'Field location is required' }),
   areaPlanted: z.string(),
   quantity: z.string(),
   weatherCondition: z.string(),
@@ -69,12 +71,6 @@ const fieldConfigs: {
     placeholder: 'Planting Date',
     label: 'Planting Date',
     type: 'date',
-  },
-  {
-    name: 'fieldLocation',
-    placeholder: 'Field Location',
-    label: 'Field Location',
-    type: 'text',
   },
   {
     name: 'areaPlanted',
@@ -123,6 +119,13 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
   const { data: crops } = useFetchCrops(selectedCategory)
   const { data: varieties } = useFetchVarieties(selectedCrop)
 
+  const [selectedLocation, setSelectedLocation] = useState<string>('')
+
+  const onLocationSelect = (locationName: string) => {
+    setSelectedLocation(locationName)
+    setValue('fieldLocation', locationName)
+  }
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const harvestDate = new Date(data.harvestDate)
@@ -144,6 +147,7 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
       })
       console.log('Form submitted successfully', data)
       form.reset()
+      setSelectedLocation('') // Reset the selected location
     } catch (error) {
       console.error('Failed to submit form:', error)
     }
@@ -237,6 +241,26 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
               )
             }
           })}
+        </div>
+
+        {/* Add the MapComponent here */}
+        <div>
+          <FormLabel>Field Location</FormLabel>
+          <p className='text-sm text-gray-500 mb-2'>
+            Please point the location on the map to insert the field location.
+          </p>
+          <MapComponent onLocationSelect={onLocationSelect} />
+          {selectedLocation && (
+            <p className='mt-2 text-sm text-green-600'>
+              Selected Location: {selectedLocation}
+            </p>
+          )}
+          {/* Display error message if fieldLocation is not selected */}
+          {form.formState.errors.fieldLocation && (
+            <p className='mt-2 text-sm text-red-600'>
+              {form.formState.errors.fieldLocation?.message}
+            </p>
+          )}
         </div>
 
         <Button
