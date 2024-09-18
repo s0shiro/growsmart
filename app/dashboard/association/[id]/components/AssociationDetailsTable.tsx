@@ -2,7 +2,14 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { MoreHorizontal, Search } from 'lucide-react'
+import {
+  MoreHorizontal,
+  Search,
+  Download,
+  Users,
+  UserPlus,
+  Trash2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,10 +19,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 import useAssociationDetails from '@/hooks/useAssociationDetails'
 import Link from 'next/link'
+import { toast } from 'sonner'
 import DownloadButton from '@/app/dashboard/farmers/components/DownloadButton'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 type AssociationDetail = {
   id: string
@@ -27,13 +62,13 @@ type AssociationDetail = {
   barangay: string
   municipality: string
   created_at: string
-  position: string | null // Allow null
-  association_id: string | null // Allow null
+  position: string | null
+  association_id: string | null
 }
 
 type AssociationDetailsTableProps = {
   associationId: string
-  associationName: string // Add the associationName prop
+  associationName: string
 }
 
 export default function AssociationDetailsTable({
@@ -77,156 +112,183 @@ export default function AssociationDetailsTable({
     handleSearch(term)
   }
 
+  const handleAddMember = () => {
+    // Implement add member logic here
+    toast({
+      title: 'Add Member',
+      description: 'Member addition functionality to be implemented.',
+    })
+  }
+
   if (isLoading) {
-    return <div>Loading...</div>
+    return <AssociationDetailsSkeleton />
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Error</CardTitle>
+          <CardDescription>{error.message}</CardDescription>
+        </CardHeader>
+      </Card>
+    )
   }
 
   return (
-    <motion.div
-      className='bg-card bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border'
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
-    >
-      <div className='flex justify-between items-center mb-6'>
-        {/* Dynamic title with association name */}
-        <h2 className='lg:text-xl font-semibold text-foreground'>
-          Members{/* {associationName} */}
-        </h2>
-
-        <DownloadButton
-          url={`/dashboard/association/${associationId}/pdf`}
-          fileName={`${associationName}_masterlist`}
-          buttonName='Download Association MasterList'
-        />
-
-        <div className='flex items-center space-x-4'>
-          {/* Search bar */}
+    <Card className='w-full'>
+      <CardHeader>
+        <div className='flex justify-between items-center'>
+          <div>
+            <CardTitle className='text-2xl font-bold'>
+              {associationName}
+            </CardTitle>
+            <CardDescription>Association Members</CardDescription>
+          </div>
+          <div className='flex space-x-2'>
+            <DownloadButton
+              url={`/dashboard/association/${associationId}/pdf`}
+              fileName={`${associationName}_masterlist`}
+              buttonName='Download Masterlist'
+            />
+            {/* <Button onClick={handleAddMember}>
+              <UserPlus className='mr-2 h-4 w-4' />
+              Add Member
+            </Button> */}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className='flex justify-between items-center mb-4'>
+          <div className='flex items-center space-x-2'>
+            <Users className='h-5 w-5 text-muted-foreground' />
+            <span className='text-lg font-semibold'>
+              {filteredDetails.length} Members
+            </span>
+          </div>
           <div className='relative'>
-            <input
-              type='text'
+            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+            <Input
               placeholder='Search members...'
-              className='bg-input text-foreground placeholder-muted-foreground rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
               value={searchTerm}
               onChange={onSearchChange}
-            />
-            <Search
-              className='absolute left-3 top-2.5 text-muted-foreground'
-              size={18}
+              className='pl-8'
             />
           </div>
         </div>
-      </div>
-
-      <div className='overflow-x-auto'>
         {filteredDetails.length === 0 ? (
           <div className='text-center text-muted-foreground py-6'>
             No members found.
           </div>
         ) : (
-          <table className='min-w-full divide-y divide-border'>
-            <thead>
-              <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Name
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Gender
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Barangay
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Position
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Municipality
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Association
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-border'>
-              {filteredDetails.map((detail) => (
-                <motion.tr
-                  key={detail.id}
-                  className='bg-white dark:bg-inherit'
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm font-medium text-foreground'>
-                      {detail.firstname} {detail.lastname}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm text-foreground'>
-                      {detail.gender}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm text-foreground'>
-                      {detail.barangay}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm text-foreground'>
-                      {detail.position}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm text-foreground'>
-                      {detail.municipality}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <div className='text-sm text-foreground'>
-                      {associationName}
-                    </div>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-muted-foreground'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup='true'
-                          size='icon'
-                          variant='ghost'
+          <div className='rounded-md border'>
+            <ScrollArea className='max-h-full'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Gender</TableHead>
+                    <TableHead>Barangay</TableHead>
+                    <TableHead>Position</TableHead>
+                    <TableHead>Municipality</TableHead>
+                    <TableHead className='text-right'>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredDetails.map((detail) => (
+                    <TableRow key={detail.id}>
+                      <TableCell className='font-medium'>
+                        <div className='flex items-center space-x-2'>
+                          <Avatar>
+                            <AvatarImage
+                              src={`https://api.dicebear.com/6.x/initials/svg?seed=${detail.firstname} ${detail.lastname}`}
+                            />
+                            <AvatarFallback>
+                              {detail.firstname[0]}
+                              {detail.lastname[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            {detail.firstname} {detail.lastname}
+                            <p className='text-sm text-muted-foreground'>
+                              {detail.phone}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            detail.gender === 'Male' ? 'default' : 'secondary'
+                          }
                         >
-                          <MoreHorizontal className='h-4 w-4' />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align='end'>
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <Link href={`/dashboard/farmers/${detail.id}`}>
-                          <DropdownMenuItem>Farmer</DropdownMenuItem>
-                        </Link>
-                        <DropdownMenuItem onClick={() => alert('Edit action')}>
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => alert('Delete action')}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
+                          {detail.gender}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{detail.barangay}</TableCell>
+                      <TableCell>{detail.position || 'N/A'}</TableCell>
+                      <TableCell>{detail.municipality}</TableCell>
+                      <TableCell className='text-right'>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant='ghost' className='h-8 w-8 p-0'>
+                              <span className='sr-only'>Open menu</span>
+                              <MoreHorizontal className='h-4 w-4' />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align='end'>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/myfarmers/${detail.id}`}>
+                                View Farmer Details
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => console.log('edit')}
+                            >
+                              Edit Member
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className='text-red-600'
+                              onClick={() => console.log('remove')}
+                            >
+                              <Trash2 className='mr-2 h-4 w-4' />
+                              Remove from Association
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <ScrollBar orientation='horizontal' />
+            </ScrollArea>
+          </div>
         )}
-      </div>
-    </motion.div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function AssociationDetailsSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className='h-8 w-[250px]' />
+        <Skeleton className='h-4 w-[200px]' />
+      </CardHeader>
+      <CardContent>
+        <div className='space-y-2'>
+          <Skeleton className='h-4 w-[100px]' />
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-2/3' />
+        </div>
+      </CardContent>
+    </Card>
   )
 }

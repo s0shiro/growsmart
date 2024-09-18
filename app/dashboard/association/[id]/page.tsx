@@ -22,9 +22,6 @@ const AssociationPage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <div>
-      <h2 className='lg:text-xl font-semibold text-foreground mb-4'>
-        {association.name}
-      </h2>
       {params.id ? (
         <AssociationDetailsTable
           associationId={params.id}
