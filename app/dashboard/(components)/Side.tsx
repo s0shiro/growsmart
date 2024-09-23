@@ -20,6 +20,7 @@ import {
   CheckCircle,
   User,
   UserCheck,
+  Plus,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -35,9 +36,14 @@ const technicianLinks = [
 
 const productionLinks = [
   {
+    href: '/dashboard/+planting',
+    Icon: Plus,
+    label: 'Add Planting',
+  },
+  {
     href: '/dashboard/inspection',
     Icon: ClipboardList,
-    label: 'Inspection',
+    label: 'Standing Crops',
   },
   {
     href: '/dashboard/harvest',
