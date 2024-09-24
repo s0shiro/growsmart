@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MoreHorizontal, Search } from 'lucide-react'
-import useFetchPlantings from '@/hooks/useFetchPlantings'
+import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
 import {
   DropdownMenu,
   DropdownMenuContent,

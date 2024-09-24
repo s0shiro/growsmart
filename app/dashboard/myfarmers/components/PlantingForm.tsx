@@ -17,8 +17,8 @@ import { Button } from '@/components/ui/button'
 import { addPlantingRecord } from '@/lib/planting'
 import { isToday } from 'date-fns'
 
-import useGetCropCategory from '@/hooks/useGetCropCategory'
-import { useFetchCrops, useFetchVarieties } from '@/hooks/useCrops'
+import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
+import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
 import SelectField from '../../(components)/CustomSelectField'
 import MapComponent from './MapComponent' // Import the MapComponent
 

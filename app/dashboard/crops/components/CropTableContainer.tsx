@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Plus, Search } from 'lucide-react'
 import DialogForm from '../../(components)/DialogForm'
 import CropForm from '../add-crops/CropForm'
-import { useFetchAllRegisteredCrops } from '@/hooks/useFetchAllRegisteredCrops'
+import { useFetchAllRegisteredCrops } from '@/hooks/crop/useFetchAllRegisteredCrops'
 import CropTable from './CropTable'
 import Pagination from './Pagination'
 import {

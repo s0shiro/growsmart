@@ -9,7 +9,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react'
-import useFetchPlantings from '@/hooks/useFetchPlantings'
+import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
 import {
   DropdownMenu,
   DropdownMenuContent,

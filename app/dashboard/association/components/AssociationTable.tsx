@@ -10,7 +10,7 @@ import {
   Plus,
   BarChart2,
 } from 'lucide-react'
-import useReadAssociation from '@/hooks/useReadAssociations'
+import useReadAssociation from '@/hooks/association/useReadAssociations'
 import {
   DropdownMenu,
   DropdownMenuContent,

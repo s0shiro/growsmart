@@ -13,7 +13,7 @@ import {
   Search,
   Plus,
 } from 'lucide-react'
-import useFetchFarmers from '@/hooks/fetchFarmers'
+import useFetchFarmers from '@/hooks/farmer/fetchFarmers'
 import useFetchAssociations from '@/hooks/association/useFetchAssociations'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

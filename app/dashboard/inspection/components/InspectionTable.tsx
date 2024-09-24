@@ -34,7 +34,7 @@ import {
   ChevronRight,
   Eye,
 } from 'lucide-react'
-import useReadInspections from '@/hooks/useReadInspection'
+import useReadInspections from '@/hooks/crop/useReadInspection'
 import CropName from './CropName'
 import FarmerName from './FarmerName'
 import InspectionForm from './InpectionForm'

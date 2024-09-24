@@ -9,7 +9,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react'
-import useFetchHarvestedStatus from '@/hooks/useFetchHarvestedStatus'
+import useFetchHarvestedStatus from '@/hooks/crop/useFetchHarvestedStatus'
 import {
   DropdownMenu,
   DropdownMenuContent,

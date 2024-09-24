@@ -30,7 +30,7 @@ import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 import { formatDate } from '@/lib/utils'
-import useFetchPlantings from '@/hooks/useFetchPlantings'
+import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
 import Link from 'next/link'
 import HarvestForm from './HarvestForm'
 import DailogForm from '../(components)/DialogForm'

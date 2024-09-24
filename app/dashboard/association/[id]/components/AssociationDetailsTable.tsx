@@ -46,7 +46,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import useAssociationDetails from '@/hooks/useAssociationDetails'
+import useAssociationDetails from '@/hooks/association/useAssociationDetails'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import DownloadButton from '@/app/dashboard/farmers/components/DownloadButton'

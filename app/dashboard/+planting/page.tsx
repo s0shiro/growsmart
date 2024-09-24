@@ -20,8 +20,8 @@ import { addPlantingRecord } from '@/lib/planting'
 import { isToday } from 'date-fns'
 import { MapPin } from 'lucide-react'
 
-import useGetCropCategory from '@/hooks/useGetCropCategory'
-import { useFetchCrops, useFetchVarieties } from '@/hooks/useCrops'
+import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
+import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
 import SelectField from '../(components)/CustomSelectField'
 import MapComponent from '../myfarmers/components/MapComponent'
 

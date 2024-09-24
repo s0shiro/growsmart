@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 import { useTransition } from 'react'
-import { useAddFarmer } from '@/hooks/useAddFarmer'
+import { useAddFarmer } from '@/hooks/farmer/useAddFarmer'
 import SelectField from '../../(components)/CustomSelectField'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
@@ -24,7 +24,7 @@ import {
   useFetchBarangays,
   useFetchMunicipalities,
 } from '@/hooks/municipalities/useFetchMunicipalities'
-import useReadAssociation from '@/hooks/useReadAssociations'
+import useReadAssociation from '@/hooks/association/useReadAssociations'
 import SelectFieldName from './SelecFieldName'
 
 const FormSchema = z.object({

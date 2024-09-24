@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { MoreHorizontal, Search } from 'lucide-react'
-import useFetchHarvestedStatus from '@/hooks/useFetchHarvestedStatus'
+import useFetchHarvestedStatus from '@/hooks/crop/useFetchHarvestedStatus'
 import {
   DropdownMenu,
   DropdownMenuContent,

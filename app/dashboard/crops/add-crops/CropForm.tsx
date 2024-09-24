@@ -3,8 +3,8 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import useGetCropCategory from '@/hooks/useGetCropCategory'
-import { useFetchCrops } from '@/hooks/useCrops'
+import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
+import { useFetchCrops } from '@/hooks/crop/useCrops'
 import {
   Form,
   FormControl,
