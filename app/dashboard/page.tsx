@@ -4,9 +4,9 @@ import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import StatCard from '@/components/StatCard'
 import { BarChart2, ShoppingBag, Zap } from 'lucide-react'
-import SalesOverviewChart from './(components)/SalesOverviewChart'
-import CategoryDistributionChart from './(components)/CategoryDistributionChart'
-import SalesChannelChart from './(components)/SalesChannelChart'
+import SalesOverviewChart from './(components)/charts/SalesOverviewChart'
+import CategoryDistributionChart from './(components)/charts/CategoryDistributionChart'
+import SalesChannelChart from './(components)/charts/SalesChannelChart'
 import FarmersCountCard from './(components)/FarmersCountCard'
 
 export default function Dashboard() {

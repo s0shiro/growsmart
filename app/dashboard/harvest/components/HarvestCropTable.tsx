@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import CropName from '../../inspection/components/CropName'
+import CropName from '../../(components)/ui/CropName'
 import {
   Table,
   TableBody,
@@ -38,10 +38,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import FarmerName from '../../inspection/components/FarmerName'
-import DialogForm from '../../(components)/DialogForm'
-import HarvestForm from '../../records/HarvestForm'
-import HarvestUploader from '../../records/HarvestUploader'
+import FarmerName from '../../(components)/ui/FarmerName'
+import DialogForm from '../../(components)/forms/DialogForm'
+import HarvestForm from '../../(components)/forms/HarvestForm'
+import HarvestUploader from '../../(components)/forms/HarvestUploader'
 
 type PlantingRecords = {
   area_planted: number

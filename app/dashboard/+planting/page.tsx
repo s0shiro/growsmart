@@ -22,7 +22,7 @@ import { MapPin } from 'lucide-react'
 
 import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
 import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
-import SelectField from '../(components)/CustomSelectField'
+import SelectField from '../(components)/forms/CustomSelectField'
 import MapComponent from '../myfarmers/components/MapComponent'
 
 const FormSchema = z.object({
@@ -107,6 +107,7 @@ const fieldConfigs: {
     type: 'date',
   },
 ]
+
 
 export default function ImprovedPlantingForm({
   farmerID,

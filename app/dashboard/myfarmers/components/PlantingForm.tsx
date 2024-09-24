@@ -19,7 +19,7 @@ import { isToday } from 'date-fns'
 
 import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
 import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
-import SelectField from '../../(components)/CustomSelectField'
+import SelectField from '../../(components)/forms/CustomSelectField'
 import MapComponent from './MapComponent' // Import the MapComponent
 
 const FormSchema = z.object({

@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import CropName from '../../inspection/components/CropName'
+import CropName from '../../(components)/ui/CropName'
 import {
   Table,
   TableBody,
@@ -38,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import FarmerName from '../../inspection/components/FarmerName'
+import FarmerName from '../../(components)/ui/FarmerName'
 
 type PlantingRecords = {
   area_planted: number

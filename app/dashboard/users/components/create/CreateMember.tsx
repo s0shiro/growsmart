@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import CreateForm from './CreateForm'
-import DialogForm from '@/app/dashboard/(components)/DialogForm'
+import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 
 export default function CreateMember() {
   return (

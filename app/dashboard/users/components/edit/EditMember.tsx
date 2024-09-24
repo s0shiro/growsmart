@@ -3,7 +3,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Pencil1Icon } from '@radix-ui/react-icons'
 
-import DialogForm from '@/app/dashboard/(components)/DialogForm'
+import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import EditForm from './EditorForm'
 
 export default function EditMember() {

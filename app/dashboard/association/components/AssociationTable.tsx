@@ -44,7 +44,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import AssociationForm from './create/AssociationForm'
-import DialogForm from '../../(components)/DialogForm'
+import DialogForm from '../../(components)/forms/DialogForm'
 
 type Association = {
   id: string

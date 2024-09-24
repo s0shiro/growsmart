@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 
 import { useTransition } from 'react'
 import { useAddFarmer } from '@/hooks/farmer/useAddFarmer'
-import SelectField from '../../(components)/CustomSelectField'
+import SelectField from '../../(components)/forms/CustomSelectField'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'

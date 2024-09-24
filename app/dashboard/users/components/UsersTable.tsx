@@ -35,7 +35,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import DialogForm from '../../(components)/DialogForm'
+import DialogForm from '../../(components)/forms/DialogForm'
 import EditForm from './edit/EditorForm'
 import DeleteUser from './DeleteUser'
 import { Member } from '@/lib/types'

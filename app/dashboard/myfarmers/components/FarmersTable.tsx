@@ -50,9 +50,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import DialogForm from '../../(components)/DialogForm'
+import DialogForm from '../../(components)/forms/DialogForm'
 import PlantingForm from './PlantingForm'
-import AssociationName from './AssociationName'
+import AssociationName from '../../(components)/ui/AssociationName'
 import CreateFarmerForm from './CreateFarmerForm'
 import Link from 'next/link'
 

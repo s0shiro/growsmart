@@ -104,7 +104,7 @@ const Side = ({ userSession }: { userSession: any }) => {
   return (
     <aside className='fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background px-6 py-4 sm:flex'>
       <nav className='flex flex-col gap-4'>
-        <Link href='/' className='group flex items-center gap-2 rounded-lg'>
+        <Link href='/public' className='group flex items-center gap-2 rounded-lg'>
           <Image
             src='/no-bg.png'
             alt='Organization Logo'

@@ -49,7 +49,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import useAssociationDetails from '@/hooks/association/useAssociationDetails'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import DownloadButton from '@/app/dashboard/farmers/components/DownloadButton'
+import DownloadButton from '@/app/dashboard/(components)/ui/DownloadButton'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 type AssociationDetail = {

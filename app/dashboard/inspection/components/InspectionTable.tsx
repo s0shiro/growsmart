@@ -35,10 +35,10 @@ import {
   Eye,
 } from 'lucide-react'
 import useReadInspections from '@/hooks/crop/useReadInspection'
-import CropName from './CropName'
-import FarmerName from './FarmerName'
+import CropName from '../../(components)/ui/CropName'
+import FarmerName from '../../(components)/ui/FarmerName'
 import InspectionForm from './InpectionForm'
-import DialogForm from '../../(components)/DialogForm'
+import DialogForm from '../../(components)/forms/DialogForm'
 import Link from 'next/link'
 
 interface Crop {

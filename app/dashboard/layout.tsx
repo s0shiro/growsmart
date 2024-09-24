@@ -1,9 +1,9 @@
 //LAYOUT.TSX
 
 import { readUserSession } from '@/lib/actions'
-import SheetNav from './(components)/SheetNav'
+import SheetNav from './(components)/navigation/SheetNav'
 import { redirect } from 'next/navigation'
-import SidebarWithUserSession from './(components)/SideBarWithUserSession'
+import SidebarWithUserSession from './(components)/navigation/SideBarWithUserSession'
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const { data: userSession } = await readUserSession()

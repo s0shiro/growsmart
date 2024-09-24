@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { readMembers } from '../actions'
+import { readMembers } from '../../app/dashboard/users/actions'
 
 export const useReadUsers = () => {
   return useQuery({

@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Filter, Search } from 'lucide-react'
-import AssociationName from '../../myfarmers/components/AssociationName'
+import AssociationName from '../../(components)/ui/AssociationName'
+import React from 'react'
 
 type FarmerFiltersProps = {
   searchTerm: string

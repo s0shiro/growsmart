@@ -33,9 +33,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import Link from 'next/link'
-import DownloadButton from './DownloadButton'
+import DownloadButton from '../../(components)/ui/DownloadButton'
 import { Label } from '@/components/ui/label'
-import AssociationName from '../../myfarmers/components/AssociationName'
+import AssociationName from '../../(components)/ui/AssociationName'
 import {
   Table,
   TableBody,

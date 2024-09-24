@@ -27,10 +27,10 @@ import Link from 'next/link'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import ToggleThemeButton from '@/components/MyComponents/shadcn/ToggleThemeButton'
 import { usePathname, useRouter } from 'next/navigation'
-import CustomBreadcrumbSeparator from './CustomBreadcrumbSeparator'
+import BreadcrumbSeparator from './BreadcrumbSeparator'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabaseBrowser } from '@/utils/supabase/browser'
-import NotificationIcon from './NotificationIcon'
+import NotificationIcon from '../ui/NotificationIcon'
 
 // Helper function to format breadcrumb segments
 const formatPathname = (pathname: string): JSX.Element[] => {
@@ -45,7 +45,7 @@ const formatPathname = (pathname: string): JSX.Element[] => {
         <Link href={`/${array.slice(0, index + 1).join('/')}`}>
           {segment.charAt(0).toUpperCase() + segment.slice(1)}
         </Link>
-        {index < array.length - 1 && <CustomBreadcrumbSeparator />}
+        {index < array.length - 1 && <BreadcrumbSeparator />}
       </span>
     ))
 }
@@ -77,7 +77,7 @@ const SheetNav = () => {
         <SheetContent side='left' className='sm:max-w-xs'>
           <nav className='grid gap-6 text-lg font-medium'>
             <Link
-              href='/'
+              href='/public'
               className='group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base'
             >
               <Package2 className='h-5 w-5 transition-all group-hover:scale-110' />
