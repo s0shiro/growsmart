@@ -12,7 +12,7 @@ const initFarmer = {
   phone: '',
 }
 
-export default function useFetchFarmers() {
+export default function useFetchFarmersByUserId() {
   return useQuery({
     queryKey: ['farmers'],
     queryFn: async () => {
@@ -21,6 +21,7 @@ export default function useFetchFarmers() {
 
       if (data.session?.user) {
         const farmers = await getListOfFarmers(data.session.user.id)
+        console.log("successfully fetched farmers!")
         return farmers
       }
       return [initFarmer]

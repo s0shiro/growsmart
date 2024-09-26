@@ -13,7 +13,7 @@ import {
   Search,
   Plus,
 } from 'lucide-react'
-import useFetchFarmers from '@/hooks/farmer/fetchFarmers'
+
 import useFetchAssociations from '@/hooks/association/useFetchAssociations'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,6 +55,7 @@ import PlantingForm from './PlantingForm'
 import AssociationName from '../../(components)/ui/AssociationName'
 import CreateFarmerForm from './CreateFarmerForm'
 import Link from 'next/link'
+import useFetchFarmersByUserId from '@/hooks/farmer/useFetchFarmersByUserId'
 
 type Farmer = {
   id: string
@@ -76,7 +77,7 @@ type Association = {
 }
 
 const FarmersTable = () => {
-  const { data: farmersData } = useFetchFarmers()
+  const { data: farmersData } = useFetchFarmersByUserId()
   const { data: associationsData } = useFetchAssociations()
   const farmers: Farmer[] = (farmersData as Farmer[]) || []
   const associations: Association[] = (associationsData as Association[]) || []

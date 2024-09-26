@@ -7,7 +7,7 @@ export const useGetCropCategory = () => {
     queryFn: async () => {
       try {
         const data = await getAllCropCategory()
-        console.log('Fetched crop categories:', data)
+        console.log("successfully fetched crop categories")
         return data
       } catch (error) {
         console.error('Error fetching crop categories:', error)
