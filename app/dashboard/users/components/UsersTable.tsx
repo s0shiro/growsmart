@@ -8,6 +8,8 @@ import {
   Edit,
   Trash,
   Eye,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,19 +36,20 @@ import {
 } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import DialogForm from '../../(components)/forms/DialogForm'
 import EditForm from './edit/EditorForm'
 import DeleteUser from './DeleteUser'
 import { Member } from '@/lib/types'
 import CreateForm from './create/CreateForm'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function UsersTable() {
   const [members, setMembers] = useState<Member[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
   const [selectedUser, setSelectedUser] = useState<Member | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4
 
   useEffect(() => {
     async function fetchMembers() {
@@ -67,6 +70,7 @@ export default function UsersTable() {
           member.status?.toLowerCase().includes(term),
       )
       setFilteredMembers(filtered)
+      setCurrentPage(1)
     },
     [members],
   )
@@ -121,14 +125,20 @@ export default function UsersTable() {
     }
   }
 
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
+  const paginatedMembers = filteredMembers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
   return (
-    <div className='bg-background text-foreground'>
-      <div className='flex justify-between items-center mb-6'>
+    <div className='space-y-6'>
+      <div className='flex justify-between items-center'>
         <h1 className='text-3xl font-bold'>Users</h1>
         <DialogForm
           id='create-trigger'
-          description='This is description'
-          title='Create Member'
+          description='Add a new user to the system'
+          title='Create User'
           Trigger={
             <Button>
               <UserPlus className='mr-2 h-4 w-4' />
@@ -139,21 +149,25 @@ export default function UsersTable() {
         />
       </div>
 
-      <div className='mb-4'>
+      <div className='flex justify-between items-center'>
         <Input
           type='search'
-          placeholder='Search members...'
+          placeholder='Search users...'
           value={searchTerm}
           onChange={onSearchChange}
           className='max-w-sm'
           icon={<Search className='h-4 w-4 text-muted-foreground' />}
         />
       </div>
+
       <Card>
-        <ScrollArea className='h-[calc(100vh-350px)]'>
-          <Table className='min-w-[800px] table-auto divide-y divide-border'>
+        <CardHeader>
+          <CardTitle>User List</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
             <TableHeader>
-              <TableRow className='bg-background hover:bg-background'>
+              <TableRow>
                 <TableHead className='w-[250px]'>Name</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Joined</TableHead>
@@ -162,7 +176,7 @@ export default function UsersTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredMembers.map((member) => (
+              {paginatedMembers.map((member) => (
                 <TableRow key={member.user_id}>
                   <TableCell className='font-medium'>
                     <div className='flex items-center'>
@@ -212,8 +226,8 @@ export default function UsersTable() {
                         </DropdownMenuItem>
                         <DialogForm
                           id='edit-member'
-                          title='Record Planting'
-                          description={`Edit member`}
+                          title='Edit User'
+                          description={`Edit user details`}
                           Trigger={
                             <DropdownMenuItem
                               onSelect={(e) => e.preventDefault()}
@@ -244,9 +258,35 @@ export default function UsersTable() {
               ))}
             </TableBody>
           </Table>
-          <ScrollBar orientation='horizontal' />
-        </ScrollArea>
+        </CardContent>
       </Card>
+
+      <div className="flex justify-between items-center mt-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {Math.min(filteredMembers.length, currentPage * itemsPerPage)} of {filteredMembers.length} users
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
       {selectedUser && (
         <Dialog

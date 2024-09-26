@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import MapComponent from '@/app/dashboard/myfarmers/components/MapComponent'
+import MapComponent from '@/app/dashboard/(components)/MapComponent'
 
 interface FieldLocationProps {
   selectedLocation: string

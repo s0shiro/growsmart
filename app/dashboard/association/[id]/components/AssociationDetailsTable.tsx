@@ -9,6 +9,8 @@ import {
   Users,
   UserPlus,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -72,13 +74,13 @@ type AssociationDetailsTableProps = {
 }
 
 export default function AssociationDetailsTable({
-  associationId,
-  associationName,
-}: AssociationDetailsTableProps) {
+                                                  associationId,
+                                                  associationName,
+                                                }: AssociationDetailsTableProps) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredDetails, setFilteredDetails] = useState<AssociationDetail[]>(
-    [],
-  )
+  const [filteredDetails, setFilteredDetails] = useState<AssociationDetail[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
 
   const {
     data: details,
@@ -101,6 +103,7 @@ export default function AssociationDetailsTable({
             .includes(term),
         )
         setFilteredDetails(filtered)
+        setCurrentPage(1)
       }
     },
     [details],
@@ -119,6 +122,12 @@ export default function AssociationDetailsTable({
       description: 'Member addition functionality to be implemented.',
     })
   }
+
+  const totalPages = Math.ceil(filteredDetails.length / itemsPerPage)
+  const paginatedDetails = filteredDetails.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   if (isLoading) {
     return <AssociationDetailsSkeleton />
@@ -182,91 +191,114 @@ export default function AssociationDetailsTable({
           </div>
         ) : (
           <div className='rounded-md border'>
-            <ScrollArea className='max-h-full'>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Gender</TableHead>
-                    <TableHead>Barangay</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>Municipality</TableHead>
-                    <TableHead className='text-right'>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredDetails.map((detail) => (
-                    <TableRow key={detail.id}>
-                      <TableCell className='font-medium'>
-                        <div className='flex items-center space-x-2'>
-                          <Avatar>
-                            <AvatarImage
-                              src={`https://api.dicebear.com/6.x/initials/svg?seed=${detail.firstname} ${detail.lastname}`}
-                            />
-                            <AvatarFallback>
-                              {detail.firstname[0]}
-                              {detail.lastname[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            {detail.firstname} {detail.lastname}
-                            <p className='text-sm text-muted-foreground'>
-                              {detail.phone}
-                            </p>
-                          </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Gender</TableHead>
+                  <TableHead>Barangay</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Municipality</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedDetails.map((detail) => (
+                  <TableRow key={detail.id}>
+                    <TableCell className='font-medium'>
+                      <div className='flex items-center space-x-2'>
+                        <Avatar>
+                          <AvatarImage
+                            src={`https://api.dicebear.com/6.x/initials/svg?seed=${detail.firstname} ${detail.lastname}`}
+                          />
+                          <AvatarFallback>
+                            {detail.firstname[0]}
+                            {detail.lastname[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          {detail.firstname} {detail.lastname}
+                          <p className='text-sm text-muted-foreground'>
+                            {detail.phone}
+                          </p>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            detail.gender === 'Male' ? 'default' : 'secondary'
-                          }
-                        >
-                          {detail.gender}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{detail.barangay}</TableCell>
-                      <TableCell>{detail.position || 'N/A'}</TableCell>
-                      <TableCell>{detail.municipality}</TableCell>
-                      <TableCell className='text-right'>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant='ghost' className='h-8 w-8 p-0'>
-                              <span className='sr-only'>Open menu</span>
-                              <MoreHorizontal className='h-4 w-4' />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align='end'>
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                              <Link href={`/dashboard/myfarmers/${detail.id}`}>
-                                View Farmer Details
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => console.log('edit')}
-                            >
-                              Edit Member
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className='text-red-600'
-                              onClick={() => console.log('remove')}
-                            >
-                              <Trash2 className='mr-2 h-4 w-4' />
-                              Remove from Association
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <ScrollBar orientation='horizontal' />
-            </ScrollArea>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          detail.gender === 'Male' ? 'default' : 'secondary'
+                        }
+                      >
+                        {detail.gender}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{detail.barangay}</TableCell>
+                    <TableCell>{detail.position || 'N/A'}</TableCell>
+                    <TableCell>{detail.municipality}</TableCell>
+                    <TableCell className='text-right'>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <span className='sr-only'>Open menu</span>
+                            <MoreHorizontal className='h-4 w-4' />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end'>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/myfarmers/${detail.id}`}>
+                              View Farmer Details
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => console.log('edit')}
+                          >
+                            Edit Member
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className='text-red-600'
+                            onClick={() => console.log('remove')}
+                          >
+                            <Trash2 className='mr-2 h-4 w-4' />
+                            Remove from Association
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
+        <div className="flex justify-between items-center mt-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {Math.min(filteredDetails.length, currentPage * itemsPerPage)} of {filteredDetails.length} members
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

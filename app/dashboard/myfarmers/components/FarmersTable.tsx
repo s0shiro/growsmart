@@ -12,6 +12,8 @@ import {
   Trash,
   Search,
   Plus,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 
 import useFetchAssociations from '@/hooks/association/useFetchAssociations'
@@ -67,8 +69,8 @@ type Farmer = {
   barangay: string
   phone: string
   created_at: string
-  association_id: string // New field
-  position: string // New field
+  association_id: string
+  position: string
 }
 
 type Association = {
@@ -87,8 +89,9 @@ const FarmersTable = () => {
   const [municipalityFilter, setMunicipalityFilter] = useState('All')
   const [associationFilter, setAssociationFilter] = useState('All')
   const [positionFilter, setPositionFilter] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
 
-  // Create a mapping of association IDs to names
   const associationMap = associations.reduce(
     (acc, association) => {
       acc[association.id] = association.name
@@ -97,7 +100,6 @@ const FarmersTable = () => {
     {} as Record<string, string>,
   )
 
-  // Filter farmers directly in the render process
   const filteredFarmers = farmers.filter(
     (farmer) =>
       (farmer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,8 +112,15 @@ const FarmersTable = () => {
       (positionFilter === 'All' || farmer.position === positionFilter),
   )
 
+  const totalPages = Math.ceil(filteredFarmers.length / itemsPerPage)
+  const paginatedFarmers = filteredFarmers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value.toLowerCase())
+    setCurrentPage(1)
   }
 
   const uniqueMunicipalities = [
@@ -128,13 +137,13 @@ const FarmersTable = () => {
   ]
 
   return (
-    <div>
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-foreground'>My Farmers</h2>
+    <div className="space-y-6">
+      <div className='flex justify-between items-center'>
+        <h2 className='text-2xl font-bold text-foreground'>My Farmers</h2>
         <DialogForm
           id='create-trigger'
           title='Add Farmer'
-          description='Add a new crop to your list.'
+          description='Add a new farmer to your list.'
           Trigger={
             <Button>
               <Plus className='mr-2 h-4 w-4' />
@@ -145,65 +154,70 @@ const FarmersTable = () => {
         />
       </div>
 
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6'>
-        <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
-          <Input
-            type='search'
-            placeholder='Search farmers...'
-            value={searchTerm}
-            onChange={handleSearch}
-            className='w-full sm:w-[300px]'
-            icon={<Search className='h-4 w-4 text-muted-foreground' />}
-          />
-          <Select
-            value={municipalityFilter}
-            onValueChange={setMunicipalityFilter}
-          >
-            <SelectTrigger className='w-full sm:w-[180px]'>
-              <SelectValue placeholder='Filter by Municipality' />
-            </SelectTrigger>
-            <SelectContent>
-              {uniqueMunicipalities.map((municipality) => (
-                <SelectItem key={municipality} value={municipality}>
-                  {municipality}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={associationFilter}
-            onValueChange={setAssociationFilter}
-          >
-            <SelectTrigger className='w-full sm:w-[180px]'>
-              <SelectValue placeholder='Filter by Association' />
-            </SelectTrigger>
-            <SelectContent>
-              {uniqueAssociations.map((associationId) => (
-                <SelectItem key={associationId} value={associationId}>
-                  {associationMap[associationId] || associationId}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={positionFilter} onValueChange={setPositionFilter}>
-            <SelectTrigger className='w-full sm:w-[180px]'>
-              <SelectValue placeholder='Filter by Position' />
-            </SelectTrigger>
-            <SelectContent>
-              {uniquePositions.map((position) => (
-                <SelectItem key={position} value={position}>
-                  {position}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <Input
+          type='search'
+          placeholder='Search farmers...'
+          value={searchTerm}
+          onChange={handleSearch}
+          className='w-full'
+          icon={<Search className='h-4 w-4 text-muted-foreground' />}
+        />
+        <Select
+          value={municipalityFilter}
+          onValueChange={(value) => { setMunicipalityFilter(value); setCurrentPage(1); }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder='Filter by Municipality' />
+          </SelectTrigger>
+          <SelectContent>
+            {uniqueMunicipalities.map((municipality) => (
+              <SelectItem key={municipality} value={municipality}>
+                {municipality}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={associationFilter}
+          onValueChange={(value) => { setAssociationFilter(value); setCurrentPage(1); }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder='Filter by Association' />
+          </SelectTrigger>
+          <SelectContent>
+            {uniqueAssociations.map((associationId) => (
+              <SelectItem key={associationId} value={associationId}>
+                {associationMap[associationId] || associationId}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={positionFilter}
+          onValueChange={(value) => { setPositionFilter(value); setCurrentPage(1); }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder='Filter by Position' />
+          </SelectTrigger>
+          <SelectContent>
+            {uniquePositions.map((position) => (
+              <SelectItem key={position} value={position}>
+                {position}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex justify-end">
         <Button
           variant='outline'
           onClick={() => {
             setMunicipalityFilter('All')
             setAssociationFilter('All')
             setPositionFilter('All')
+            setCurrentPage(1)
           }}
         >
           <Filter className='mr-2 h-4 w-4' />
@@ -211,7 +225,7 @@ const FarmersTable = () => {
         </Button>
       </div>
 
-      <ScrollArea className='h-[calc(100vh-350px)]'>
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -225,7 +239,7 @@ const FarmersTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredFarmers.map((farmer) => (
+            {paginatedFarmers.map((farmer) => (
               <TableRow key={farmer.id}>
                 <TableCell className='font-medium'>
                   <div className='flex items-center'>
@@ -276,7 +290,6 @@ const FarmersTable = () => {
                         <Trash className='mr-2 h-4 w-4' />
                         Delete
                       </DropdownMenuItem>
-
                       <DialogForm
                         id='create-record'
                         title='Record Planting'
@@ -297,8 +310,34 @@ const FarmersTable = () => {
             ))}
           </TableBody>
         </Table>
-        <ScrollBar orientation='horizontal' />
-      </ScrollArea>
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {Math.min(filteredFarmers.length, currentPage * itemsPerPage)} of {filteredFarmers.length} farmers
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
       {selectedFarmer && (
         <Dialog
