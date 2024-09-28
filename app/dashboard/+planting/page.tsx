@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -37,6 +37,23 @@ const FormSchema = z.object({
   }),
 })
 
+// Helper function to calculate harvest date based on category
+function calculateHarvestDate(plantingDate: string, cropCategory: string) {
+  const daysToHarvest: { [key: string]: number } = {
+    "palay": 120,
+    "corn": 90,
+    "high-value": 60,
+  };
+
+  if (!plantingDate || !cropCategory) return '';
+
+  const days = daysToHarvest[cropCategory] || 0;
+  const planting = new Date(plantingDate);
+  planting.setDate(planting.getDate() + days);
+
+  return planting.toISOString().split('T')[0]; // Return in yyyy-mm-dd format
+}
+
 export default function ImprovedPlantingForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -48,8 +65,14 @@ export default function ImprovedPlantingForm() {
   const { data: categories } = useGetCropCategory()
   const { watch, setValue } = form
 
+  const categoryNames = (categories || []).reduce((acc: any, category: any) => {
+    acc[category.id] = category.name;
+    return acc;
+  }, {});
+
   const selectedFarmer = watch('farmerId')
   const selectedCategory = watch('cropCategory')
+  const plantingDate = watch('plantingDate');
   const selectedCrop = watch('cropType')
 
   const { data: crops } = useFetchCrops(selectedCategory)
@@ -62,6 +85,20 @@ export default function ImprovedPlantingForm() {
     setSelectedLocation(locationName)
     setValue('fieldLocation', locationName)
   }
+
+  useEffect(() => {
+    if (plantingDate && selectedCategory) {
+      const harvestDate = calculateHarvestDate(plantingDate, categoryNames[selectedCategory]);
+      setValue('harvestDate', harvestDate);
+    }
+  }, [plantingDate, selectedCategory, setValue, categoryNames]);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      const categoryName = categoryNames[selectedCategory] || "Unknown Category";
+      console.log(categoryName);
+    }
+  }, [selectedCategory, categoryNames]);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
@@ -90,6 +127,7 @@ export default function ImprovedPlantingForm() {
       await queryClient.invalidateQueries({ queryKey: ['inspections'] })
     } catch (error) {
       console.error('Failed to submit form:', error)
+      toast.error('Failed to submit form. Please try again later.')
     }
   }
 

@@ -40,14 +40,14 @@ interface CropDetailsProps {
 }
 
 const CropDetails: React.FC<CropDetailsProps> = ({
-                                                   control,
-                                                   categories,
-                                                   crops,
-                                                   varieties,
-                                                   setValue,
-                                                   selectedCategory,
-                                                   selectedCrop,
-                                                 }) => {
+  control,
+  categories,
+  crops,
+  varieties,
+  setValue,
+  selectedCategory,
+  selectedCrop,
+}) => {
   const fieldConfigs = [
     {
       name: 'cropCategory',
@@ -100,7 +100,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
     {
       name: 'harvestDate',
       placeholder: 'Select date',
-      label: 'Expected Harvest',
+      label: 'Expected Harvest Date',
       type: 'date',
     },
   ]
@@ -151,13 +151,14 @@ const CropDetails: React.FC<CropDetailsProps> = ({
     name: string,
     label: string,
     placeholder: string,
+    readOnly: boolean = false,
   ) => (
     <FormField
       key={name}
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col">
+        <FormItem className='flex flex-col'>
           <FormLabel>{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
@@ -168,31 +169,40 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                     'w-full pl-3 text-left font-normal',
                     !field.value && 'text-muted-foreground',
                   )}
+                  disabled={readOnly}
                 >
                   {field.value ? (
                     format(new Date(field.value), 'PPP')
                   ) : (
                     <span>{placeholder}</span>
                   )}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={field.value ? new Date(field.value) : undefined}
-                onSelect={(date) => {
-                  if (date) {
-                    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-                    field.onChange(utcDate.toISOString().split('T')[0]);
-                  } else {
-                    field.onChange('');
-                  }
-                }}
-                initialFocus
-              />
-            </PopoverContent>
+            {!readOnly && (
+              <PopoverContent className='w-auto p-0' align='start'>
+                <Calendar
+                  mode='single'
+                  selected={field.value ? new Date(field.value) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      const utcDate = new Date(
+                        Date.UTC(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate(),
+                        ),
+                      )
+                      field.onChange(utcDate.toISOString().split('T')[0])
+                    } else {
+                      field.onChange('')
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            )}
           </Popover>
           <FormMessage />
         </FormItem>
@@ -201,9 +211,9 @@ const CropDetails: React.FC<CropDetailsProps> = ({
   )
 
   return (
-    <Card className="w-full">
-      <CardContent className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Card className='w-full'>
+      <CardContent className='p-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {fieldConfigs.map(({ name, placeholder, label, type }) => {
             if (type === 'select') {
               if (name === 'cropCategory') {
@@ -239,7 +249,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                 )
               }
             } else if (type === 'date') {
-              return renderDatePicker(name, label, placeholder)
+              return renderDatePicker(name, label, placeholder, name === 'harvestDate')
             } else {
               return (
                 <FormField
