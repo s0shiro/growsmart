@@ -40,6 +40,7 @@ import FarmerName from '../../(components)/ui/FarmerName'
 import InspectionForm from './InpectionForm'
 import DialogForm from '../../(components)/forms/DialogForm'
 import Link from 'next/link'
+import { getStatusColor } from '@/lib/utils'
 
 interface Crop {
   id: string
@@ -132,18 +133,7 @@ export default function InspectionTable() {
     setCurrentPage(1)
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'inspection':
-        return 'bg-yellow-200 text-yellow-800'
-      case 'pending':
-        return 'bg-blue-200 text-blue-800'
-      case 'completed':
-        return 'bg-green-200 text-green-800'
-      default:
-        return 'bg-gray-200 text-gray-800'
-    }
-  }
+
 
   return (
     <Card className='w-full max-w-6xl mx-auto'>
@@ -263,7 +253,7 @@ export default function InspectionTable() {
                         }
                         form={<InspectionForm plantingID={crop.id} />}
                       />
-                      <Link href={`/dashboard/inspection/${crop.id}`}>
+                      <Link href={`/dashboard/standing/${crop.id}`}>
                         <DropdownMenuItem>
                           <Eye className='mr-2 h-4 w-4' />
                           Inspection History

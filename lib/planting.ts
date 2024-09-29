@@ -121,7 +121,7 @@ export const getPlantedStatusRecords = async (userID: string) => {
   const { data, error } = await supabase
     .from('planting_records')
     .select('*') // Selects all fields; you can specify fields if needed
-    .or('status.eq.harvest') // Filters records where status is "planted" or "inspection"
+    .or('status.eq.harvest') // Filters records where status is "planted" or "standing"
     .eq('user_id', userID) // Filters records by the provided userID
     .order('created_at', { ascending: false }) // Orders the records by created_at in descending order
 
@@ -133,14 +133,14 @@ export const getPlantedStatusRecords = async (userID: string) => {
   return data // Returns the queried records
 }
 
-//get the plating records that the status is equal to inspection
+//get the plating records that the status is equal to standing
 export const getInspectionStatusRecords = async (userID: string) => {
   const supabase = createClient()
 
   const { data, error } = await supabase
     .from('planting_records')
     .select('*') // Selects all fields; you can specify fields if needed
-    .eq('status', 'inspection') // Filters records where status is "planted" or "inspection"
+    .eq('status', 'inspection') // Filters records where status is "planted" or "standing"
     .eq('user_id', userID) // Filters records by the provided userID
     .order('created_at', { ascending: false }) // Orders the records by created_at in descending order
 

@@ -39,6 +39,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import FarmerName from '../../(components)/ui/FarmerName'
+import { getStatusColor } from '@/lib/utils'
 
 type PlantingRecords = {
   area_planted: number
@@ -129,15 +130,6 @@ const HarvestedCropsTable = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   )
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'harvested':
-        return 'bg-red-800 text-red-100'
-      default:
-        return 'bg-green-800 text-green-100'
-    }
-  }
 
   return (
     <Card className='w-full max-w-6xl mx-auto'>

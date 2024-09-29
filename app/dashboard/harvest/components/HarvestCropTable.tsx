@@ -42,6 +42,7 @@ import FarmerName from '../../(components)/ui/FarmerName'
 import DialogForm from '../../(components)/forms/DialogForm'
 import HarvestForm from '../../(components)/forms/HarvestForm'
 import HarvestUploader from '../../(components)/forms/HarvestUploader'
+import { getStatusColor } from '@/lib/utils'
 
 type PlantingRecords = {
   area_planted: number
@@ -133,14 +134,6 @@ const HarvestCropTable = () => {
     currentPage * itemsPerPage,
   )
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'harvest':
-        return 'bg-green-800 text-green-100'
-      default:
-        return 'bg-yellow-800 text-red-100'
-    }
-  }
 
   return (
     <Card className='w-full max-w-6xl mx-auto'>

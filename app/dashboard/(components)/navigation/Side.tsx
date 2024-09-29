@@ -41,7 +41,7 @@ const productionLinks = [
     label: 'Add Planting',
   },
   {
-    href: '/dashboard/inspection',
+    href: '/dashboard/standing',
     Icon: ClipboardList,
     label: 'Standing Crops',
   },

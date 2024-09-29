@@ -129,7 +129,7 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const harvestDate = new Date(data.harvestDate)
-      const status = isToday(harvestDate) ? 'harvest' : 'inspection'
+      const status = isToday(harvestDate) ? 'harvest' : 'standing'
 
       await addPlantingRecord({
         farmerId: farmerID,
