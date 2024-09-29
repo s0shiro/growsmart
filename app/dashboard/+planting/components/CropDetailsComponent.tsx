@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Control, UseFormSetValue } from 'react-hook-form'
+import { Control, UseFormSetValue, useWatch } from 'react-hook-form'
 import {
   FormField,
   FormItem,
@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
@@ -104,6 +104,8 @@ const CropDetails: React.FC<CropDetailsProps> = ({
       type: 'date',
     },
   ]
+
+  const formValues = useWatch({ control })
 
   const renderSelect = (
     name: string,
@@ -211,71 +213,112 @@ const CropDetails: React.FC<CropDetailsProps> = ({
   )
 
   return (
-    <Card className='w-full'>
-      <CardContent className='p-6'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {fieldConfigs.map(({ name, placeholder, label, type }) => {
-            if (type === 'select') {
-              if (name === 'cropCategory') {
-                return renderSelect(
+    <div className='flex flex-col lg:flex-row gap-6'>
+      <Card className='flex-1'>
+        <CardHeader>
+          <CardTitle>Crop Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            {fieldConfigs.map(({ name, placeholder, label, type }) => {
+              if (type === 'select') {
+                if (name === 'cropCategory') {
+                  return renderSelect(
+                    name,
+                    label,
+                    placeholder,
+                    categories,
+                    false,
+                    (value) => {
+                      setValue('cropType', '')
+                      setValue('variety', '')
+                    },
+                  )
+                } else if (name === 'cropType') {
+                  return renderSelect(
+                    name,
+                    label,
+                    placeholder,
+                    crops,
+                    !selectedCategory,
+                    (value) => {
+                      setValue('variety', '')
+                    },
+                  )
+                } else if (name === 'variety') {
+                  return renderSelect(
+                    name,
+                    label,
+                    placeholder,
+                    varieties,
+                    !selectedCrop,
+                  )
+                }
+              } else if (type === 'date') {
+                return renderDatePicker(
                   name,
                   label,
                   placeholder,
-                  categories,
-                  false,
-                  (value) => {
-                    setValue('cropType', '')
-                    setValue('variety', '')
-                  },
+                  name === 'harvestDate',
                 )
-              } else if (name === 'cropType') {
-                return renderSelect(
-                  name,
-                  label,
-                  placeholder,
-                  crops,
-                  !selectedCategory,
-                  (value) => {
-                    setValue('variety', '')
-                  },
-                )
-              } else if (name === 'variety') {
-                return renderSelect(
-                  name,
-                  label,
-                  placeholder,
-                  varieties,
-                  !selectedCrop,
+              } else {
+                return (
+                  <FormField
+                    key={name}
+                    control={control}
+                    name={name}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={placeholder}
+                            type={type}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )
               }
-            } else if (type === 'date') {
-              return renderDatePicker(name, label, placeholder, name === 'harvestDate')
-            } else {
-              return (
-                <FormField
-                  key={name}
-                  control={control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={placeholder}
-                          type={type}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )
-            }
-          })}
-        </div>
-      </CardContent>
-    </Card>
+            })}
+          </div>
+        </CardContent>
+      </Card>
+      <Card className='flex-1'>
+        <CardHeader>
+          <CardTitle>Crop Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='space-y-2'>
+            {fieldConfigs.map(({ name, label }) => (
+              <div
+                key={name}
+                className='flex justify-between items-center py-2 border-b last:border-b-0'
+              >
+                <span className='font-medium'>{label}:</span>
+                <span className='text-muted-foreground'>
+                  {name === 'cropCategory'
+                    ? categories.find(
+                        (category) => category.id === formValues[name],
+                      )?.name || 'Not set'
+                    : name === 'cropType'
+                      ? crops.find((crop) => crop.id === formValues[name])
+                          ?.name || 'Not set'
+                      : name === 'variety'
+                        ? varieties.find(
+                            (variety) => variety.id === formValues[name],
+                          )?.name || 'Not set'
+                        : formValues[name] || 'Not set'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 

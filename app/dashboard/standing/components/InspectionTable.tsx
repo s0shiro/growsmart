@@ -37,8 +37,6 @@ import {
   Loader2,
 } from 'lucide-react'
 import useReadInspections from '@/hooks/crop/useReadInspection'
-import CropName from '../../(components)/ui/CropName'
-import FarmerName from '../../(components)/ui/FarmerName'
 import InspectionForm from './InpectionForm'
 import DialogForm from '../../(components)/forms/DialogForm'
 import Link from 'next/link'
@@ -96,32 +94,36 @@ export default function InspectionTable() {
     }
   }, [crops])
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-64">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  )
-  if (error) return (
-    <Card className="w-full max-w-6xl mx-auto">
-      <CardContent className="p-6">
-        <p className="text-center text-destructive">Error loading crops data</p>
-      </CardContent>
-    </Card>
-  )
+  if (isLoading)
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+      </div>
+    )
+  if (error)
+    return (
+      <Card className='w-full max-w-6xl mx-auto'>
+        <CardContent className='p-6'>
+          <p className='text-center text-destructive'>
+            Error loading crops data
+          </p>
+        </CardContent>
+      </Card>
+    )
 
   const filteredCrops = Array.isArray(crops)
     ? crops.filter((crop) => {
-      const typedCrop = crop as Crop
-      return (
-        Object.values(typedCrop).some((value) =>
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
-        ) &&
-        (filters.cropName === 'all' ||
-          typedCrop.crop_type === filters.cropName) &&
-        (filters.fieldLocation === 'all' ||
-          typedCrop.field_location === filters.fieldLocation)
-      )
-    })
+        const typedCrop = crop as Crop
+        return (
+          Object.values(typedCrop).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+          ) &&
+          (filters.cropName === 'all' ||
+            typedCrop.crop_type === filters.cropName) &&
+          (filters.fieldLocation === 'all' ||
+            typedCrop.field_location === filters.fieldLocation)
+        )
+      })
     : []
 
   const pageCount = Math.ceil(filteredCrops.length / itemsPerPage)
@@ -147,33 +149,38 @@ export default function InspectionTable() {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto overflow-hidden">
-      <CardHeader className="bg-primary/5 border-b">
-        <CardTitle className="text-2xl font-bold">Standing Crops</CardTitle>
+    <Card className='w-full max-w-6xl mx-auto overflow-hidden'>
+      <CardHeader className='bg-primary/5 border-b'>
+        <CardTitle className='text-2xl font-bold'>Standing Crops</CardTitle>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <CardContent className='p-6 space-y-6'>
+        <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
+          <div className='relative flex-grow'>
+            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
             <Input
-              placeholder="Search crops..."
+              placeholder='Search crops...'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary"
+              className='pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary'
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             <Select
               value={filters.cropName}
               onValueChange={(value) => handleFilterChange('cropName', value)}
             >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="All Crops" />
+              <SelectTrigger className='w-[140px]'>
+                <SelectValue placeholder='All Crops' />
               </SelectTrigger>
               <SelectContent>
                 {cropNames.map((id) => (
                   <SelectItem key={id} value={id}>
-                    <CropName cropId={id} />
+                    {id === 'all'
+                      ? 'All'
+                      : (Array.isArray(crops) &&
+                          crops.find((crop: any) => crop.crop_type === id)
+                            ?.crops?.name) ||
+                        'Unknown'}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -184,7 +191,7 @@ export default function InspectionTable() {
                 handleFilterChange('fieldLocation', value)
               }
             >
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className='w-[140px]'>
                 <SelectValue
                   placeholder={
                     filters.fieldLocation === 'all'
@@ -203,25 +210,25 @@ export default function InspectionTable() {
             </Select>
             {Object.values(filters).some((filter) => filter !== 'all') && (
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={clearFilters}
-                className="flex items-center hover:bg-destructive/10 transition-colors duration-300"
+                className='flex items-center hover:bg-destructive/10 transition-colors duration-300'
               >
-                <X className="mr-2 h-4 w-4" /> Clear Filters
+                <X className='mr-2 h-4 w-4' /> Clear Filters
               </Button>
             )}
           </div>
         </div>
-        <div className="rounded-md border overflow-hidden">
+        <div className='rounded-md border overflow-hidden'>
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
+              <TableRow className='bg-muted/50'>
                 <TableHead>Farmer Name</TableHead>
                 <TableHead>Crop Name</TableHead>
                 <TableHead>Field Location</TableHead>
                 <TableHead>Harvest Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className='text-right'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -234,11 +241,14 @@ export default function InspectionTable() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
-                    <TableCell className="font-medium">
-                      <FarmerName farmerId={crop.farmer_id} />
+                    <TableCell className='font-medium'>
+                      <p>
+                        {crop.technician_farmers?.firstname}{' '}
+                        {crop.technician_farmers?.lastname}
+                      </p>
                     </TableCell>
                     <TableCell>
-                      <CropName cropId={crop.crop_type} />
+                      <p>{crop.crops?.name}</p>
                     </TableCell>
                     <TableCell>{crop.field_location}</TableCell>
                     <TableCell>{crop.harvest_date}</TableCell>
@@ -247,18 +257,18 @@ export default function InspectionTable() {
                         {crop.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className='text-right'>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <span className='sr-only'>Open menu</span>
+                            <MoreHorizontal className='h-4 w-4' />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align='end'>
                           <DialogForm
-                            id="create-record"
-                            title="Record Planting"
+                            id='create-record'
+                            title='Record Planting'
                             description={`Record planting data to ${crop.id}`}
                             Trigger={
                               <DropdownMenuItem
@@ -271,7 +281,7 @@ export default function InspectionTable() {
                           />
                           <Link href={`/dashboard/standing/${crop.id}`}>
                             <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
+                              <Eye className='mr-2 h-4 w-4' />
                               Inspection History
                             </DropdownMenuItem>
                           </Link>
@@ -284,32 +294,38 @@ export default function InspectionTable() {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing {Math.min(filteredCrops.length, (currentPage - 1) * itemsPerPage + 1)} to {Math.min(filteredCrops.length, currentPage * itemsPerPage)} of {filteredCrops.length} entries
+        <div className='flex items-center justify-between'>
+          <p className='text-sm text-muted-foreground'>
+            Showing{' '}
+            {Math.min(
+              filteredCrops.length,
+              (currentPage - 1) * itemsPerPage + 1,
+            )}{' '}
+            to {Math.min(filteredCrops.length, currentPage * itemsPerPage)} of{' '}
+            {filteredCrops.length} entries
           </p>
-          <div className="flex items-center space-x-2">
+          <div className='flex items-center space-x-2'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="transition-all duration-300 hover:bg-primary/10"
+              className='transition-all duration-300 hover:bg-primary/10'
             >
-              <ChevronLeft className="mr-2 h-4 w-4" />
+              <ChevronLeft className='mr-2 h-4 w-4' />
               Previous
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() =>
                 setCurrentPage((prev) => Math.min(pageCount, prev + 1))
               }
               disabled={currentPage === pageCount}
-              className="transition-all duration-300 hover:bg-primary/10"
+              className='transition-all duration-300 hover:bg-primary/10'
             >
               Next
-              <ChevronRight className="ml-2 h-4 w-4" />
+              <ChevronRight className='ml-2 h-4 w-4' />
             </Button>
           </div>
         </div>

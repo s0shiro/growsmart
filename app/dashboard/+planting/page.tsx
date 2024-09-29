@@ -175,11 +175,11 @@ export default function ImprovedPlantingForm() {
               exit={{ opacity: 0, x: 100 }}
               transition={{ duration: 0.3 }}
             >
-              <Card>
+              <Card className="w-full mx-auto">
                 <CardHeader>
-                  <CardTitle className="text-lg">Crop Details</CardTitle>
+                  <CardTitle className="text-2xl">Crop Details</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <CardContent>
                   <CropDetails
                     control={form.control}
                     categories={categories || []}
