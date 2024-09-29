@@ -84,7 +84,15 @@ export const addCrop = async ({
 export const getAllCropCategory = async () => {
   const supabase = createClient()
 
-  const { data, error } = await supabase.from('crop_categories').select('*')
+  const { data, error } = await supabase
+    .from('crop_categories')
+    .select(`
+      *,
+      crops (
+        *,
+        crop_varieties (*)
+      )
+    `)
 
   if (error) {
     console.error('Supabase error:', error.message)

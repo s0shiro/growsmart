@@ -1,7 +1,7 @@
 import { getAllCropCategory } from '@/lib/crop'
 import { useQuery } from '@tanstack/react-query'
 
-export const useGetCropCategory = () => {
+export const useGetAllCropData = () => {
   return useQuery({
     queryKey: ['category'],
     queryFn: async () => {
@@ -17,4 +17,4 @@ export const useGetCropCategory = () => {
   })
 }
 
-export default useGetCropCategory
+export default useGetAllCropData

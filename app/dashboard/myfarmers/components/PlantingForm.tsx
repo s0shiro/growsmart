@@ -17,10 +17,10 @@ import { Button } from '@/components/ui/button'
 import { addPlantingRecord } from '@/lib/planting'
 import { isToday } from 'date-fns'
 
-import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
 import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
 import SelectField from '../../(components)/forms/CustomSelectField'
-import MapComponent from '../../(components)/MapComponent' // Import the MapComponent
+import MapComponent from '../../(components)/MapComponent'
+import useGetAllCropData from '@/hooks/crop/useGetAllCropData' // Import the MapComponent
 
 const FormSchema = z.object({
   cropCategory: z.string(),
@@ -110,7 +110,7 @@ function PlantingForm({ farmerID }: { farmerID: string | undefined }) {
     defaultValues: {},
   })
 
-  const { data: categories } = useGetCropCategory()
+  const { data: categories } = useGetAllCropData()
   const { watch, setValue } = form
 
   const selectedCategory = watch('cropCategory')

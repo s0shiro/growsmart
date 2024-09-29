@@ -7,8 +7,6 @@ import { z } from 'zod'
 import { Form } from '@/components/ui/form'
 import { addPlantingRecord } from '@/lib/planting'
 import { isToday } from 'date-fns'
-import useGetCropCategory from '@/hooks/crop/useGetCropCategory'
-import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
 import useFetchFarmersByUserId from '@/hooks/farmer/useFetchFarmersByUserId'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import FarmerSelection from '@/app/dashboard/+planting/components/FarmerSelection'
@@ -18,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 
 const FormSchema = z.object({
   farmerId: z.string().nonempty({ message: 'Farmer selection is required' }),
@@ -62,10 +61,10 @@ export default function ImprovedPlantingForm() {
 
   const queryClient = useQueryClient()
   const { data: farmers } = useFetchFarmersByUserId()
-  const { data: categories } = useGetCropCategory()
+  const { data: allCropData } = useGetAllCropData()
   const { watch, setValue } = form
 
-  const categoryNames = (categories || []).reduce((acc: any, category: any) => {
+  const categoryNames = (allCropData || []).reduce((acc: any, category: any) => {
     acc[category.id] = category.name;
     return acc;
   }, {});
@@ -74,9 +73,6 @@ export default function ImprovedPlantingForm() {
   const selectedCategory = watch('cropCategory')
   const plantingDate = watch('plantingDate');
   const selectedCrop = watch('cropType')
-
-  const { data: crops } = useFetchCrops(selectedCategory)
-  const { data: varieties } = useFetchVarieties(selectedCrop)
 
   const [selectedLocation, setSelectedLocation] = useState<string>('')
   const [step, setStep] = useState(1)
@@ -182,9 +178,6 @@ export default function ImprovedPlantingForm() {
                 <CardContent>
                   <CropDetails
                     control={form.control}
-                    categories={categories || []}
-                    crops={crops || []}
-                    varieties={varieties || []}
                     setValue={setValue}
                     selectedCategory={selectedCategory}
                     selectedCrop={selectedCrop}
@@ -217,13 +210,9 @@ export default function ImprovedPlantingForm() {
               />
               <div className="flex justify-between mt-4">
                 <Button type="button" onClick={prevStep}>
-                  Previous
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={form.formState.isSubmitting}
-                >
-                  {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
+                <Button type="submit">
+                  Submit
                 </Button>
               </div>
             </motion.div>

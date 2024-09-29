@@ -37,7 +37,13 @@ export const getListOfFarmers = async (userId: string) => {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select()
+    .select(`
+      *,
+      association(
+        id,
+        name
+      )
+    `)
     .eq('user_id', userId)
     .order('lastname', { ascending: true }) // Orders by lastname in ascending order
 

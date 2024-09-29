@@ -15,8 +15,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
-
-import useFetchAssociations from '@/hooks/association/useFetchAssociations'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -54,7 +52,6 @@ import {
 } from '@/components/ui/select'
 import DialogForm from '../../(components)/forms/DialogForm'
 import PlantingForm from './PlantingForm'
-import AssociationName from '../../(components)/ui/AssociationName'
 import CreateFarmerForm from './CreateFarmerForm'
 import Link from 'next/link'
 import useFetchFarmersByUserId from '@/hooks/farmer/useFetchFarmersByUserId'
@@ -71,6 +68,7 @@ type Farmer = {
   created_at: string
   association_id: string
   position: string
+  association: Association
 }
 
 type Association = {
@@ -80,9 +78,7 @@ type Association = {
 
 const FarmersTable = () => {
   const { data: farmersData } = useFetchFarmersByUserId()
-  const { data: associationsData } = useFetchAssociations()
   const farmers: Farmer[] = (farmersData as Farmer[]) || []
-  const associations: Association[] = (associationsData as Association[]) || []
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFarmer, setSelectedFarmer] = useState<Farmer | null>(null)
@@ -92,13 +88,6 @@ const FarmersTable = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  const associationMap = associations.reduce(
-    (acc, association) => {
-      acc[association.id] = association.name
-      return acc
-    },
-    {} as Record<string, string>,
-  )
 
   const filteredFarmers = farmers.filter(
     (farmer) =>
@@ -186,9 +175,14 @@ const FarmersTable = () => {
             <SelectValue placeholder='Filter by Association' />
           </SelectTrigger>
           <SelectContent>
-            {uniqueAssociations.map((associationId) => (
-              <SelectItem key={associationId} value={associationId}>
-                {associationMap[associationId] || associationId}
+            {uniqueAssociations.map((id) => (
+              <SelectItem key={id} value={id}>
+                {id === 'all'
+                  ? 'All'
+                  : (Array.isArray(farmers) &&
+                    farmers.find((farmer: any) => farmer.association_id === id)?.association
+                      ?.name) ||
+                  'All'}
               </SelectItem>
             ))}
           </SelectContent>
@@ -257,7 +251,7 @@ const FarmersTable = () => {
                 <TableCell>{farmer.municipality}</TableCell>
                 <TableCell>{farmer.barangay}</TableCell>
                 <TableCell>
-                  <AssociationName associationID={farmer.association_id} />
+                  <p>{farmer.association.name}</p>
                 </TableCell>
                 <TableCell>
                   <Badge variant='outline'>{farmer.position}</Badge>
@@ -364,9 +358,7 @@ const FarmersTable = () => {
               <div className='grid grid-cols-4 items-center gap-4'>
                 <Label className='text-right'>Association:</Label>
                 <span className='col-span-3'>
-                  <AssociationName
-                    associationID={selectedFarmer.association_id}
-                  />
+                  {selectedFarmer.association.name}
                 </span>
               </div>
               <div className='grid grid-cols-4 items-center gap-4'>

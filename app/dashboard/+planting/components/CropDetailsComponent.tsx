@@ -28,12 +28,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 
 interface CropDetailsProps {
   control: Control<any>
-  categories: any[]
-  crops: any[]
-  varieties: any[]
   setValue: UseFormSetValue<any>
   selectedCategory: string
   selectedCrop: string
@@ -41,13 +39,20 @@ interface CropDetailsProps {
 
 const CropDetails: React.FC<CropDetailsProps> = ({
   control,
-  categories,
-  crops,
-  varieties,
   setValue,
   selectedCategory,
   selectedCrop,
 }) => {
+  const { data: allCropData = [] } = useGetAllCropData()
+
+  const categories = Array.isArray(allCropData) ? allCropData : []
+  const crops = selectedCategory
+    ? categories.find((category: any) => category.id === selectedCategory)?.crops || []
+    : []
+  const varieties = selectedCrop
+    ? crops.find((crop: any) => crop.id === selectedCrop)?.crop_varieties || []
+    : []
+
   const fieldConfigs = [
     {
       name: 'cropCategory',
@@ -302,14 +307,14 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                 <span className='text-muted-foreground'>
                   {name === 'cropCategory'
                     ? categories.find(
-                        (category) => category.id === formValues[name],
+                        (category:any) => category.id === formValues[name],
                       )?.name || 'Not set'
                     : name === 'cropType'
-                      ? crops.find((crop) => crop.id === formValues[name])
+                      ? crops.find((crop:any) => crop.id === formValues[name])
                           ?.name || 'Not set'
                       : name === 'variety'
                         ? varieties.find(
-                            (variety) => variety.id === formValues[name],
+                            (variety:any) => variety.id === formValues[name],
                           )?.name || 'Not set'
                         : formValues[name] || 'Not set'}
                 </span>
