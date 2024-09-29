@@ -13,15 +13,18 @@ export function formatDate(dateString: string) {
   })
 }
 
-export const getStatusColor = (status: string) => {
+export function getStatusColor(status: string): string {
+  console.log(`Status received: ${status}`);
   switch (status.toLowerCase()) {
     case 'inspection':
-      return 'bg-yellow-200 text-yellow-800'
+      return 'bg-green-500 text-white';
     case 'harvest':
-      return 'bg-blue-200 text-blue-800'
+      return 'bg-green-500 text-white';
     case 'harvested':
-      return 'bg-green-200 text-green-800'
+      return 'bg-green-500 text-black';
+    case 'cancelled':
+      return 'bg-destructive text-destructive-foreground';
     default:
-      return 'bg-gray-200 text-gray-800'
+      return 'bg-gray-500 text-white';
   }
 }

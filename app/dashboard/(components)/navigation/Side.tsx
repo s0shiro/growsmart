@@ -48,12 +48,12 @@ const productionLinks = [
   {
     href: '/dashboard/harvest',
     Icon: CheckSquare,
-    label: 'Harvest',
+    label: 'Harvest Crops',
   },
   {
     href: '/dashboard/harvested',
     Icon: CheckCircle,
-    label: 'Harvested',
+    label: 'Harvested Crops',
   },
 ]
 

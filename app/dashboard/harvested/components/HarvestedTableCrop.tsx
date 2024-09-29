@@ -4,10 +4,11 @@ import { useState, useMemo } from 'react'
 import {
   MoreHorizontal,
   Search,
-  Filter,
   ChevronLeft,
   ChevronRight,
   X,
+  Eye,
+  Loader2
 } from 'lucide-react'
 import useFetchHarvestedStatus from '@/hooks/crop/useFetchHarvestedStatus'
 import {
@@ -40,6 +41,7 @@ import {
 } from '@/components/ui/table'
 import FarmerName from '../../(components)/ui/FarmerName'
 import { getStatusColor } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
 
 type PlantingRecords = {
   area_planted: number
@@ -91,9 +93,9 @@ const HarvestedCropsTable = () => {
     ]
   }, [allPlantingRecords])
 
-  const handleSearch = (e: any) => {
-    const term = e.target.value.toLowerCase()
-    setSearchTerm(term)
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1)
   }
 
   const handleFilterChange = (type: keyof Filters, value: string) => {
@@ -131,29 +133,35 @@ const HarvestedCropsTable = () => {
     currentPage * itemsPerPage,
   )
 
+  if (isFetching) return (
+    <div className="flex items-center justify-center h-64">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  )
+
   return (
-    <Card className='w-full max-w-6xl mx-auto'>
-      <CardHeader>
-        <CardTitle>Harvested Crops</CardTitle>
+    <Card className="w-full max-w-6xl mx-auto overflow-hidden">
+      <CardHeader className="bg-primary/5 border-b">
+        <CardTitle className="text-2xl font-bold">Harvested Crops</CardTitle>
       </CardHeader>
-      <CardContent className='space-y-4'>
-        <div className='flex flex-col sm:flex-row gap-2 items-start sm:items-center'>
-          <div className='relative flex-grow'>
+      <CardContent className="p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder='Search crops...'
+              placeholder="Search crops..."
               value={searchTerm}
               onChange={handleSearch}
-              className='pl-8'
+              className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary"
             />
-            <Filter className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
           </div>
-          <div className='flex flex-wrap gap-2'>
+          <div className="flex flex-wrap gap-2">
             <Select
               value={filters.cropName}
               onValueChange={(value) => handleFilterChange('cropName', value)}
             >
-              <SelectTrigger className='w-[140px]'>
-                <SelectValue placeholder='All Crops' />
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="All Crops" />
               </SelectTrigger>
               <SelectContent>
                 {cropNames.map((id) => (
@@ -169,7 +177,7 @@ const HarvestedCropsTable = () => {
                 handleFilterChange('fieldLocation', value)
               }
             >
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className="w-[140px]">
                 <SelectValue
                   placeholder={
                     filters.fieldLocation === 'all'
@@ -188,101 +196,106 @@ const HarvestedCropsTable = () => {
             </Select>
             {Object.values(filters).some((filter) => filter !== 'all') && (
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={clearFilters}
-                className='flex items-center'
+                className="flex items-center hover:bg-destructive/10 transition-colors duration-300"
               >
-                <X className='mr-2 h-4 w-4' /> Clear Filters
+                <X className="mr-2 h-4 w-4" /> Clear Filters
               </Button>
             )}
           </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Farmer Name</TableHead>
-              <TableHead>Crop Name</TableHead>
-              <TableHead>Field Location</TableHead>
-              <TableHead>Harvest Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className='text-right'>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedRecords.map((record, index) => (
-              <TableRow
-                key={record.id} // Ensure unique key for each row
-                className={index % 2 === 0 ? 'bg-muted/50' : ''}
-              >
-                <TableCell className='font-medium'>
-                  <FarmerName farmerId={record.farmer_id} />
-                </TableCell>
-                <TableCell>
-                  <CropName cropId={record.crop_type} />
-                </TableCell>
-                <TableCell>{record.field_location}</TableCell>
-                <TableCell>{record.harvest_date}</TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(record.status)}>
-                    {record.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className='text-right'>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='ghost' className='h-8 w-8 p-0'>
-                        <span className='sr-only'>Open menu</span>
-                        <MoreHorizontal className='h-4 w-4' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem>
-                        <Link href={`/dashboard/farmers/${record.farmer_id}`}>
-                          View Farmer
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Link href={`/dashboard/harvested/${record.id}`}>
-                          Harvest Details
-                        </Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        <div className="rounded-md border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead>Farmer Name</TableHead>
+                <TableHead>Crop Name</TableHead>
+                <TableHead>Field Location</TableHead>
+                <TableHead>Harvest Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <div className='flex items-center justify-between'>
-          <p className='text-sm text-muted-foreground'>
-            Showing{' '}
-            {Math.min(
-              filteredRecords.length,
-              (currentPage - 1) * itemsPerPage + 1,
-            )}{' '}
-            to {Math.min(filteredRecords.length, currentPage * itemsPerPage)} of{' '}
-            {filteredRecords.length} entries
+            </TableHeader>
+            <TableBody>
+              <AnimatePresence>
+                {paginatedRecords.map((record, index) => (
+                  <motion.tr
+                    key={record.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
+                    <TableCell className="font-medium">
+                      <FarmerName farmerId={record.farmer_id} />
+                    </TableCell>
+                    <TableCell>
+                      <CropName cropId={record.crop_type} />
+                    </TableCell>
+                    <TableCell>{record.field_location}</TableCell>
+                    <TableCell>{record.harvest_date}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(record.status)}>
+                        {record.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Link href={`/dashboard/farmers/${record.farmer_id}`}>
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Farmer
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link href={`/dashboard/harvested/${record.id}`}>
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Harvest Details
+                            </DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing {Math.min(filteredRecords.length, (currentPage - 1) * itemsPerPage + 1)} to {Math.min(filteredRecords.length, currentPage * itemsPerPage)} of {filteredRecords.length} entries
           </p>
-          <div className='flex items-center space-x-2'>
+          <div className="flex items-center space-x-2">
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
+              className="transition-all duration-300 hover:bg-primary/10"
             >
-              <ChevronLeft className='h-4 w-4' />
+              <ChevronLeft className="mr-2 h-4 w-4" />
               Previous
             </Button>
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={() =>
                 setCurrentPage((prev) => Math.min(pageCount, prev + 1))
               }
               disabled={currentPage === pageCount}
+              className="transition-all duration-300 hover:bg-primary/10"
             >
               Next
-              <ChevronRight className='h-4 w-4' />
+              <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
