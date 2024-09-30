@@ -12,6 +12,7 @@ export const createNewFarmer = async (data: {
   phoneNumber: string
   association_id: string
   position: string
+  avatar: string | undefined
 }) => {
   const supabase = createClient()
   const user = await getCurrentUser()
@@ -26,6 +27,7 @@ export const createNewFarmer = async (data: {
     phone: data.phoneNumber,
     association_id: data.association_id,
     position: data.position,
+    avatar: data.avatar,
   })
 
   if (error) {

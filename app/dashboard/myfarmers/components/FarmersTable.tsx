@@ -68,6 +68,7 @@ type Farmer = {
   created_at: string
   association_id: string
   position: string
+  avatar: string
   association: Association
 }
 
@@ -239,7 +240,7 @@ const FarmersTable = () => {
                   <div className='flex items-center'>
                     <Avatar className='h-8 w-8 mr-2'>
                       <AvatarImage
-                        src={`/placeholder.svg?text=${farmer.firstname[0]}`}
+                        src={farmer.avatar}
                         alt={farmer.firstname}
                       />
                       <AvatarFallback>{farmer.firstname[0]}</AvatarFallback>
@@ -284,19 +285,6 @@ const FarmersTable = () => {
                         <Trash className='mr-2 h-4 w-4' />
                         Delete
                       </DropdownMenuItem>
-                      <DialogForm
-                        id='create-record'
-                        title='Record Planting'
-                        description={`Record planting data to ${farmer.firstname}`}
-                        Trigger={
-                          <DropdownMenuItem
-                            onSelect={(e) => e.preventDefault()}
-                          >
-                            Record Planting
-                          </DropdownMenuItem>
-                        }
-                        form={<PlantingForm farmerID={farmer.id} />}
-                      />
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

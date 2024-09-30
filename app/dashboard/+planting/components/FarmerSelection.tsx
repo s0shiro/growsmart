@@ -12,7 +12,7 @@ interface Farmer {
   id: string
   firstname: string
   lastname: string
-  avatarUrl?: string
+  avatar?: string
 }
 
 interface FarmerSelectionProps {
@@ -59,7 +59,7 @@ export default function FarmerSelection({ control, farmers }: FarmerSelectionPro
                     onClick={() => field.onChange(farmer.id)}
                   >
                     <Avatar>
-                      <AvatarImage src={farmer.avatarUrl} alt={`${farmer.firstname} ${farmer.lastname}`} />
+                      <AvatarImage src={farmer.avatar} alt={`${farmer.firstname} ${farmer.lastname}`} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {farmer.firstname[0]}{farmer.lastname[0]}
                       </AvatarFallback>

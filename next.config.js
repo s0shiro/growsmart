@@ -16,6 +16,10 @@ const nextConfig = {
         hostname: 'lzbjbeovjpnaktxpdfcn.supabase.co',
         protocol: 'https',
       },
+      {
+        hostname: 'files.edgestore.dev',
+        protocol: 'https',
+      },
     ],
   },
 }

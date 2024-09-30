@@ -13,8 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-
-import { useTransition } from 'react'
+import { useState } from 'react'
 import { useAddFarmer } from '@/hooks/farmer/useAddFarmer'
 import SelectField from '../../(components)/forms/CustomSelectField'
 import { toast } from 'sonner'
@@ -26,6 +25,9 @@ import {
 } from '@/hooks/municipalities/useFetchMunicipalities'
 import useReadAssociation from '@/hooks/association/useReadAssociations'
 import SelectFieldName from './SelecFieldName'
+import { SingleImageDropzone } from '@/app/dashboard/(components)/forms/single-image-dropzone'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEdgeStore } from '@/lib/edgestore'
 
 const FormSchema = z.object({
   firstname: z.string(),
@@ -38,6 +40,7 @@ const FormSchema = z.object({
     .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
   association: z.string(),
   position: z.string(),
+  avatar: z.string().optional(),
 })
 
 type FarmerFieldNames =
@@ -122,9 +125,11 @@ function CreateFarmerForm() {
   })
 
   const addFarmerMutation = useAddFarmer()
-  const [isPending, startTransition] = useTransition()
   const { data: associations, error, isLoading } = useReadAssociation()
   const { data: municipalities } = useFetchMunicipalities()
+  const [file, setFile] = useState<File>()
+
+  const { edgestore } = useEdgeStore()
 
   // Watch municipality selection
   const selectedMunicipality = useWatch({
@@ -134,10 +139,6 @@ function CreateFarmerForm() {
 
   // Fetch barangays based on selected municipality
   const { data: barangays } = useFetchBarangays(selectedMunicipality || '')
-
-  console.log(municipalities)
-  console.log('Selected Municipality:', selectedMunicipality)
-  console.log('Barangays:', barangays)
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     // Get the selected municipality name based on its code
@@ -150,148 +151,187 @@ function CreateFarmerForm() {
       (brgy: any) => brgy.code === data.barangay,
     )?.name
 
-    // Proceed with form submission, sending the names instead of codes
-    startTransition(() => {
-      addFarmerMutation.mutate(
-        {
-          firstname: data.firstname,
-          lastname: data.lastname,
-          gender: data.gender,
-          municipality: selectedMunicipality, // Send name instead of code
-          barangay: selectedBarangay, // Send name instead of code
-          phoneNumber: data.phoneNumber,
-          association_id: data.association,
-          position: data.position,
-        },
-        {
-          onSuccess: () => {
-            toast.success('Farmer created successfully!')
-            document.getElementById('create-trigger')?.click()
+    // Upload the avatar if a file is selected
+    let avatarUrl = data.avatar
+    if (file) {
+      try {
+        const res = await edgestore.myPublicImages.upload({
+          file,
+          input: { type: 'avatar' },
+          onProgressChange: (progress) => {
+            console.log(progress)
           },
-          onError: (error: any) => {
-            toast.error('Failed to create farmer.')
-          },
-        },
-      )
-    })
+        })
+        avatarUrl = res.url
+      } catch (error) {
+        console.error('Error uploading file:', error)
+        toast.error('Failed to upload avatar.')
+        return
+      }
+    }
+
+    try {
+      await addFarmerMutation.mutateAsync({
+        firstname: data.firstname,
+        lastname: data.lastname,
+        gender: data.gender,
+        municipality: selectedMunicipality, // Send name instead of code
+        barangay: selectedBarangay, // Send name instead of code
+        phoneNumber: data.phoneNumber,
+        association_id: data.association,
+        position: data.position,
+        avatar: avatarUrl,
+      })
+      toast.success('Farmer created successfully!')
+      document.getElementById('create-trigger')?.click()
+    } catch (error) {
+      console.error('Error creating farmer:', error)
+      toast.error('Failed to create farmer.')
+    }
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6'>
-          {fieldConfigs.map(({ name, placeholder, label, type }) => {
-            if (type === 'select' && name === 'association') {
-              return (
-                <SelectField
-                  control={form.control}
-                  key={name}
-                  name='association'
-                  label='Association'
-                  placeholder='Select Association'
-                  options={
-                    associations?.map((assoc) => ({
-                      id: assoc.id,
-                      name: assoc.name,
-                    })) || []
-                  }
-                />
-              )
-            } else if (type === 'select' && name === 'municipality') {
-              return (
-                <SelectField
-                  control={form.control}
-                  key={name}
-                  name='municipality'
-                  label='Municipality'
-                  placeholder='Select Municipality'
-                  options={
-                    municipalities?.map((mun: any) => ({
-                      id: mun.code,
-                      name: mun.name,
-                    })) || []
-                  }
-                />
-              )
-            } else if (type === 'select' && name === 'barangay') {
-              return (
-                <SelectField
-                  control={form.control}
-                  key={name}
-                  name='barangay'
-                  label='Barangay'
-                  placeholder='Select Barangay'
-                  options={
-                    barangays?.map((brgy: any) => ({
-                      id: brgy.code,
-                      name: brgy.name,
-                    })) || []
-                  }
-                  disabled={!selectedMunicipality} // Disable until a municipality is selected
-                />
-              )
-            } else if (type === 'select' && name === 'gender') {
-              return (
-                <SelectField
-                  control={form.control}
-                  key={name}
-                  name='gender'
-                  label='Gender'
-                  placeholder='Select Gender'
-                  options={[
-                    { id: 'male', name: 'Male' },
-                    { id: 'female', name: 'Female' },
-                  ]}
-                />
-              )
-            } else if (type === 'select' && name === 'position') {
-              return (
-                <SelectField
-                  control={form.control}
-                  key={name}
-                  name='position'
-                  label='Position'
-                  placeholder='Select Position'
-                  options={positions}
-                />
-              )
-            } else {
-              return (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={placeholder}
-                          type={type}
-                          {...field}
-                          className='mt-1 block w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )
-            }
-          })}
-        </div>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-center">Create New Farmer</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <div className="flex justify-center mb-6">
+              <SingleImageDropzone
+                width={200}
+                height={200}
+                value={file}
+                dropzoneOptions={{
+                  maxSize: 1024 * 1024, // 1MB
+                }}
+                onChange={(file) => {
+                  setFile(file);
+                }}
+              />
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+              {fieldConfigs.map(({ name, placeholder, label, type }) => {
+                if (type === 'select' && name === 'association') {
+                  return (
+                    <SelectField
+                      control={form.control}
+                      key={name}
+                      name='association'
+                      label='Association'
+                      placeholder='Select Association'
+                      options={
+                        associations?.map((assoc) => ({
+                          id: assoc.id,
+                          name: assoc.name,
+                        })) || []
+                      }
+                    />
+                  )
+                } else if (type === 'select' && name === 'municipality') {
+                  return (
+                    <SelectField
+                      control={form.control}
+                      key={name}
+                      name='municipality'
+                      label='Municipality'
+                      placeholder='Select Municipality'
+                      options={
+                        municipalities?.map((mun: any) => ({
+                          id: mun.code,
+                          name: mun.name,
+                        })) || []
+                      }
+                    />
+                  )
+                } else if (type === 'select' && name === 'barangay') {
+                  return (
+                    <SelectField
+                      control={form.control}
+                      key={name}
+                      name='barangay'
+                      label='Barangay'
+                      placeholder='Select Barangay'
+                      options={
+                        barangays?.map((brgy: any) => ({
+                          id: brgy.code,
+                          name: brgy.name,
+                        })) || []
+                      }
+                      disabled={!selectedMunicipality} // Disable until a municipality is selected
+                    />
+                  )
+                } else if (type === 'select' && name === 'gender') {
+                  return (
+                    <SelectField
+                      control={form.control}
+                      key={name}
+                      name='gender'
+                      label='Gender'
+                      placeholder='Select Gender'
+                      options={[
+                        { id: 'male', name: 'Male' },
+                        { id: 'female', name: 'Female' },
+                      ]}
+                    />
+                  )
+                } else if (type === 'select' && name === 'position') {
+                  return (
+                    <SelectField
+                      control={form.control}
+                      key={name}
+                      name='position'
+                      label='Position'
+                      placeholder='Select Position'
+                      options={positions}
+                    />
+                  )
+                } else {
+                  return (
+                    <FormField
+                      key={name}
+                      control={form.control}
+                      name={name}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={placeholder}
+                              type={type}
+                              {...field}
+                              className='mt-1 block w-full'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )
+                }
+              })}
+            </div>
 
-        <Button
-          type='submit'
-          className='w-full flex gap-2 items-center dark:bg-green-500'
-          variant='outline'
-          disabled={isPending}
-        >
-          Add
-          <Loader2 className={cn('animate-spin', { hidden: !isPending })} />
-        </Button>
-      </form>
-    </Form>
+            <Button
+              type='submit'
+              className='w-full flex gap-2 items-center dark:bg-green-500'
+              variant='outline'
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin mr-2" />
+                  Submitting...
+                </>
+              ) : (
+                'Add'
+              )}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }
 
