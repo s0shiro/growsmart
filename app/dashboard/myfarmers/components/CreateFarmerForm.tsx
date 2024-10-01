@@ -17,21 +17,22 @@ import { useState } from 'react'
 import { useAddFarmer } from '@/hooks/farmer/useAddFarmer'
 import SelectField from '../../(components)/forms/CustomSelectField'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, User, Phone, MapPin, Users, Briefcase } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   useFetchBarangays,
   useFetchMunicipalities,
 } from '@/hooks/municipalities/useFetchMunicipalities'
 import useReadAssociation from '@/hooks/association/useReadAssociations'
-import SelectFieldName from './SelecFieldName'
 import { SingleImageDropzone } from '@/app/dashboard/(components)/forms/single-image-dropzone'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEdgeStore } from '@/lib/edgestore'
+import { Separator } from '@/components/ui/separator'
 
 const FormSchema = z.object({
-  firstname: z.string(),
-  lastname: z.string(),
+  rsbsaNumber: z.coerce.number(),
+  firstname: z.string().min(1, "First name is required"),
+  lastname: z.string().min(1, "Last name is required"),
   gender: z.string(),
   municipality: z.string(),
   barangay: z.string(),
@@ -44,6 +45,7 @@ const FormSchema = z.object({
 })
 
 type FarmerFieldNames =
+  | 'rsbsaNumber'
   | 'firstname'
   | 'lastname'
   | 'gender'
@@ -58,54 +60,70 @@ const fieldConfigs: {
   placeholder: string
   label: string
   type: string
+  icon: React.ElementType
 }[] = [
   {
+    name: 'rsbsaNumber',
+    placeholder: 'RSBSA Number',
+    label: 'RSBSA Number',
+    type: 'number',
+    icon: User,
+  },
+  {
     name: 'firstname',
-    placeholder: 'firstname',
-    label: 'Firstname',
+    placeholder: 'First name',
+    label: 'First Name',
     type: 'text',
+    icon: User,
   },
   {
     name: 'lastname',
-    placeholder: 'lastname',
-    label: 'Lastname',
+    placeholder: 'Last name',
+    label: 'Last Name',
     type: 'text',
+    icon: User,
   },
   {
     name: 'gender',
     placeholder: 'Select Gender',
     label: 'Gender',
     type: 'select',
+    icon: User,
   },
   {
     name: 'municipality',
     placeholder: 'Select a municipality',
     label: 'Municipality',
     type: 'select',
+    icon: MapPin,
   },
   {
     name: 'barangay',
     placeholder: 'Select a barangay',
     label: 'Barangay',
     type: 'select',
+    icon: MapPin,
   },
   {
     name: 'phoneNumber',
-    placeholder: 'phonenumber',
-    label: 'PhoneNumber',
+    placeholder: 'Phone number',
+    label: 'Phone Number',
     type: 'number',
+    icon: Phone,
   },
   {
     name: 'association',
     placeholder: 'Select an association',
     label: 'Association',
     type: 'select',
+    icon: Users,
   },
   {
     name: 'position',
     placeholder: 'Select Position',
     label: 'Position',
     type: 'select',
+    icon: Briefcase,
   },
 ]
 
@@ -131,27 +149,22 @@ function CreateFarmerForm() {
 
   const { edgestore } = useEdgeStore()
 
-  // Watch municipality selection
   const selectedMunicipality = useWatch({
     control: form.control,
     name: 'municipality',
   })
 
-  // Fetch barangays based on selected municipality
   const { data: barangays } = useFetchBarangays(selectedMunicipality || '')
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    // Get the selected municipality name based on its code
     const selectedMunicipality = municipalities?.find(
       (mun: any) => mun.code === data.municipality,
     )?.name
 
-    // Get the selected barangay name based on its code
     const selectedBarangay = barangays?.find(
       (brgy: any) => brgy.code === data.barangay,
     )?.name
 
-    // Upload the avatar if a file is selected
     let avatarUrl = data.avatar
     if (file) {
       try {
@@ -175,12 +188,13 @@ function CreateFarmerForm() {
         firstname: data.firstname,
         lastname: data.lastname,
         gender: data.gender,
-        municipality: selectedMunicipality, // Send name instead of code
-        barangay: selectedBarangay, // Send name instead of code
+        municipality: selectedMunicipality,
+        barangay: selectedBarangay,
         phoneNumber: data.phoneNumber,
         association_id: data.association,
         position: data.position,
         avatar: avatarUrl,
+        rsbsaNumber: data.rsbsaNumber,
       })
       toast.success('Farmer created successfully!')
       document.getElementById('create-trigger')?.click()
@@ -198,93 +212,56 @@ function CreateFarmerForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-            <div className="flex justify-center mb-6">
+            <div className="flex flex-col items-center mb-6">
               <SingleImageDropzone
                 width={200}
                 height={200}
                 value={file}
                 dropzoneOptions={{
-                  maxSize: 1024 * 1024, // 1MB
+                  maxSize: 1024 * 1024,
                 }}
                 onChange={(file) => {
                   setFile(file);
                 }}
               />
+              <p className="text-sm text-muted-foreground mt-2">Upload farmer's avatar (optional)</p>
             </div>
+            <Separator />
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-              {fieldConfigs.map(({ name, placeholder, label, type }) => {
-                if (type === 'select' && name === 'association') {
+              {fieldConfigs.map(({ name, placeholder, label, type, icon: Icon }) => {
+                if (type === 'select') {
+                  let options: { id: string; name: string }[] = [];
+                  let disabled = false;
+
+                  switch (name) {
+                    case 'association':
+                      options = associations?.map((assoc) => ({ id: assoc.id, name: assoc.name })) || [];
+                      break;
+                    case 'municipality':
+                      options = municipalities?.map((mun: any) => ({ id: mun.code, name: mun.name })) || [];
+                      break;
+                    case 'barangay':
+                      options = barangays?.map((brgy: any) => ({ id: brgy.code, name: brgy.name })) || [];
+                      disabled = !selectedMunicipality;
+                      break;
+                    case 'gender':
+                      options = [{ id: 'male', name: 'Male' }, { id: 'female', name: 'Female' }];
+                      break;
+                    case 'position':
+                      options = positions;
+                      break;
+                  }
+
                   return (
                     <SelectField
                       control={form.control}
                       key={name}
-                      name='association'
-                      label='Association'
-                      placeholder='Select Association'
-                      options={
-                        associations?.map((assoc) => ({
-                          id: assoc.id,
-                          name: assoc.name,
-                        })) || []
-                      }
-                    />
-                  )
-                } else if (type === 'select' && name === 'municipality') {
-                  return (
-                    <SelectField
-                      control={form.control}
-                      key={name}
-                      name='municipality'
-                      label='Municipality'
-                      placeholder='Select Municipality'
-                      options={
-                        municipalities?.map((mun: any) => ({
-                          id: mun.code,
-                          name: mun.name,
-                        })) || []
-                      }
-                    />
-                  )
-                } else if (type === 'select' && name === 'barangay') {
-                  return (
-                    <SelectField
-                      control={form.control}
-                      key={name}
-                      name='barangay'
-                      label='Barangay'
-                      placeholder='Select Barangay'
-                      options={
-                        barangays?.map((brgy: any) => ({
-                          id: brgy.code,
-                          name: brgy.name,
-                        })) || []
-                      }
-                      disabled={!selectedMunicipality} // Disable until a municipality is selected
-                    />
-                  )
-                } else if (type === 'select' && name === 'gender') {
-                  return (
-                    <SelectField
-                      control={form.control}
-                      key={name}
-                      name='gender'
-                      label='Gender'
-                      placeholder='Select Gender'
-                      options={[
-                        { id: 'male', name: 'Male' },
-                        { id: 'female', name: 'Female' },
-                      ]}
-                    />
-                  )
-                } else if (type === 'select' && name === 'position') {
-                  return (
-                    <SelectField
-                      control={form.control}
-                      key={name}
-                      name='position'
-                      label='Position'
-                      placeholder='Select Position'
-                      options={positions}
+                      name={name as any}
+                      label={label}
+                      placeholder={placeholder}
+                      options={options}
+                      disabled={disabled}
+                      icon={<Icon className="h-4 w-4 text-muted-foreground" />}
                     />
                   )
                 } else {
@@ -297,12 +274,15 @@ function CreateFarmerForm() {
                         <FormItem>
                           <FormLabel>{label}</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder={placeholder}
-                              type={type}
-                              {...field}
-                              className='mt-1 block w-full'
-                            />
+                            <div className="relative">
+                              <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                placeholder={placeholder}
+                                type={type}
+                                {...field}
+                                className='pl-10 mt-1 block w-full'
+                              />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -315,8 +295,8 @@ function CreateFarmerForm() {
 
             <Button
               type='submit'
-              className='w-full flex gap-2 items-center dark:bg-green-500'
-              variant='outline'
+              className='w-full flex gap-2 items-center justify-center'
+              variant='default'
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? (
@@ -325,7 +305,7 @@ function CreateFarmerForm() {
                   Submitting...
                 </>
               ) : (
-                'Add'
+                'Create Farmer'
               )}
             </Button>
           </form>

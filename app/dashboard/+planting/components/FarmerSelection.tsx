@@ -13,6 +13,7 @@ interface Farmer {
   firstname: string
   lastname: string
   avatar?: string
+  rsbsa_number: number
 }
 
 interface FarmerSelectionProps {
@@ -66,7 +67,7 @@ export default function FarmerSelection({ control, farmers }: FarmerSelectionPro
                     </Avatar>
                     <div>
                       <p className="text-sm font-medium text-card-foreground">{`${farmer.firstname} ${farmer.lastname}`}</p>
-                      <p className="text-xs text-muted-foreground">Farmer ID: {farmer.id}</p>
+                      <p className="text-xs text-muted-foreground">RSBSA Number: {farmer.rsbsa_number}</p>
                     </div>
                   </div>
                 ))}

@@ -29,6 +29,7 @@ const FarmerProfileTabs = ({ id }: { id: string }) => {
     position,
     association_id,
     avatar,
+    rsbsa_number,
   } = farmer || {}
 
   return (
@@ -72,6 +73,11 @@ const FarmerProfileTabs = ({ id }: { id: string }) => {
                       icon={<User className="w-5 h-5" />}
                       label="Full Name"
                       value={`${firstname} ${lastname}`}
+                    />
+                    <ProfileItem
+                      icon={<User className="w-5 h-5" />}
+                      label="RSBSA Number"
+                      value={`${rsbsa_number}`}
                     />
                     <ProfileItem
                       icon={<User className="w-5 h-5" />}

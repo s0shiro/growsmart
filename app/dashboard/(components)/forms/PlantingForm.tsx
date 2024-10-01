@@ -18,8 +18,8 @@ import { addPlantingRecord } from '@/lib/planting'
 import { isToday } from 'date-fns'
 
 import { useFetchCrops, useFetchVarieties } from '@/hooks/crop/useCrops'
-import SelectField from '../../(components)/forms/CustomSelectField'
-import MapComponent from '../../(components)/MapComponent'
+import SelectField from './CustomSelectField'
+import MapComponent from '../MapComponent'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData' // Import the MapComponent
 
 const FormSchema = z.object({

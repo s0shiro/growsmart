@@ -13,6 +13,7 @@ export const createNewFarmer = async (data: {
   association_id: string
   position: string
   avatar: string | undefined
+  rsbsaNumber: number
 }) => {
   const supabase = createClient()
   const user = await getCurrentUser()
@@ -28,6 +29,7 @@ export const createNewFarmer = async (data: {
     association_id: data.association_id,
     position: data.position,
     avatar: data.avatar,
+    rsbsa_number: data.rsbsaNumber,
   })
 
   if (error) {
@@ -47,7 +49,7 @@ export const getListOfFarmers = async (userId: string) => {
       )
     `)
     .eq('user_id', userId)
-    .order('lastname', { ascending: true }) // Orders by lastname in ascending order
+    .order('firstname', { ascending: true }) // Orders by lastname in ascending order
 
   if (error) {
     console.error('Supabase error:', error.message)

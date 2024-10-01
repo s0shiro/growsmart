@@ -51,7 +51,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import DialogForm from '../../(components)/forms/DialogForm'
-import PlantingForm from './PlantingForm'
 import CreateFarmerForm from './CreateFarmerForm'
 import Link from 'next/link'
 import useFetchFarmersByUserId from '@/hooks/farmer/useFetchFarmersByUserId'
@@ -70,6 +69,7 @@ type Farmer = {
   position: string
   avatar: string
   association: Association
+  rsbsa_number: number
 }
 
 type Association = {
@@ -225,7 +225,7 @@ const FarmersTable = () => {
           <TableHeader>
             <TableRow>
               <TableHead className='w-[250px]'>Name</TableHead>
-              <TableHead>Phone</TableHead>
+              <TableHead>RSBSA Number</TableHead>
               <TableHead>Municipality</TableHead>
               <TableHead>Barangay</TableHead>
               <TableHead>Association</TableHead>
@@ -248,7 +248,7 @@ const FarmersTable = () => {
                     {farmer.firstname} {farmer.lastname}
                   </div>
                 </TableCell>
-                <TableCell>{farmer.phone}</TableCell>
+                <TableCell>{farmer.rsbsa_number}</TableCell>
                 <TableCell>{farmer.municipality}</TableCell>
                 <TableCell>{farmer.barangay}</TableCell>
                 <TableCell>
