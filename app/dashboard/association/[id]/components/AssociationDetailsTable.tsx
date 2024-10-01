@@ -209,7 +209,7 @@ export default function AssociationDetailsTable({
                       <div className='flex items-center space-x-2'>
                         <Avatar>
                           <AvatarImage
-                            src={`https://api.dicebear.com/6.x/initials/svg?seed=${detail.firstname} ${detail.lastname}`}
+                            src={detail.avatar}
                           />
                           <AvatarFallback>
                             {detail.firstname[0]}

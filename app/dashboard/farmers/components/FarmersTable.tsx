@@ -239,7 +239,7 @@ const FarmersTable = () => {
                   <div className="flex items-center">
                     <Avatar className="h-8 w-8 mr-2">
                       <AvatarImage
-                        src={`/placeholder.svg?text=${farmer.firstname[0]}`}
+                        src={farmer.avatar}
                         alt={farmer.firstname}
                       />
                       <AvatarFallback>{farmer.firstname[0]}</AvatarFallback>
