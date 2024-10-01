@@ -11,11 +11,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, CheckCircle2, Sprout, Apple, Leaf, Calendar, MapPin, Droplet, CloudSun, DollarSign, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import {
   Popover,
   PopoverContent,
@@ -38,11 +38,11 @@ interface CropDetailsProps {
 }
 
 const CropDetails: React.FC<CropDetailsProps> = ({
-  control,
-  setValue,
-  selectedCategory,
-  selectedCrop,
-}) => {
+                                                   control,
+                                                   setValue,
+                                                   selectedCategory,
+                                                   selectedCrop,
+                                                 }) => {
   const { data: allCropData = [] } = useGetAllCropData()
 
   const categories = Array.isArray(allCropData) ? allCropData : []
@@ -59,54 +59,63 @@ const CropDetails: React.FC<CropDetailsProps> = ({
       placeholder: 'Select Category',
       label: 'Crop Category',
       type: 'select',
+      icon: Sprout,
     },
     {
       name: 'cropType',
       placeholder: 'Select Crop Name',
       label: 'Crop Name',
       type: 'select',
+      icon: Apple,
     },
     {
       name: 'variety',
       placeholder: 'Select Variety',
       label: 'Variety',
       type: 'select',
+      icon: Leaf,
     },
     {
       name: 'plantingDate',
       placeholder: 'Select date',
       label: 'Planting Date',
       type: 'date',
+      icon: Calendar,
     },
     {
       name: 'areaPlanted',
       placeholder: 'Enter area',
       label: 'Area Planted',
       type: 'number',
+      icon: MapPin,
     },
     {
       name: 'quantity',
       placeholder: 'Enter quantity',
       label: 'Quantity',
       type: 'number',
+      icon: Droplet,
     },
     {
       name: 'weatherCondition',
       placeholder: 'Enter weather condition',
       label: 'Weather Condition',
       type: 'text',
+      icon: CloudSun,
     },
     {
       name: 'expenses',
       placeholder: 'Enter expenses',
       label: 'Expenses',
       type: 'number',
+      icon: DollarSign,
     },
     {
       name: 'harvestDate',
       placeholder: 'Select date',
       label: 'Expected Harvest Date',
       type: 'date',
+      icon: Clock,
     },
   ]
 
@@ -189,7 +198,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
             </PopoverTrigger>
             {!readOnly && (
               <PopoverContent className='w-auto p-0' align='start'>
-                <Calendar
+                <CalendarComponent
                   mode='single'
                   selected={field.value ? new Date(field.value) : undefined}
                   onSelect={(date) => {
@@ -297,29 +306,40 @@ const CropDetails: React.FC<CropDetailsProps> = ({
           <CardTitle>Crop Summary</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='space-y-2'>
-            {fieldConfigs.map(({ name, label }) => (
-              <div
-                key={name}
-                className='flex justify-between items-center py-2 border-b last:border-b-0'
-              >
-                <span className='font-medium'>{label}:</span>
-                <span className='text-muted-foreground'>
-                  {name === 'cropCategory'
-                    ? categories.find(
-                        (category:any) => category.id === formValues[name],
-                      )?.name || 'Not set'
-                    : name === 'cropType'
-                      ? crops.find((crop:any) => crop.id === formValues[name])
-                          ?.name || 'Not set'
-                      : name === 'variety'
-                        ? varieties.find(
-                            (variety:any) => variety.id === formValues[name],
-                          )?.name || 'Not set'
-                        : formValues[name] || 'Not set'}
-                </span>
-              </div>
-            ))}
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            {fieldConfigs.map(({ name, label, icon: Icon }) => {
+              const value = name === 'cropCategory'
+                ? categories.find((category:any) => category.id === formValues[name])?.name
+                : name === 'cropType'
+                  ? crops.find((crop:any) => crop.id === formValues[name])?.name
+                  : name === 'variety'
+                    ? varieties.find((variety:any) => variety.id === formValues[name])?.name
+                    : formValues[name]
+
+              const isSet = value && value !== 'Not set'
+
+              return (
+                <div
+                  key={name}
+                  className={cn(
+                    'p-4 rounded-lg transition-all duration-200 ease-in-out',
+                    isSet ? 'bg-primary/10' : 'bg-muted'
+                  )}
+                >
+                  <div className='flex items-center space-x-2'>
+                    <Icon className={cn('h-5 w-5', isSet ? 'text-primary' : 'text-muted-foreground')} />
+                    <span className='font-medium text-sm text-muted-foreground'>{label}</span>
+                    {isSet && <CheckCircle2 className='h-4 w-4 text-primary ml-auto' />}
+                  </div>
+                  <p className={cn(
+                    'mt-1 font-semibold',
+                    isSet ? 'text-primary' : 'text-muted-foreground'
+                  )}>
+                    {value || 'Not set'}
+                  </p>
+                </div>
+              )
+            })}
           </div>
         </CardContent>
       </Card>
