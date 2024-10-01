@@ -47,7 +47,7 @@ const edgeStoreRouter = es.router({
       maxSize: 1024 * 1024, // 1MB
     })
     // Define the path for the route
-    .input(z.object({ type: z.enum(['post', 'profile', "avatar"]) }))
+    .input(z.object({ type: z.enum(['post', 'profile', "avatar", "harvests"]) }))
     //eg. post/cute.jpg
     .path(({ input }) => [{ type: input.type }]),
 

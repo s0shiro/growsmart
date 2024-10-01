@@ -293,24 +293,6 @@ const HarvestCropTable = () => {
                               />
                             }
                           />
-                          <DialogForm
-                            id='upload-harvest'
-                            title='Record Harvest'
-                            description={`Record harvest`}
-                            Trigger={
-                              <DropdownMenuItem
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                Harvest Uploader
-                              </DropdownMenuItem>
-                            }
-                            form={
-                              <HarvestUploader
-                                farmerID={record.farmer_id}
-                                plantingID={record.id}
-                              />
-                            }
-                          />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

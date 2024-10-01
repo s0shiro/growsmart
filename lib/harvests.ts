@@ -15,6 +15,7 @@ interface HarvestData {
   areaHarvested: string
   damagedQuantity: string
   damagedReason: string
+  harvestImages: string[]
 }
 
 interface HarvestRecord {
@@ -27,6 +28,7 @@ interface HarvestRecord {
   area_harvested: number
   damaged_quantity: number
   damaged_reason: string
+  harvest_images: string[]
 }
 
 export const addHarvest = async (data: HarvestData) => {
@@ -43,6 +45,7 @@ export const addHarvest = async (data: HarvestData) => {
     area_harvested: parseFloat(data.areaHarvested),
     damaged_quantity: parseFloat(data.damagedQuantity),
     damaged_reason: data.damagedReason,
+    harvest_images: data.harvestImages,
   }
 
   const { error } = await supabase
@@ -81,7 +84,7 @@ export const getPlantingRecordWithHarvest = async (plantingID: string) => {
   const plantingRecordQuery = supabase
     .from('planting_records')
     .select(
-      `crop_type, variety, planting_date, weather_condition, expenses, field_location, harvests_report(harvest_date, yield_quantity, profit, damaged_quantity, damaged_reason, id, planting_id, farmer_id, added_by, object_id, name)`,
+      `crop_type, variety, planting_date, weather_condition, expenses, field_location, harvest_records(*)`,
     )
     .eq('id', plantingID) // Filter to only include the record with the matching plantingID
     .single()
@@ -93,6 +96,7 @@ export const getPlantingRecordWithHarvest = async (plantingID: string) => {
   if (error) throw error
 
   const plantingRecord: PlantingRecord = data
+  console.log('Planting record:', plantingRecord)
 
   return data
 }

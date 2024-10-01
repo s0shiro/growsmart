@@ -112,7 +112,7 @@ const CropForm = () => {
           document.getElementById('create-trigger')?.click()
           toast.success('Crop added successfully!')
           form.reset()
-          queryClient.invalidateQueries({ queryKey: ['registered-crops'] })
+          await queryClient.invalidateQueries({ queryKey: ['registered-crops'] })
         }
       } catch (error) {
         toast.error('Unexpected error occurred.')
