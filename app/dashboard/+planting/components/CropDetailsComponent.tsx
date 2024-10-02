@@ -98,14 +98,14 @@ const CropDetails: React.FC<CropDetailsProps> = ({
     {
       name: 'areaPlanted',
       placeholder: 'Enter area',
-      label: 'Area Planted',
+      label: 'Area Planted (ha)',
       type: 'number',
       icon: MapPin,
     },
     {
       name: 'quantity',
       placeholder: 'Enter quantity',
-      label: 'Quantity',
+      label: 'Quantity (kg)',
       type: 'number',
       icon: Droplet,
     },
