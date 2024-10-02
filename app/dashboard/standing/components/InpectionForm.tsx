@@ -14,18 +14,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { recordInspection } from '@/lib/inspection'
+import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
+import { updateStatusWhenAddHarvest } from '@/lib/planting'
 
 const FormSchema = z.object({
   dateOfInspection: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for Date of Inspection',
   }),
-  damagedQuantity: z
-    .string()
-    .regex(/^\d+$/, 'Damaged Quantity must be a number'),
+  damagedQuantity: z.coerce.number().nonnegative(),
   damagedReason: z
     .string()
     .max(256, 'Damaged Reason must be 256 characters or less'),
-  findings: z.string(),
+  findings: z.string().optional(),
 })
 
 function InspectionForm({ plantingID }: { plantingID: string }) {
@@ -34,15 +35,25 @@ function InspectionForm({ plantingID }: { plantingID: string }) {
     defaultValues: {},
   })
 
+  const queryClient = useQueryClient()
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      await recordInspection({
+      const res = await recordInspection({
         plantingID: plantingID,
         dateOfInspection: data.dateOfInspection,
         damagedQuantity: data.damagedQuantity,
         damagedReason: data.damagedReason,
         findings: data.findings,
       })
+
+      document.getElementById('create-visit')?.click()
+      toast.success('Successfully record visit!')
+      console.log('visit record successfully!')
+      await queryClient.invalidateQueries({
+        queryKey: ['history', plantingID],
+      })
+      form.reset()
     } catch (error) {
       console.error('Failed to submit form:', error)
     }
@@ -77,7 +88,7 @@ function InspectionForm({ plantingID }: { plantingID: string }) {
             name='damagedQuantity'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Damaged Quantity</FormLabel>
+                <FormLabel>Damaged Quantity (kg)</FormLabel>
                 <FormControl>
                   <Input
                     placeholder='Damaged Quantity'
@@ -121,7 +132,7 @@ function InspectionForm({ plantingID }: { plantingID: string }) {
                 <FormLabel>Findings</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder='Findings'
+                    placeholder='Findings (optional)'
                     {...field}
                     onChange={field.onChange}
                     className='mt-1 block w-full h-32 resize-none'

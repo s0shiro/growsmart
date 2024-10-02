@@ -7,7 +7,7 @@ export const recordInspection = async (data: {
   dateOfInspection: string
   damagedQuantity: number
   damagedReason: string
-  findings: string
+  findings?: string
 }) => {
   const supabase = createClient()
 

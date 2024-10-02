@@ -76,7 +76,7 @@ export default function VisitHistory({ params }: { params: { id: string } }) {
             Track and manage crop visits
           </p>
         </div>
-        {data[0]?.planting_records.status !== 'harvested' && (
+        {data[0]?.planting_records?.status !== 'harvested' && (
           <DialogForm
             id='create-visit'
             title='Record Visit'
