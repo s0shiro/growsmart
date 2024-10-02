@@ -271,7 +271,7 @@ const FarmersTable = () => {
                         <Eye className='mr-2 h-4 w-4' />
                         View Details
                       </DropdownMenuItem>
-                      <Link href={`/dashboard/myfarmers/${farmer.id}`}>
+                      <Link href={`/dashboard/${farmer.id}`}>
                         <DropdownMenuItem>
                           <Eye className='mr-2 h-4 w-4' />
                           View Profile

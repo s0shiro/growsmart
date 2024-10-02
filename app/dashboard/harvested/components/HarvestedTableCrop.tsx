@@ -265,7 +265,7 @@ const HarvestedCropsTable = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
-                          <Link href={`/dashboard/farmers/${record.farmer_id}`}>
+                          <Link href={`/dashboard/${record.farmer_id}`}>
                             <DropdownMenuItem>
                               <Eye className='mr-2 h-4 w-4' />
                               View Farmer

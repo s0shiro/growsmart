@@ -248,7 +248,7 @@ export default function AssociationDetailsTable({
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/myfarmers/${detail.id}`}>
+                            <Link href={`/dashboard/${detail.id}`}>
                               View Farmer Details
                             </Link>
                           </DropdownMenuItem>

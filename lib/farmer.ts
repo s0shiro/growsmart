@@ -63,7 +63,7 @@ export const getOneFarmer = async (farmerId: string) => {
 
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select()
+    .select(`*, association(name)`)
     .eq('id', farmerId)
     .single()
 
