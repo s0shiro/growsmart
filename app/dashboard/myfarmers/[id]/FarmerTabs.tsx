@@ -33,92 +33,85 @@ const FarmerProfileTabs = ({ id }: { id: string }) => {
   } = farmer || {}
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="bg-card text-card-foreground">
+    <div className=''>
+      <Card className='bg-card text-card-foreground'>
         <CardHeader>
-          <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-            <Avatar className="w-24 h-24 border-2 border-primary">
+          <div className='flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6'>
+            <Avatar className='w-24 h-24 border-2 border-primary'>
               <AvatarImage src={avatar} alt={lastname} />
-              <AvatarFallback className="text-3xl">
+              <AvatarFallback className='text-3xl'>
                 {firstname?.[0]}
                 {lastname?.[0]}
               </AvatarFallback>
             </Avatar>
-            <div className="text-center md:text-left">
-              <CardTitle className="text-3xl font-bold">
+            <div className='text-center md:text-left'>
+              <CardTitle className='text-3xl font-bold'>
                 {firstname}&apos;s Profile
               </CardTitle>
-              <p className="text-muted-foreground mt-1">
+              <p className='text-muted-foreground mt-1'>
                 Manage your farmer information
               </p>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="planting">Planting Records</TabsTrigger>
-              <TabsTrigger value="harvests">Harvests Report</TabsTrigger>
-              <TabsTrigger value="interventions">Interventions</TabsTrigger>
+          <Tabs defaultValue='profile' className='w-full'>
+            <TabsList className='grid w-full grid-cols-2 md:grid-cols-4'>
+              <TabsTrigger value='profile'>Profile</TabsTrigger>
+              <TabsTrigger value='planting'>Planting Records</TabsTrigger>
+              <TabsTrigger value='harvests'>Harvests Report</TabsTrigger>
+              <TabsTrigger value='interventions'>Interventions</TabsTrigger>
             </TabsList>
-            <TabsContent value="profile" className="mt-6">
+            <TabsContent value='profile' className='mt-6'>
               <Card>
                 <CardHeader>
                   <CardTitle>Farmer Details</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CardContent className='space-y-6'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <ProfileItem
-                      icon={<User className="w-5 h-5" />}
-                      label="Full Name"
+                      icon={<User className='w-5 h-5' />}
+                      label='Full Name'
                       value={`${firstname} ${lastname}`}
                     />
                     <ProfileItem
-                      icon={<User className="w-5 h-5" />}
-                      label="RSBSA Number"
+                      icon={<User className='w-5 h-5' />}
+                      label='RSBSA Number'
                       value={`${rsbsa_number}`}
                     />
                     <ProfileItem
-                      icon={<User className="w-5 h-5" />}
-                      label="Gender"
+                      icon={<User className='w-5 h-5' />}
+                      label='Gender'
                       value={gender}
                     />
                     <ProfileItem
-                      icon={<MapPin className="w-5 h-5" />}
-                      label="Address"
+                      icon={<MapPin className='w-5 h-5' />}
+                      label='Address'
                       value={`${barangay}, ${municipality}`}
                     />
                     <ProfileItem
-                      icon={<Phone className="w-5 h-5" />}
-                      label="Contact No."
+                      icon={<Phone className='w-5 h-5' />}
+                      label='Contact No.'
                       value={phone}
                     />
                     <ProfileItem
-                      icon={<Briefcase className="w-5 h-5" />}
-                      label="Position"
+                      icon={<Briefcase className='w-5 h-5' />}
+                      label='Position'
                       value={position ?? undefined}
                     />
                     <ProfileItem
-                      icon={<Users className="w-5 h-5" />}
-                      label="Association ID"
+                      icon={<Users className='w-5 h-5' />}
+                      label='Association ID'
                       value={association_id ?? undefined}
                     />
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="planting" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Planting Records</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <PlantingRecords farmerID={id} />
-                </CardContent>
-              </Card>
+            <TabsContent value='planting' className='mt-6'>
+              <PlantingRecords farmerID={id} />
             </TabsContent>
-            <TabsContent value="harvests" className="mt-6">
+            <TabsContent value='harvests' className='mt-6'>
               <Card>
                 <CardHeader>
                   <CardTitle>Harvests Report</CardTitle>
@@ -128,7 +121,7 @@ const FarmerProfileTabs = ({ id }: { id: string }) => {
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="interventions" className="mt-6">
+            <TabsContent value='interventions' className='mt-6'>
               <Card>
                 <CardHeader>
                   <CardTitle>Interventions</CardTitle>
@@ -146,38 +139,38 @@ const FarmerProfileTabs = ({ id }: { id: string }) => {
 }
 
 const ProfileItem = ({
-                       icon,
-                       label,
-                       value,
-                     }: {
+  icon,
+  label,
+  value,
+}: {
   icon: React.ReactNode
   label: string
   value: string | undefined
 }) => (
-  <div className="flex items-center space-x-3">
-    <div className="flex-shrink-0 text-muted-foreground">{icon}</div>
+  <div className='flex items-center space-x-3'>
+    <div className='flex-shrink-0 text-muted-foreground'>{icon}</div>
     <div>
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      <p className="text-lg">{value || 'N/A'}</p>
+      <p className='text-sm font-medium text-muted-foreground'>{label}</p>
+      <p className='text-lg'>{value || 'N/A'}</p>
     </div>
   </div>
 )
 
 const FarmerProfileSkeleton = () => (
-  <div className="container mx-auto px-4 py-8">
-    <Card className="bg-card text-card-foreground">
+  <div className='container mx-auto px-4 py-8'>
+    <Card className='bg-card text-card-foreground'>
       <CardHeader>
-        <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-          <Skeleton className="w-24 h-24 rounded-full" />
-          <div className="text-center md:text-left">
-            <Skeleton className="h-8 w-48 mb-2" />
-            <Skeleton className="h-4 w-64" />
+        <div className='flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6'>
+          <Skeleton className='w-24 h-24 rounded-full' />
+          <div className='text-center md:text-left'>
+            <Skeleton className='h-8 w-48 mb-2' />
+            <Skeleton className='h-4 w-64' />
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <Skeleton className="h-10 w-full mb-6" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className='h-10 w-full mb-6' />
+        <Skeleton className='h-64 w-full' />
       </CardContent>
     </Card>
   </div>

@@ -71,14 +71,13 @@ export const getAllPlantingRecords = async (farmerID: string) => {
 
   const { data, error } = await supabase
     .from('planting_records')
-    .select()
+    .select(`*, crops (name), crop_varieties (name)`)
     .eq('farmer_id', farmerID)
     .order('created_at', { ascending: false })
 
   if (error) {
     console.error('Supabase error:', error.message)
   }
-
   return data
 }
 
