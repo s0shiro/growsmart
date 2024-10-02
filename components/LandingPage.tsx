@@ -1,184 +1,152 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Menu, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Menu, ArrowRight, Facebook } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { readUserSession } from '@/lib/actions'
-
-const services = [
-  {
-    title: 'Crop Consulting',
-    description:
-      'Empower your farming operation with our crop consulting services. Our experts analyze soil, climate conditions, and crop performance to provide data-driven recommendations.',
-    image: '/nature.jpg',
-  },
-  {
-    title: 'Pest Management',
-    description:
-      'Protect your crops with our integrated pest management solutions. We use eco-friendly methods to control pests and diseases effectively.',
-    image: '/nature.jpg',
-  },
-  {
-    title: 'Organic Farming',
-    description:
-      'Transition to organic farming with our comprehensive support. We guide you through certification processes and sustainable practices.',
-    image: '/nature.jpg',
-  },
-  {
-    title: 'Farm Management',
-    description:
-      'Optimize your farm operations with our management services. We help streamline processes and improve overall farm productivity.',
-    image: '/nature.jpg',
-  },
-]
 
 export default async function LandingPage() {
   const { data: userSession } = await readUserSession()
 
   return (
-    <div className='min-h-screen flex flex-col'>
-      <div className='relative flex-grow'>
-        {/* Background Image */}
+    <div className='min-h-screen flex flex-col bg-background text-foreground'>
+      {/* Header */}
+      <header className='fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-filter backdrop-blur-md border-b border-border'>
+        <div className='container mx-auto px-4 py-4 flex justify-between items-center'>
+          <Link href='/' className='flex items-center space-x-2'>
+            <Image
+              src='/no-bg.png'
+              alt='GrowSmart Logo'
+              width={40}
+              height={40}
+            />
+            <span className='text-xl font-semibold text-primary'>
+              GrowSmart
+            </span>
+          </Link>
+          {/*<nav className='hidden md:flex space-x-4'>*/}
+          {/*  <Link*/}
+          {/*    href='#about'*/}
+          {/*    className='text-foreground/80 hover:text-primary transition-colors'*/}
+          {/*  >*/}
+          {/*    About*/}
+          {/*  </Link>*/}
+          {/*</nav>*/}
+          {userSession.user ? (
+            <Link href='/dashboard'>
+              <Button variant='default'>Dashboard</Button>
+            </Link>
+          ) : (
+            <Link href='/login'>
+              <Button variant='default'>Get Started</Button>
+            </Link>
+          )}
+          <Button variant='ghost' size='icon' className='md:hidden'>
+            <Menu className='h-6 w-6' />
+            <span className='sr-only'>Menu</span>
+          </Button>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className='relative pt-20 pb-40 md:pt-40 md:pb-60'>
         <Image
           src='/rice-terra.jpg'
           alt='Lush green agricultural field'
           fill
           quality={100}
-          className='z-0 object-cover'
+          className='object-cover'
         />
-
-        {/* Content Overlay */}
-        <div className='relative z-10 min-h-screen flex flex-col'>
-          {/* Blurred Header */}
-          <header className='fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-30 backdrop-filter backdrop-blur-md p-6 flex justify-between items-center'>
-            <Button variant='ghost' size='icon' className='text-white'>
-              <Menu className='h-6 w-6' />
-              <span className='sr-only'>Menu</span>
+        <div className='absolute inset-0 bg-black/50' />
+        <div className='relative z-10 container mx-auto px-4'>
+          <div className='max-w-3xl mx-auto text-center text-white'>
+            <h1 className='text-5xl md:text-7xl font-bold mb-6'>
+              Grow Smarter, Not Harder
+            </h1>
+            <p className='text-xl mb-8'>
+              GrowSmart is designed to simplify {` `}
+              <span className='font-bold'>crop production monitoring</span>,
+              helping the Marinduque Provincial Agriculture Office easily track farmers'
+              planting activities and ensure efficient management from seeding
+              to harvest.
+            </p>
+            <Button size='lg' asChild>
+              <Link href='#about'>
+                Learn More <ArrowRight className='ml-2 h-5 w-5' />
+              </Link>
             </Button>
-            <span className='text-xl font-semibold'>
-              Marinduque Provincial Agriculture Office
-            </span>
-            {userSession.user ? (
-              <Link href={'/dashboard'}>
-                <Button
-                  variant='outline'
-                  className='text-white border-white hover:bg-white hover:text-green-900'
-                >
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <Link href={'/login'}>
-                <Button
-                  variant='outline'
-                  className='text-white border-white hover:bg-white hover:text-green-900'
-                >
-                  Get Started
-                </Button>
-              </Link>
-            )}
-          </header>
-          {/* Main Content */}
-          <main className='flex-grow flex flex-col justify-between p-6'>
-            <div className='self-end max-w-md text-right'>
-              <p className='text-lg font-light mt-20'>
-                We are passionate about sustainable agriculture and committed to
-                providing high-quality products and services that nourish both{' '}
-                <span className='font-normal'>people and the planet</span>.
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id='about' className='py-20'>
+        <div className='container mx-auto px-4'>
+          <div className='max-w-3xl mx-auto text-center'>
+            <h2 className='text-3xl font-bold mb-6'>About Marinduque Provincial Agriculture Office</h2>
+            <p className='text-lg mb-8'>
+              We are passionate about sustainable agriculture and committed to
+              providing high-quality products and services that nourish both
+              <span className='font-semibold'> people and the planet</span>.
+            </p>
+            <div className='flex flex-wrap justify-center gap-4 text-sm font-light'>
+              <span className='bg-primary/10 text-primary px-3 py-1 rounded-full'>
+                Organic Farming
+              </span>
+              <span className='bg-primary/10 text-primary px-3 py-1 rounded-full'>
+                Hydroponics
+              </span>
+              <span className='bg-primary/10 text-primary px-3 py-1 rounded-full'>
+                Vertical Farming
+              </span>
+              <span className='bg-primary/10 text-primary px-3 py-1 rounded-full'>
+                Farm Management
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className='bg-background border-t border-border py-8'>
+        <div className='container mx-auto px-4'>
+          <div className='flex flex-col md:flex-row justify-between items-center'>
+            <div className='mb-4 md:mb-0'>
+              <Image
+                src='/no-bg.png'
+                alt='GrowSmart Logo'
+                width={40}
+                height={40}
+              />
+              <p className='mt-2 text-sm text-muted-foreground'>
+                © 2024 MPAO. All rights reserved.
               </p>
             </div>
-
-            <div className='flex flex-col items-center space-y-56'>
-              {/* Terra Cultiva Large Text */}
-              <h1 className='text-6xl sm:text-8xl font-bold leading-none text-center'>
-                GROWSMART
-              </h1>
-
-              <div className='space-y-4 w-full'>
-                <p className='text-sm font-light italic text-center'>
-                  // Roots in Sustainability.
-                </p>
-
-                {/* Categories */}
-                <div className='flex flex-wrap justify-between text-sm font-light'>
-                  <span className='mb-2'>[ Organic Farming ]</span>
-                  <span className='mb-2'>[ Hydroponics ]</span>
-                  <span className='mb-2'>[ Vertical Farming ]</span>
-                  <span className='mb-2'>[ Farm Management ]</span>
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
-
-      {/* New Section */}
-      {/* <section className='bg-white text-gray-900 py-16'>
-        <div className='container mx-auto px-4'>
-          <div className='mb-12'>
-            <p className='text-sm text-green-700 mb-2'>
-              // Harvesting Legacy, Planting Tomorrow.
-            </p>
-            <h2 className='text-4xl md:text-6xl font-bold mb-6'>
-              <span className='text-gray-400'>Rooted in Tradition,</span>
-              <br />
-              Growing for the Future
-            </h2>
-            <p className='text-lg max-w-3xl'>
-              At Terra Cultiva, we are passionate about sustainable agriculture
-              and committed to providing high-quality products and services that
-              nourish both people and the planet. With a focus on innovation,
-              eco-friendly practices, and community engagement, we strive to be
-              a driving force in the future of agriculture.
-            </p>
-          </div>
-
-          <div className='flex justify-between items-center mb-8'>
-            <h3 className='text-2xl font-semibold'>What we do</h3>
-            <p className='text-green-700'>Terra Cultiva</p>
-            <p className='text-gray-500'>©2024</p>
-          </div>
-
-          <div className='mb-8'>
-            <p className='text-lg mb-4'>
-              We offer a comprehensive range of services to support farmers and
-              agricultural enthusiasts in cultivating success sustainably.
-            </p>
-            <Button className='bg-green-700 hover:bg-green-800 text-white'>
-              All Services
-            </Button>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-            {services.map((service, index) => (
-              <Card key={index} className='overflow-hidden'>
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  width={300}
-                  height={200}
-                  className='w-full h-48 object-cover'
-                />
-                <CardContent className='p-4'>
-                  <h4 className='text-xl font-semibold mb-2'>
-                    {service.title}
-                  </h4>
-                  <p className='text-sm'>{service.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className='flex justify-center mt-8'>
-            <Button variant='outline' className='mr-2'>
-              <ChevronLeft className='h-4 w-4' />
-            </Button>
-            <Button variant='outline'>
-              <ChevronRight className='h-4 w-4' />
-            </Button>
+            <nav className='flex items-center space-x-4'>
+              <Link
+                href='#'
+                className='text-muted-foreground hover:text-primary transition-colors'
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href='#'
+                className='text-muted-foreground hover:text-primary transition-colors'
+              >
+                Terms of Service
+              </Link>
+              <Link
+                href='https://www.facebook.com/PagriDuque'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-muted-foreground hover:text-primary transition-colors'
+              >
+                <Facebook className='h-5 w-5' />
+                <span className='sr-only'>Facebook</span>
+              </Link>
+            </nav>
           </div>
         </div>
-      </section> */}
+      </footer>
     </div>
   )
 }

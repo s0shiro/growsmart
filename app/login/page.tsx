@@ -8,12 +8,13 @@ import { Label } from '@/components/ui/label'
 import { login } from '@/lib/auth'
 import { useFormState } from 'react-dom'
 import { useTransition } from 'react'
+import { ArrowRight, Mail, Lock } from 'lucide-react'
 
 const initState = { message: null }
 
 export default function Login({
-  searchParams,
-}: {
+                                searchParams,
+                              }: {
   searchParams: { message: string }
 }) {
   const [formState, action] = useFormState(
@@ -35,67 +36,66 @@ export default function Login({
   }
 
   return (
-    <div className='w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[720px]'>
-      <div className='hidden bg-white lg:block'>
-        <div className='relative h-full'>
-          <Image
-            src='/logo.png'
-            alt='Image'
-            fill
-            className='h-full w-full object-cover'
-          />
+    <div className="flex min-h-screen bg-background">
+      <div className="m-auto w-full max-w-md p-8 bg-card rounded-[var(--radius)] shadow-xl">
+        <div className="mb-8 text-center">
+          <Image src="/no-bg.png" alt="GrowSmart Logo" width={80} height={80} className="mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-primary">GrowSmart</h1>
+          <p className="text-sm text-muted-foreground mt-2">Log in to your account</p>
         </div>
-      </div>
-      <div className='border-l border-gray-300 flex items-center justify-center py-12'>
-        <div className='mx-auto grid w-[350px] gap-6'>
-          <div className='grid gap-2 text-center'>
-            <h1 className='text-3xl font-bold'>GrowSmart</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
+            <div className="relative">
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="m@example.com"
+                required
+                className="pl-10 w-full bg-background"
+              />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+            </div>
           </div>
-          <form onSubmit={handleSubmit} className='grid gap-4'>
-            <div className='grid gap-2'>
-              <Label htmlFor='email'>Email</Label>
-              <Input
-                id='email'
-                type='email'
-                name='email'
-                placeholder='m@example.com'
-                required
-              />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
+              <Link href="/forgot-password" className="text-xs text-primary hover:text-primary/80">
+                Forgot password?
+              </Link>
             </div>
-            <div className='grid gap-2'>
-              <div className='flex items-center'>
-                <Label htmlFor='password'>Password</Label>
-                <Link
-                  href='/forgot-password'
-                  className='ml-auto inline-block text-sm underline'
-                >
-                  Forgot your password?
-                </Link>
-              </div>
+            <div className="relative">
               <Input
-                id='password'
-                type='password'
-                name='password'
-                placeholder='••••••••'
+                id="password"
+                type="password"
+                name="password"
+                placeholder="••••••••"
                 required
+                className="pl-10 w-full bg-background"
               />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
             </div>
-            <Button type='submit' className='w-full' disabled={isPending}>
-              {isPending ? 'Logging in...' : 'Login'}
-            </Button>
-
-            {searchParams?.message && (
-              <p className='p-4 mt-4 text-center bg-foreground/10 text-foreground'>
-                {searchParams.message}
-              </p>
+          </div>
+          <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isPending}>
+            {isPending ? 'Logging in...' : (
+              <>
+                Login <ArrowRight className="ml-2 h-4 w-4" />
+              </>
             )}
-          </form>
-          <div className='mt-4 text-center text-sm'>
-            Don&apos;t have an account?{' '}
-            <Link href='/signup' className='underline'>
-              Sign up
-            </Link>
-          </div>
+          </Button>
+
+          {searchParams?.message && (
+            <p className="p-4 text-center bg-destructive/10 text-destructive rounded-[var(--radius)] text-sm">
+              {searchParams.message}
+            </p>
+          )}
+        </form>
+        <div className="mt-8 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{' '}
+          <Link href="/signup" className="font-medium text-primary hover:text-primary/80">
+            Sign up
+          </Link>
         </div>
       </div>
     </div>
