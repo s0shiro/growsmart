@@ -8,7 +8,7 @@ import {
   ChevronRight,
   X,
   Plus,
-  BarChart2,
+  Building2,
 } from 'lucide-react'
 import useReadAssociation from '@/hooks/association/useReadAssociations'
 import {
@@ -80,6 +80,7 @@ export default function AssociationTable() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase()
     setSearchTerm(term)
+    setCurrentPage(1)
   }
 
   const handleFilterChange = (type: keyof Filters, value: string) => {
@@ -94,6 +95,7 @@ export default function AssociationTable() {
     setFilters({
       associationName: 'all',
     })
+    setSearchTerm('')
     setCurrentPage(1)
   }
 
@@ -116,28 +118,40 @@ export default function AssociationTable() {
   )
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <Card className="w-full max-w-6xl mx-auto">
+        <CardContent className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </CardContent>
+      </Card>
+    )
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>
+    return (
+      <Card className="w-full max-w-6xl mx-auto">
+        <CardContent className="flex justify-center items-center h-64">
+          <p className="text-destructive">Error: {error.message}</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
     <div className='bg-background'>
-      <Card className='w-full max-w-6xl mx-auto'>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+      <Card className='w-full max-w-6xl mx-auto shadow-lg'>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-6'>
           <div>
-            <CardTitle className='text-2xl font-bold'>
+            <CardTitle className='text-3xl font-bold'>
               Associations Dashboard
             </CardTitle>
-            <CardDescription>
+            <CardDescription className='text-muted-foreground mt-1'>
               Manage and monitor farmer associations
             </CardDescription>
           </div>
           <DialogForm
             id='create-trigger'
-            description='This is description'
+            description='Add a new farmer association to the system'
             title='Add Association'
             Trigger={
               <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
@@ -148,32 +162,30 @@ export default function AssociationTable() {
           />
         </CardHeader>
         <CardContent>
-          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6'>
-            <Card>
+          <div className='mb-8'>
+            <Card className='w-full sm:w-64'>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                 <CardTitle className='text-sm font-medium'>
                   Total Associations
                 </CardTitle>
-                <BarChart2 className='h-4 w-4 text-muted-foreground' />
+                <Building2 className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>
-                  {allAssociations.length}
-                </div>
+                <div className='text-3xl font-bold'>{allAssociations.length}</div>
               </CardContent>
             </Card>
           </div>
 
-          <div className='space-y-4'>
-            <div className='flex flex-col sm:flex-row gap-2 items-start sm:items-center'>
+          <div className='space-y-6'>
+            <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
               <div className='relative flex-grow'>
                 <Input
                   placeholder='Search associations...'
                   value={searchTerm}
                   onChange={handleSearch}
-                  className='pl-8'
+                  className='pl-10'
                 />
-                <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+                <Search className='absolute left-3 top-2.5 h-5 w-5 text-muted-foreground' />
               </div>
               <div className='flex flex-wrap gap-2'>
                 <Select
@@ -182,7 +194,7 @@ export default function AssociationTable() {
                     handleFilterChange('associationName', value)
                   }
                 >
-                  <SelectTrigger className='w-[140px]'>
+                  <SelectTrigger className='w-[180px]'>
                     <SelectValue placeholder='All Associations' />
                   </SelectTrigger>
                   <SelectContent>
@@ -193,7 +205,7 @@ export default function AssociationTable() {
                     ))}
                   </SelectContent>
                 </Select>
-                {Object.values(filters).some((filter) => filter !== 'all') && (
+                {(Object.values(filters).some((filter) => filter !== 'all') || searchTerm) && (
                   <Button
                     variant='outline'
                     onClick={clearFilters}
@@ -204,50 +216,51 @@ export default function AssociationTable() {
                 )}
               </div>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Members Count</TableHead>
-                  <TableHead className='text-right'>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedAssociations.map((association, index) => (
-                  <TableRow
-                    key={association.id}
-                    className={index % 2 === 0 ? 'bg-muted/50' : ''}
-                  >
-                    <TableCell className='font-medium'>
-                      {association.name ?? 'Unnamed Association'}
-                    </TableCell>
-                    <TableCell>
-                      <MembersCount associationID={association.id} />
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' className='h-8 w-8 p-0'>
-                            <span className='sr-only'>Open menu</span>
-                            <MoreHorizontal className='h-4 w-4' />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <Link
-                            href={`/dashboard/association/${association.id}`}
-                          >
-                            <DropdownMenuItem>Details</DropdownMenuItem>
-                          </Link>
-                          <DropdownMenuItem>
-                            {/* Add other actions here */}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            <div className='rounded-md border'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className='w-[50%]'>Name</TableHead>
+                    <TableHead>Members</TableHead>
+                    <TableHead className='text-right'>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {paginatedAssociations.map((association, index) => (
+                    <TableRow
+                      key={association.id}
+                      className={index % 2 === 0 ? 'bg-muted/50' : ''}
+                    >
+                      <TableCell className='font-medium'>
+                        {association.name ?? 'Unnamed Association'}
+                      </TableCell>
+                      <TableCell>
+                        <MembersCount associationID={association.id} />
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant='ghost' className='h-8 w-8 p-0'>
+                              <span className='sr-only'>Open menu</span>
+                              <MoreHorizontal className='h-4 w-4' />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align='end'>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/association/${association.id}`}>
+                                View Details
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>Edit Association</DropdownMenuItem>
+                            <DropdownMenuItem>Manage Members</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
             <div className='flex items-center justify-between'>
               <p className='text-sm text-muted-foreground'>
                 Showing{' '}
@@ -271,7 +284,7 @@ export default function AssociationTable() {
                   }
                   disabled={currentPage === 1}
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <ChevronLeft className='h-4 w-4 mr-2' />
                   Previous
                 </Button>
                 <Button
@@ -283,7 +296,7 @@ export default function AssociationTable() {
                   disabled={currentPage === pageCount}
                 >
                   Next
-                  <ChevronRight className='h-4 w-4' />
+                  <ChevronRight className='h-4 w-4 ml-2' />
                 </Button>
               </div>
             </div>

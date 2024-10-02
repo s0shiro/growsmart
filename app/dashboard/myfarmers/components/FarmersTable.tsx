@@ -229,7 +229,6 @@ const FarmersTable = () => {
               <TableHead>Municipality</TableHead>
               <TableHead>Barangay</TableHead>
               <TableHead>Association</TableHead>
-              <TableHead>Position</TableHead>
               <TableHead className='text-right'>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -253,9 +252,6 @@ const FarmersTable = () => {
                 <TableCell>{farmer.barangay}</TableCell>
                 <TableCell>
                   <p>{farmer.association.name}</p>
-                </TableCell>
-                <TableCell>
-                  <Badge variant='outline'>{farmer.position}</Badge>
                 </TableCell>
                 <TableCell className='text-right'>
                   <DropdownMenu>

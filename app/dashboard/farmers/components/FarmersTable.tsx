@@ -224,11 +224,10 @@ const FarmersTable = () => {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[250px]">Name</TableHead>
-              <TableHead>Phone</TableHead>
+              <TableHead>RSBSA Number</TableHead>
               <TableHead>Municipality</TableHead>
               <TableHead>Barangay</TableHead>
               <TableHead>Association</TableHead>
-              <TableHead>Position</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -247,14 +246,11 @@ const FarmersTable = () => {
                     {farmer.firstname} {farmer.lastname}
                   </div>
                 </TableCell>
-                <TableCell>{farmer.phone}</TableCell>
+                <TableCell>{farmer.rsbsa_number}</TableCell>
                 <TableCell>{farmer.municipality}</TableCell>
                 <TableCell>{farmer.barangay}</TableCell>
                 <TableCell>
                   <AssociationName associationID={farmer.association_id} />
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{farmer.position}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>

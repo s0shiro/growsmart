@@ -11,7 +11,19 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarIcon, CheckCircle2, Sprout, Apple, Leaf, Calendar, MapPin, Droplet, CloudSun, DollarSign, Clock } from 'lucide-react'
+import {
+  CalendarIcon,
+  CheckCircle2,
+  Sprout,
+  Apple,
+  Leaf,
+  Calendar,
+  MapPin,
+  Droplet,
+  CloudSun,
+  DollarSign,
+  Clock,
+} from 'lucide-react'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -38,16 +50,17 @@ interface CropDetailsProps {
 }
 
 const CropDetails: React.FC<CropDetailsProps> = ({
-                                                   control,
-                                                   setValue,
-                                                   selectedCategory,
-                                                   selectedCrop,
-                                                 }) => {
+  control,
+  setValue,
+  selectedCategory,
+  selectedCrop,
+}) => {
   const { data: allCropData = [] } = useGetAllCropData()
 
   const categories = Array.isArray(allCropData) ? allCropData : []
   const crops = selectedCategory
-    ? categories.find((category: any) => category.id === selectedCategory)?.crops || []
+    ? categories.find((category: any) => category.id === selectedCategory)
+        ?.crops || []
     : []
   const varieties = selectedCrop
     ? crops.find((crop: any) => crop.id === selectedCrop)?.crop_varieties || []
@@ -308,13 +321,19 @@ const CropDetails: React.FC<CropDetailsProps> = ({
         <CardContent>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
             {fieldConfigs.map(({ name, label, icon: Icon }) => {
-              const value = name === 'cropCategory'
-                ? categories.find((category:any) => category.id === formValues[name])?.name
-                : name === 'cropType'
-                  ? crops.find((crop:any) => crop.id === formValues[name])?.name
-                  : name === 'variety'
-                    ? varieties.find((variety:any) => variety.id === formValues[name])?.name
-                    : formValues[name]
+              const value =
+                name === 'cropCategory'
+                  ? categories.find(
+                      (category: any) => category.id === formValues[name],
+                    )?.name
+                  : name === 'cropType'
+                    ? crops.find((crop: any) => crop.id === formValues[name])
+                        ?.name
+                    : name === 'variety'
+                      ? varieties.find(
+                          (variety: any) => variety.id === formValues[name],
+                        )?.name
+                      : formValues[name]
 
               const isSet = value && value !== 'Not set'
 
@@ -323,18 +342,29 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                   key={name}
                   className={cn(
                     'p-4 rounded-lg transition-all duration-200 ease-in-out',
-                    isSet ? 'bg-primary/10' : 'bg-muted'
+                    isSet ? 'bg-primary/10' : 'bg-muted',
                   )}
                 >
                   <div className='flex items-center space-x-2'>
-                    <Icon className={cn('h-5 w-5', isSet ? 'text-primary' : 'text-muted-foreground')} />
-                    <span className='font-medium text-sm text-muted-foreground'>{label}</span>
-                    {isSet && <CheckCircle2 className='h-4 w-4 text-primary ml-auto' />}
+                    <Icon
+                      className={cn(
+                        'h-5 w-5',
+                        isSet ? 'text-primary' : 'text-muted-foreground',
+                      )}
+                    />
+                    <span className='font-medium text-sm text-muted-foreground'>
+                      {label}
+                    </span>
+                    {isSet && (
+                      <CheckCircle2 className='h-4 w-4 text-primary ml-auto' />
+                    )}
                   </div>
-                  <p className={cn(
-                    'mt-1 font-semibold',
-                    isSet ? 'text-primary' : 'text-muted-foreground'
-                  )}>
+                  <p
+                    className={cn(
+                      'mt-1 font-semibold',
+                      isSet ? 'text-primary' : 'text-muted-foreground',
+                    )}
+                  >
                     {value || 'Not set'}
                   </p>
                 </div>

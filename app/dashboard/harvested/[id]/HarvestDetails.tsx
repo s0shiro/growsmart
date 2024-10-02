@@ -37,6 +37,8 @@ interface HarvestData {
   expenses: number
   field_location: string
   harvest_records: HarvestRecord[]
+  crops: { name: string }
+  crop_varieties: { name: string }
 }
 
 const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
@@ -48,6 +50,8 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
     expenses,
     field_location,
     harvest_records,
+    crops,
+    crop_varieties
   } = harvest
 
   const latestHarvest = harvest_records[0]
@@ -63,7 +67,7 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
             <div>
               <CardTitle className="text-3xl font-bold mb-2">Harvest Details</CardTitle>
               <CardDescription className="text-xl text-gray-100">
-                {crop_type} - {variety}
+                {crops.name} - {crop_varieties.name}
               </CardDescription>
             </div>
             <div className="flex space-x-2">
