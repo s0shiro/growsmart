@@ -96,7 +96,13 @@ export const getPlantingRecordWithHarvest = async (plantingID: string) => {
   if (error) throw error
 
   const plantingRecord: PlantingRecord = data
+
+  // Ensure only a single harvest record is returned
+  if (plantingRecord.harvest_records && plantingRecord.harvest_records.length > 0) {
+    plantingRecord.harvest_records = [plantingRecord.harvest_records[0]]
+  }
+
   console.log('Planting record:', plantingRecord)
 
-  return data
+  return plantingRecord
 }
