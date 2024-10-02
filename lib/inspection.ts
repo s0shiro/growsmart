@@ -31,8 +31,10 @@ export const getInspectionsByPlantingID = async (plantingID: string) => {
 
   const { data, error } = await supabase
     .from('inspections')
-    .select('*')
+    .select('*, planting_records(status)')
     .eq('planting_id', plantingID)
+
+  console.log(data)
 
   if (error) {
     console.error('Supabase error:', error.message)

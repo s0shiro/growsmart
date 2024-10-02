@@ -33,8 +33,8 @@ const FormSchema = z.object({
   yieldQuantity: z.string(),
   profit: z.string(),
   areaHarvested: z.string(),
-  damagedQuantity: z.string(),
-  damagedReason: z.string(),
+  damagedQuantity: z.string().optional(),
+  damagedReason: z.string().optional(),
 })
 
 type CropFormFieldName =

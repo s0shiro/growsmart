@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
 import {
@@ -24,7 +26,20 @@ import {
   Droplet,
   Scale,
   AlertTriangle,
+  Eye,
+  ChevronRight,
 } from 'lucide-react'
+import Link from 'next/link'
+
+interface Visit {
+  id: string
+  date: string
+  damaged: number
+  findings: string
+  created_at: string
+  planting_id: string
+  damaged_reason: string
+}
 
 interface HarvestRecord {
   id: string
@@ -42,6 +57,7 @@ interface HarvestRecord {
 }
 
 interface HarvestData {
+  id: string
   crop_type: string
   variety: string
   planting_date: string
@@ -51,10 +67,12 @@ interface HarvestData {
   harvest_records: HarvestRecord[]
   crops: { name: string }
   crop_varieties: { name: string }
+  inspections: Visit[]
 }
 
 const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
   const {
+    id,
     crop_type,
     variety,
     planting_date,
@@ -64,21 +82,27 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
     harvest_records,
     crops,
     crop_varieties,
+    inspections,
   } = harvest
 
   const latestHarvest = harvest_records[0]
 
-  // Simple function to format currency
   const formatCurrency = (amount: number | undefined) => {
     if (amount === undefined) return 'N/A'
     return `₱${amount.toLocaleString()}`
   }
 
-  // Calculate final profit
   const finalProfit =
     latestHarvest && expenses !== undefined
       ? latestHarvest.profit - expenses
       : undefined
+
+  const totalDamaged =
+    inspections.reduce((sum, visit) => sum + (visit.damaged || 0), 0) +
+    harvest_records.reduce(
+      (sum, record) => sum + (record.damaged_quantity || 0),
+      0,
+    )
 
   return (
     <div>
@@ -211,22 +235,38 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
                               <Scale className='mr-2 h-4 w-4' />
                               Area Harvested
                             </span>
-                            <Badge>{record.area_harvested} sqm</Badge>
+                            <Badge>{record.area_harvested} ha</Badge>
                           </li>
                           <li className='flex items-center justify-between'>
                             <span className='flex items-center text-gray-600 dark:text-gray-300'>
                               <AlertTriangle className='mr-2 h-4 w-4' />
-                              Damaged
+                              Harvesting Damaged
                             </span>
-                            <Badge>{record.damaged_quantity} kg</Badge>
+                            <Badge variant='destructive'>
+                              {record.damaged_quantity}
+                            </Badge>
                           </li>
                           <li className='flex items-center justify-between'>
                             <span className='flex items-center text-gray-600 dark:text-gray-300'>
                               <AlertTriangle className='mr-2 h-4 w-4' />
-                              Damage Reason
+                              Total Damaged
+                            </span>
+                            <Badge variant='destructive'>
+                              {totalDamaged} kg
+                            </Badge>
+                          </li>
+                          <li className='flex items-center justify-between'>
+                            <span className='flex items-center text-gray-600 dark:text-gray-300'>
+                              <AlertTriangle className='mr-2 h-4 w-4' />
+                              Damage Reasons
                             </span>
                             <Badge variant='outline'>
-                              {record.damaged_reason}
+                              {[
+                                ...new Set([
+                                  record.damaged_reason,
+                                  ...inspections.map((i) => i.damaged_reason),
+                                ]),
+                              ].join(', ')}
                             </Badge>
                           </li>
                         </ul>
@@ -237,6 +277,85 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
               </Card>
             )}
           </div>
+          <Separator className='my-8' />
+          <Card className='bg-gray-50 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden'>
+            <CardHeader className='bg-gray-100 dark:bg-gray-600 p-4'>
+              <CardTitle className='text-xl font-semibold'>
+                Visit Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='p-4'>
+              <div className='space-y-4'>
+                <div className='grid grid-cols-2 gap-4'>
+                  <Card className='bg-white dark:bg-gray-600 shadow-sm'>
+                    <CardContent className='p-4'>
+                      <p className='text-sm text-gray-500 dark:text-gray-400'>
+                        Total Visits
+                      </p>
+                      <h3 className='text-2xl font-bold mt-1'>
+                        {inspections.length}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                  <Card className='bg-white dark:bg-gray-600 shadow-sm'>
+                    <CardContent className='p-4'>
+                      <p className='text-sm text-gray-500 dark:text-gray-400'>
+                        Total damage during visits
+                      </p>
+                      <h3 className='text-2xl font-bold mt-1 text-red-600 dark:text-red-400'>
+                        {inspections.reduce(
+                          (sum, visit) => sum + (visit.damaged || 0),
+                          0,
+                        )}{' '}
+                        kg
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </div>
+                <Separator />
+                <h4 className='font-semibold text-lg mb-2'>Recent Visits</h4>
+                <ScrollArea className='h-[300px]'>
+                  {inspections.map((visit, index) => (
+                    <Card
+                      key={visit.id}
+                      className='mb-4 bg-white dark:bg-gray-600 shadow-sm'
+                    >
+                      <CardContent className='p-4'>
+                        <div className='flex justify-between items-center mb-2'>
+                          <span className='font-medium text-lg'>
+                            {formatDate(visit.date)}
+                          </span>
+                          <Badge
+                            variant={
+                              visit.damaged > 0 ? 'destructive' : 'default'
+                            }
+                          >
+                            {visit.damaged > 0
+                              ? `${visit.damaged} kg damaged`
+                              : 'No damage'}
+                          </Badge>
+                        </div>
+                        <p className='text-gray-600 dark:text-gray-300 mb-2'>
+                          {visit.findings}
+                        </p>
+                        <div className='flex justify-between items-center text-sm'>
+                          <span className='text-gray-500 dark:text-gray-400'>
+                            Reason: {visit.damaged_reason}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </ScrollArea>
+                <Link href={`/dashboard/standing/${id}`}>
+                  <Button variant='outline' className='w-full'>
+                    <Eye className='mr-2 h-4 w-4' />
+                    View All Visits
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
           <Separator className='my-8' />
           <Card className='bg-gray-50 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden'>
             <CardHeader className='bg-gray-100 dark:bg-gray-600 p-4'>
@@ -265,28 +384,6 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
                 <UploadCloud className='mr-2 h-4 w-4' />
                 Upload Photos
               </Button>
-            </CardContent>
-          </Card>
-          <Separator className='my-8' />
-          <Card className='bg-gray-50 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden'>
-            <CardHeader className='bg-gray-100 dark:bg-gray-600 p-4'>
-              <CardTitle className='text-xl font-semibold'>
-                Related Records
-              </CardTitle>
-            </CardHeader>
-            <CardContent className='p-4'>
-              <p className='text-lg flex items-center justify-between'>
-                <span className='font-medium text-gray-700 dark:text-gray-300'>
-                  Previous Harvests
-                </span>
-                <Button variant='link' asChild>
-                  <a
-                    href={`/harvests?crop=${crop_type}&field=${field_location}`}
-                  >
-                    View
-                  </a>
-                </Button>
-              </p>
             </CardContent>
           </Card>
         </CardContent>

@@ -266,23 +266,10 @@ export default function InspectionTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
-                          <DialogForm
-                            id='create-record'
-                            title='Record Planting'
-                            description={`Record planting data to ${crop.id}`}
-                            Trigger={
-                              <DropdownMenuItem
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                Inspect
-                              </DropdownMenuItem>
-                            }
-                            form={<InspectionForm plantingID={crop.id} />}
-                          />
                           <Link href={`/dashboard/standing/${crop.id}`}>
                             <DropdownMenuItem>
                               <Eye className='mr-2 h-4 w-4' />
-                              Inspection History
+                              View
                             </DropdownMenuItem>
                           </Link>
                         </DropdownMenuContent>
