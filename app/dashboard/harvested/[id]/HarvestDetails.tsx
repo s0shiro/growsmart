@@ -21,7 +21,6 @@ import {
   UploadCloud,
   Calendar,
   MapPin,
-  CloudSun,
   DollarSign,
   Droplet,
   Scale,
@@ -61,7 +60,6 @@ interface HarvestData {
   crop_type: string
   variety: string
   planting_date: string
-  weather_condition: string | null
   expenses: number
   field_location: string
   harvest_records: HarvestRecord[]
@@ -76,7 +74,6 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
     crop_type,
     variety,
     planting_date,
-    weather_condition,
     expenses,
     field_location,
     harvest_records,
@@ -158,15 +155,6 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
                   </li>
                   <li className='flex items-center justify-between'>
                     <span className='flex items-center text-gray-600 dark:text-gray-300'>
-                      <CloudSun className='mr-2 h-4 w-4' />
-                      Weather
-                    </span>
-                    <Badge variant='outline'>
-                      {weather_condition || 'N/A'}
-                    </Badge>
-                  </li>
-                  <li className='flex items-center justify-between'>
-                    <span className='flex items-center text-gray-600 dark:text-gray-300'>
                       <DollarSign className='mr-2 h-4 w-4' />
                       Expenses
                     </span>
@@ -243,7 +231,7 @@ const HarvestDetails = ({ harvest }: { harvest: HarvestData }) => {
                               Harvesting Damaged
                             </span>
                             <Badge variant='destructive'>
-                              {record.damaged_quantity}
+                              {record.damaged_quantity || 0}
                             </Badge>
                           </li>
                           <li className='flex items-center justify-between'>

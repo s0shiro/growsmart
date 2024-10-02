@@ -110,13 +110,6 @@ const CropDetails: React.FC<CropDetailsProps> = ({
       icon: Droplet,
     },
     {
-      name: 'weatherCondition',
-      placeholder: 'Enter weather condition',
-      label: 'Weather Condition',
-      type: 'text',
-      icon: CloudSun,
-    },
-    {
       name: 'expenses',
       placeholder: 'Enter expenses',
       label: 'Expenses',

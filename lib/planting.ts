@@ -12,7 +12,6 @@ type PlantingRecordData = {
   fieldLocation: string
   areaPlanted: string
   quantity: string
-  weatherCondition: string
   expenses: string
   harvestDate: string
   status: string
@@ -28,7 +27,6 @@ type PlantingRecord = {
   field_location: string
   area_planted: number
   quantity: number
-  weather_condition: string
   expenses: number
   harvest_date: string
   status: string
@@ -48,7 +46,6 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     field_location: data.fieldLocation,
     area_planted: parseFloat(data.areaPlanted),
     quantity: parseFloat(data.quantity),
-    weather_condition: data.weatherCondition,
     expenses: parseFloat(data.expenses),
     harvest_date: data.harvestDate,
     status: data.status,

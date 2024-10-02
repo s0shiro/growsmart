@@ -84,7 +84,7 @@ export const getPlantingRecordWithHarvest = async (plantingID: string) => {
   const plantingRecordQuery = supabase
     .from('planting_records')
     .select(
-      `id, crop_type, variety, planting_date, weather_condition, expenses, field_location, harvest_records(*), crops(name), crop_varieties(name), inspections(*)`,
+      `id, crop_type, variety, planting_date, expenses, field_location, harvest_records(*), crops(name), crop_varieties(name), inspections(*)`,
     )
     .eq('id', plantingID) // Filter to only include the record with the matching plantingID
     .single()

@@ -29,9 +29,6 @@ const FormSchema = z.object({
   fieldLocation: z.string().nonempty({ message: 'Field location is required' }),
   areaPlanted: z.string().nonempty({ message: 'Area planted is required' }),
   quantity: z.string().nonempty({ message: 'Quantity is required' }),
-  weatherCondition: z
-    .string()
-    .nonempty({ message: 'Weather condition is required' }),
   expenses: z.string().nonempty({ message: 'Expenses are required' }),
   harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for harvest date',
@@ -120,7 +117,6 @@ export default function ImprovedPlantingForm() {
           fieldLocation: data.fieldLocation,
           areaPlanted: data.areaPlanted,
           quantity: data.quantity,
-          weatherCondition: data.weatherCondition,
           expenses: data.expenses,
           harvestDate: data.harvestDate,
           status: status,
