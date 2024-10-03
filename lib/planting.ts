@@ -16,6 +16,7 @@ type PlantingRecordData = {
   harvestDate: string
   status: string
   cropCategory: string
+  landType?: string
 }
 
 type PlantingRecord = {
@@ -31,6 +32,7 @@ type PlantingRecord = {
   harvest_date: string
   status: string
   crop_categoryId: string
+  land_type?: string
 }
 
 export const addPlantingRecord = async (data: PlantingRecordData) => {
@@ -50,6 +52,7 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     harvest_date: data.harvestDate,
     status: data.status,
     crop_categoryId: data.cropCategory,
+    land_type: data.landType,
   }
 
   const { error } = await supabase

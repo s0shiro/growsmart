@@ -30,10 +30,10 @@ const FormSchema = z.object({
   harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for plantingDate',
   }),
-  yieldQuantity: z.string(),
-  profit: z.string(),
-  areaHarvested: z.string(),
-  damagedQuantity: z.string().optional(),
+  yieldQuantity: z.coerce.number(),
+  profit: z.coerce.number(),
+  areaHarvested: z.coerce.number(),
+  damagedQuantity: z.coerce.number().optional(),
   damagedReason: z.string().optional(),
 })
 
@@ -159,7 +159,7 @@ export default function HarvestForm({
                 <MultiFileDropzone
                   value={fileStates}
                   dropzoneOptions={{
-                    maxFiles: 6,
+                    maxFiles: 10,
                   }}
                   onChange={(files) => {
                     setFileStates(files)

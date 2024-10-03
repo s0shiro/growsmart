@@ -18,53 +18,57 @@ import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 
-const FormSchema = z.object({
-  farmerId: z.string().nonempty({ message: 'Farmer selection is required' }),
-  cropCategory: z.string().nonempty({ message: 'Crop category is required' }),
-  cropType: z.string().nonempty({ message: 'Crop name is required' }),
-  variety: z.string().nonempty({ message: 'Variety is required' }),
-  plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid date format for planting date',
-  }),
-  fieldLocation: z.string().nonempty({ message: 'Field location is required' }),
-  areaPlanted: z.string().nonempty({ message: 'Area planted is required' }),
-  quantity: z.string().nonempty({ message: 'Quantity is required' }),
-  expenses: z.string().nonempty({ message: 'Expenses are required' }),
-  harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid date format for harvest date',
-  }),
-})
-
-// Helper function to calculate harvest date based on category
-function calculateHarvestDate(plantingDate: string, cropCategory: string) {
-  const daysToHarvest: { [key: string]: number } = {
-    palay: 120,
-    corn: 90,
-    'high-value': 60,
-  }
-
-  if (!plantingDate || !cropCategory) return ''
-
-  const days = daysToHarvest[cropCategory] || 0
-  const planting = new Date(plantingDate)
-  planting.setDate(planting.getDate() + days)
-
-  return planting.toISOString().split('T')[0] // Return in yyyy-mm-dd format
-}
-
 export default function ImprovedPlantingForm() {
+  const { data: allCropData = [] } = useGetAllCropData()
+  const categories = Array.isArray(allCropData) ? allCropData : []
+
+  const FormSchema = z
+    .object({
+      farmerId: z
+        .string().min(1, { message: 'Farmer selection is required' }),
+      cropCategory: z
+        .string().min(1, { message: 'Crop category is required' }),
+      landType: z.string().optional(),
+      cropType: z.string().min(1, { message: 'Crop name is required' }),
+      variety: z.string().min(1, { message: 'Variety is required' }),
+      plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+        message: 'Invalid date format for planting date',
+      }),
+      fieldLocation: z.string().min(1, { message: 'Field location is required' }),
+      areaPlanted: z.string().min(1, { message: 'Area planted is required' }),
+      quantity: z.string().min(1, { message: 'Quantity is required' }),
+      expenses: z.string().min(1, { message: 'Expenses are required' }),
+      harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+        message: 'Invalid date format for harvest date',
+      }),
+    })
+    .refine(
+      (data) => {
+        const { cropCategory, landType } = data
+        const isRice =
+          categories.find((c) => c.id === cropCategory)?.name?.toLowerCase() ===
+          'rice'
+        return !isRice || (isRice && landType)
+      },
+      {
+        message: 'Land type is required for rice crops',
+        path: ['landType'],
+      },
+    )
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {},
+    defaultValues: {
+      landType: '',
+    },
   })
 
   const queryClient = useQueryClient()
   const { data: farmers } = useFetchFarmersByUserId()
-  const { data: allCropData } = useGetAllCropData()
   const { watch, setValue } = form
 
-  const categoryNames = (allCropData || []).reduce(
-    (acc: any, category: any) => {
+  const categoryNames = categories.reduce(
+    (acc: Record<string, string>, category: any) => {
       acc[category.id] = category.name
       return acc
     },
@@ -85,6 +89,22 @@ export default function ImprovedPlantingForm() {
     setValue('fieldLocation', locationName)
   }
 
+  function calculateHarvestDate(plantingDate: string, cropCategory: string) {
+    const daysToHarvest: { [key: string]: number } = {
+      rice: 120,
+      corn: 90,
+      'high-value': 60,
+    }
+
+    if (!plantingDate || !cropCategory) return ''
+
+    const days = daysToHarvest[cropCategory.toLowerCase()] || 0
+    const planting = new Date(plantingDate)
+    planting.setDate(planting.getDate() + days)
+
+    return planting.toISOString().split('T')[0]
+  }
+
   useEffect(() => {
     if (plantingDate && selectedCategory) {
       const harvestDate = calculateHarvestDate(
@@ -99,8 +119,11 @@ export default function ImprovedPlantingForm() {
     if (selectedCategory) {
       const categoryName = categoryNames[selectedCategory] || 'Unknown Category'
       console.log(categoryName)
+      if (categoryName.toLowerCase() !== 'rice') {
+        setValue('landType', '')
+      }
     }
-  }, [selectedCategory, categoryNames])
+  }, [selectedCategory, categoryNames, setValue])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
@@ -119,6 +142,7 @@ export default function ImprovedPlantingForm() {
           quantity: data.quantity,
           expenses: data.expenses,
           harvestDate: data.harvestDate,
+          landType: data.landType,
           status: status,
         })
         console.log('Form submitted successfully')
@@ -226,7 +250,15 @@ export default function ImprovedPlantingForm() {
                 <Button type='button' onClick={prevStep}>
                   Previous
                 </Button>
-                <Button type='submit' disabled={isPending}>
+                <Button
+                  type='submit'
+                  disabled={
+                    isPending ||
+                    (categoryNames[selectedCategory]?.toLowerCase() ===
+                      'rice' &&
+                      !form.watch('landType'))
+                  }
+                >
                   {isPending ? 'Submitting...' : 'Submit'}
                 </Button>
               </div>

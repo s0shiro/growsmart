@@ -10,11 +10,11 @@ interface HarvestData {
   farmerId: string | undefined
   plantingId: string | undefined
   harvestDate: string
-  yieldQuantity: string
-  profit: string
-  areaHarvested: string
-  damagedQuantity: string
-  damagedReason: string
+  yieldQuantity: number
+  profit: number
+  areaHarvested: number
+  damagedQuantity?: number
+  damagedReason?: string
   harvestImages: string[]
 }
 
@@ -26,8 +26,8 @@ interface HarvestRecord {
   yield_quantity: number
   profit: number
   area_harvested: number
-  damaged_quantity: number
-  damaged_reason: string
+  damaged_quantity?: number | undefined
+  damaged_reason?: string
   harvest_images: string[]
 }
 
@@ -40,10 +40,10 @@ export const addHarvest = async (data: HarvestData) => {
     farmer_id: data.farmerId || '',
     planting_id: data.plantingId || '',
     harvest_date: data.harvestDate,
-    yield_quantity: parseFloat(data.yieldQuantity),
-    profit: parseFloat(data.profit),
-    area_harvested: parseFloat(data.areaHarvested),
-    damaged_quantity: parseFloat(data.damagedQuantity),
+    yield_quantity: data.yieldQuantity,
+    profit: data.profit,
+    area_harvested: data.areaHarvested,
+    damaged_quantity: data.damagedQuantity,
     damaged_reason: data.damagedReason,
     harvest_images: data.harvestImages,
   }
