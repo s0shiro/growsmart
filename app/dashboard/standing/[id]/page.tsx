@@ -196,7 +196,7 @@ export default function VisitHistory({ params }: { params: { id: string } }) {
                       <CardContent>
                         <p className='text-muted-foreground'>
                           <strong>Quantity:</strong>{' '}
-                          {selectedVisit.damaged || 'N/A'}
+                          {selectedVisit.damaged || 'N/A'} kg
                         </p>
                         <p className='text-muted-foreground mt-2'>
                           <strong>Reason:</strong>{' '}

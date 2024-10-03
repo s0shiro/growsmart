@@ -131,7 +131,7 @@ export default function CropTableContainer() {
         </div>
 
         <div className='flex space-x-2 mb-4'>
-          {['All', 'Palay', 'Corn', 'High-Value'].map((tab) => (
+          {['All', 'Rice', 'Corn', 'High-Value'].map((tab) => (
             <Button
               key={tab}
               variant={activeTab === tab ? 'default' : 'outline'}
@@ -165,7 +165,7 @@ export default function CropTableContainer() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='All'>All crops</SelectItem>
-              <SelectItem value='Planting'>palay</SelectItem>
+              <SelectItem value='Planting'>rice</SelectItem>
               <SelectItem value='Growing'>corn</SelectItem>
               <SelectItem value='Inspection'>high-value</SelectItem>
             </SelectContent>
