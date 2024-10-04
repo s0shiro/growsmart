@@ -29,7 +29,7 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Main content */}
-        <div className='flex-1 p-1 overflow-x-auto'>
+        <div className='flex-1 px-2 py-4 overflow-x-auto'>
           <main className='flex-1 bg-background rounded-lg'>{children}</main>
         </div>
       </div>

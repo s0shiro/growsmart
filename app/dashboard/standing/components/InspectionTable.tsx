@@ -1,6 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -9,314 +18,195 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import {
-  MoreHorizontal,
-  X,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  Search,
-  Loader2,
-} from 'lucide-react'
-import useReadInspections from '@/hooks/crop/useReadInspection'
-import InspectionForm from './InpectionForm'
-import DialogForm from '../../(components)/forms/DialogForm'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { ChevronLeft, ChevronRight, Eye } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
-import { getStatusColor } from '@/lib/utils'
-import { motion, AnimatePresence } from 'framer-motion'
+import useReadInspections from '@/hooks/crop/useReadInspection'
+import { formatDate } from '@/lib/utils'
 
+//TODO: Define Crop interface
 interface Crop {
   id: string
-  created_at: string
-  farmer_id: string
-  crop_type: string
-  variety: string
   planting_date: string
-  field_location: string
-  area_planted: number
-  quantity: number
-  weather_condition: string | null
-  expenses: number
   harvest_date: string
-  technician_id?: string
   status: string
+  technician_farmers: {
+    lastname: string
+    firstname: string
+  }
+  crops: {
+    name: string
+  }
 }
 
-interface Filters {
-  cropName: string
-  fieldLocation: string
-}
-
-export default function InspectionTable() {
+export default function CropInspections() {
   const { data: crops, isLoading, error } = useReadInspections()
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [filters, setFilters] = useState<Filters>({
-    cropName: 'all',
-    fieldLocation: 'all',
-  })
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterCrop, setFilterCrop] = useState<string | null>(null)
+
   const itemsPerPage = 5
 
-  const [cropNames, setCropNames] = useState<string[]>([])
-  const [fieldLocations, setFieldLocations] = useState<string[]>([])
-
-  useEffect(() => {
-    if (Array.isArray(crops)) {
-      const uniqueCropNames = [
-        'all',
-        ...new Set(crops.map((crop) => crop.crop_type)),
-      ]
-      const uniqueFieldLocations = [
-        'all',
-        ...new Set(crops.map((crop) => crop.field_location)),
-      ]
-
-      setCropNames(uniqueCropNames)
-      setFieldLocations(uniqueFieldLocations)
-    }
-  }, [crops])
-
-  if (isLoading)
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <Loader2 className='h-8 w-8 animate-spin text-primary' />
-      </div>
+  const filteredCrops = useMemo(() => {
+    if (!Array.isArray(crops)) return []
+    return crops.filter(
+      (crop: any) =>
+        (crop.technician_farmers.firstname
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+          crop.technician_farmers.lastname
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          crop.crops.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (filterCrop === null || crop.crops.name === filterCrop),
     )
-  if (error)
-    return (
-      <Card className='w-full max-w-6xl mx-auto'>
-        <CardContent className='p-6'>
-          <p className='text-center text-destructive'>
-            Error loading crops data
-          </p>
-        </CardContent>
-      </Card>
-    )
+  }, [crops, searchTerm, filterCrop])
 
-  const filteredCrops = Array.isArray(crops)
-    ? crops.filter((crop) => {
-        const typedCrop = crop as Crop
-        return (
-          Object.values(typedCrop).some((value) =>
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
-          ) &&
-          (filters.cropName === 'all' ||
-            typedCrop.crop_type === filters.cropName) &&
-          (filters.fieldLocation === 'all' ||
-            typedCrop.field_location === filters.fieldLocation)
-        )
-      })
-    : []
-
-  const pageCount = Math.ceil(filteredCrops.length / itemsPerPage)
+  const totalPages = Math.ceil(filteredCrops.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedCrops = filteredCrops.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    startIndex,
+    startIndex + itemsPerPage,
   )
 
-  const handleFilterChange = (type: keyof Filters, value: string) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [type]: value,
-    }))
-    setCurrentPage(1)
-  }
+  const cropTypes = useMemo(
+    () => [
+      ...new Set(
+        Array.isArray(crops) ? crops.map((crop: any) => crop.crops.name) : [],
+      ),
+    ],
+    [crops],
+  )
 
-  const clearFilters = () => {
-    setFilters({
-      cropName: 'all',
-      fieldLocation: 'all',
-    })
-    setCurrentPage(1)
+  if (error) {
+    return (
+      <div className='text-center py-4 text-red-500'>
+        Error loading crop inspections. Please try again later.
+      </div>
+    )
   }
 
   return (
-    <Card className='w-full max-w-6xl mx-auto overflow-hidden'>
-      <CardHeader className='bg-primary/5 border-b'>
-        <CardTitle className='text-2xl font-bold'>Standing Crops</CardTitle>
-      </CardHeader>
-      <CardContent className='p-6 space-y-6'>
-        <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
-          <div className='relative flex-grow'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-            <Input
-              placeholder='Search crops...'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary'
-            />
-          </div>
-          <div className='flex flex-wrap gap-2'>
-            <Select
-              value={filters.cropName}
-              onValueChange={(value) => handleFilterChange('cropName', value)}
-            >
-              <SelectTrigger className='w-[140px]'>
-                <SelectValue placeholder='All Crops' />
-              </SelectTrigger>
-              <SelectContent>
-                {cropNames.map((id) => (
-                  <SelectItem key={id} value={id}>
-                    {id === 'all'
-                      ? 'All'
-                      : (Array.isArray(crops) &&
-                          crops.find((crop: any) => crop.crop_type === id)
-                            ?.crops?.name) ||
-                        'Unknown'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={filters.fieldLocation}
-              onValueChange={(value) =>
-                handleFilterChange('fieldLocation', value)
-              }
-            >
-              <SelectTrigger className='w-[140px]'>
-                <SelectValue
-                  placeholder={
-                    filters.fieldLocation === 'all'
-                      ? 'All Locations'
-                      : filters.fieldLocation
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {fieldLocations.map((location) => (
-                  <SelectItem key={location} value={location}>
-                    {location === 'all' ? 'All' : location}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {Object.values(filters).some((filter) => filter !== 'all') && (
-              <Button
-                variant='outline'
-                onClick={clearFilters}
-                className='flex items-center hover:bg-destructive/10 transition-colors duration-300'
-              >
-                <X className='mr-2 h-4 w-4' /> Clear Filters
-              </Button>
-            )}
-          </div>
-        </div>
-        <div className='rounded-md border overflow-hidden'>
-          <Table>
-            <TableHeader>
-              <TableRow className='bg-muted/50'>
-                <TableHead>Farmer Name</TableHead>
-                <TableHead>Crop Name</TableHead>
-                <TableHead>Field Location</TableHead>
-                <TableHead>Harvest Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <AnimatePresence>
-                {paginatedCrops.map((crop, index) => (
-                  <motion.tr
-                    key={crop.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <TableCell className='font-medium'>
-                      <p>
-                        {crop.technician_farmers?.firstname}{' '}
-                        {crop.technician_farmers?.lastname}
-                      </p>
-                    </TableCell>
+    <div>
+      <h1 className='text-2xl font-bold mb-4'>Standing Crops</h1>
+
+      <div className='flex flex-col md:flex-row gap-4 mb-4'>
+        <Input
+          placeholder='Search by farmer name or crop'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className='md:w-1/2'
+          disabled={isLoading}
+        />
+        <div className='flex-grow'></div>
+        <Select
+          value={filterCrop || undefined}
+          onValueChange={(value: string) =>
+            setFilterCrop(value === 'all' ? null : value)
+          }
+          disabled={isLoading}
+        >
+          <SelectTrigger className='md:w-1/4'>
+            <SelectValue placeholder='Filter by Crop' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Crops</SelectItem>
+            {cropTypes.map((crop) => (
+              <SelectItem key={crop as React.Key} value={crop as string}>
+                {crop as React.ReactNode}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <ScrollArea className='w-full whitespace-nowrap rounded-md border'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Farmer</TableHead>
+              <TableHead>Crop</TableHead>
+              <TableHead>Planting Date</TableHead>
+              <TableHead>Expected Harvest Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading
+              ? Array.from({ length: 7 }).map((_, index) => (
+                  <TableRow key={index}>
+                    {Array.from({ length: 6 }).map((_, cellIndex) => (
+                      <TableCell key={cellIndex}>
+                        <Skeleton className='h-4 w-[100px]' />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              : paginatedCrops.map((crop: any) => (
+                  <TableRow key={crop.id}>
+                    <TableCell>{`${crop.technician_farmers.firstname} ${crop.technician_farmers.lastname}`}</TableCell>
+                    <TableCell>{crop.crops.name}</TableCell>
+                    <TableCell>{formatDate(crop.planting_date)}</TableCell>
+                    <TableCell>{formatDate(crop.harvest_date)}</TableCell>
                     <TableCell>
-                      <p>{crop.crops?.name}</p>
-                    </TableCell>
-                    <TableCell>{crop.field_location}</TableCell>
-                    <TableCell>{crop.harvest_date}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(crop.status)}>
+                      <span className='px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800'>
                         {crop.status}
-                      </Badge>
+                      </span>
                     </TableCell>
-                    <TableCell className='text-right'>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' className='h-8 w-8 p-0'>
-                            <span className='sr-only'>Open menu</span>
-                            <MoreHorizontal className='h-4 w-4' />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <Link href={`/dashboard/standing/${crop.id}`}>
-                            <DropdownMenuItem>
-                              <Eye className='mr-2 h-4 w-4' />
-                              View
-                            </DropdownMenuItem>
-                          </Link>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <TableCell>
+                      <Link href={`/dashboard/standing/${crop.id}`} passHref>
+                        <Button variant='ghost' size='sm'>
+                          <Eye className='mr-2 h-4 w-4' />
+                          View
+                        </Button>
+                      </Link>
                     </TableCell>
-                  </motion.tr>
+                  </TableRow>
                 ))}
-              </AnimatePresence>
-            </TableBody>
-          </Table>
+          </TableBody>
+        </Table>
+        <ScrollBar orientation='horizontal' />
+      </ScrollArea>
+
+      {!isLoading && filteredCrops.length === 0 && (
+        <div className='text-center py-4'>
+          No crop inspections found matching the current filters.
         </div>
-        <div className='flex items-center justify-between'>
-          <p className='text-sm text-muted-foreground'>
-            Showing{' '}
-            {Math.min(
-              filteredCrops.length,
-              (currentPage - 1) * itemsPerPage + 1,
-            )}{' '}
-            to {Math.min(filteredCrops.length, currentPage * itemsPerPage)} of{' '}
-            {filteredCrops.length} entries
-          </p>
-          <div className='flex items-center space-x-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className='transition-all duration-300 hover:bg-primary/10'
-            >
-              <ChevronLeft className='mr-2 h-4 w-4' />
-              Previous
-            </Button>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(pageCount, prev + 1))
-              }
-              disabled={currentPage === pageCount}
-              className='transition-all duration-300 hover:bg-primary/10'
-            >
-              Next
-              <ChevronRight className='ml-2 h-4 w-4' />
-            </Button>
-          </div>
+      )}
+
+      <div className='flex justify-between items-center mt-4'>
+        <div>
+          {isLoading ? (
+            <Skeleton className='h-4 w-[100px]' />
+          ) : (
+            `Page ${currentPage} of ${totalPages}`
+          )}
         </div>
-      </CardContent>
-    </Card>
+        <div className='flex gap-2'>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={isLoading || currentPage === 1}
+          >
+            <ChevronLeft className='h-4 w-4 mr-2' />
+            Previous
+          </Button>
+          <Button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={
+              isLoading ||
+              currentPage === totalPages ||
+              filteredCrops.length === 0
+            }
+          >
+            Next
+            <ChevronRight className='h-4 w-4 ml-2' />
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }

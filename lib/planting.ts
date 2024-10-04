@@ -144,7 +144,7 @@ export const getInspectionStatusRecords = async (userID: string) => {
     .select(`
       *,
       technician_farmers (id, firstname, lastname),
-      crops (name)
+      crops (name), crop_varieties (name)
     `)
     .eq('status', 'inspection')
     .eq('user_id', userID)

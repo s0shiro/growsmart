@@ -1,22 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  UserPlus,
-  MoreHorizontal,
-  Eye,
-  MapPin,
-  Phone,
-  Filter,
-  Edit,
-  Trash,
-  Search,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -25,111 +18,69 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import DialogForm from '../../(components)/forms/DialogForm'
-import CreateFarmerForm from './CreateFarmerForm'
-import Link from 'next/link'
+import { ChevronLeft, ChevronRight, Plus, Eye } from 'lucide-react'
 import useFetchFarmersByUserId from '@/hooks/farmer/useFetchFarmersByUserId'
+import Link from 'next/link'
+import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
+import CreateFarmerForm from '@/app/dashboard/myfarmers/components/CreateFarmerForm'
+import { Skeleton } from '@/components/ui/skeleton'
 
-type Farmer = {
-  id: string
-  user_id: string
-  firstname: string
-  lastname: string
-  gender: string
-  municipality: string
-  barangay: string
-  phone: string
-  created_at: string
-  association_id: string
-  position: string
-  avatar: string
-  association: Association
-  rsbsa_number: number
-}
+type FilterValue = string | null
 
-type Association = {
-  id: string
-  name: string
-}
-
-const FarmersTable = () => {
-  const { data: farmersData } = useFetchFarmersByUserId()
-  const farmers: Farmer[] = (farmersData as Farmer[]) || []
-
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedFarmer, setSelectedFarmer] = useState<Farmer | null>(null)
-  const [municipalityFilter, setMunicipalityFilter] = useState('All')
-  const [associationFilter, setAssociationFilter] = useState('All')
-  const [positionFilter, setPositionFilter] = useState('All')
+export default function FarmerUI() {
+  const { data: farmersData, isLoading } = useFetchFarmersByUserId()
   const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterAssociation, setFilterAssociation] = useState<FilterValue>(null)
+  const [filterPosition, setFilterPosition] = useState<FilterValue>(null)
+
   const itemsPerPage = 5
 
-
-  const filteredFarmers = farmers.filter(
-    (farmer) =>
-      (farmer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        farmer.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        farmer.phone.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (municipalityFilter === 'All' ||
-        farmer.municipality === municipalityFilter) &&
-      (associationFilter === 'All' ||
-        farmer.association_id === associationFilter) &&
-      (positionFilter === 'All' || farmer.position === positionFilter),
-  )
+  const filteredFarmers = useMemo(() => {
+    return (
+      farmersData?.filter(
+        (farmer: any) =>
+          (farmer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            farmer.lastname.toLowerCase().includes(searchTerm.toLowerCase())) &&
+          (filterAssociation === null ||
+            filterAssociation === 'all' ||
+            farmer.association.name === filterAssociation) &&
+          (filterPosition === null ||
+            filterPosition === 'all' ||
+            farmer.position === filterPosition),
+      ) || []
+    )
+  }, [farmersData, searchTerm, filterAssociation, filterPosition])
 
   const totalPages = Math.ceil(filteredFarmers.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedFarmers = filteredFarmers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    startIndex,
+    startIndex + itemsPerPage,
   )
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value.toLowerCase())
-    setCurrentPage(1)
-  }
+  const associations = useMemo(
+    () => [
+      'all',
+      ...new Set(farmersData?.map((farmer: any) => farmer.association.name)),
+    ],
+    [farmersData],
+  )
 
-  const uniqueMunicipalities = [
-    'All',
-    ...new Set(farmers.map((farmer) => farmer.municipality)),
-  ]
-  const uniqueAssociations = [
-    'All',
-    ...new Set(farmers.map((farmer) => farmer.association_id)),
-  ]
-  const uniquePositions = [
-    'All',
-    ...new Set(farmers.map((farmer) => farmer.position)),
-  ]
+  const positions = useMemo(
+    () => [
+      'all',
+      ...new Set(farmersData?.map((farmer: any) => farmer.position)),
+    ],
+    [farmersData],
+  )
 
   return (
-    <div className="space-y-6">
-      <div className='flex justify-between items-center'>
-        <h2 className='text-2xl font-bold text-foreground'>My Farmers</h2>
+    <div>
+      <div className='flex justify-between items-center mb-4'>
+        <h1 className='text-2xl font-bold'>My Farmers</h1>
         <DialogForm
           id='create-trigger'
           title='Add Farmer'
@@ -144,228 +95,159 @@ const FarmersTable = () => {
         />
       </div>
 
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+      <div className='flex flex-col md:flex-row gap-4 mb-4'>
         <Input
-          type='search'
-          placeholder='Search farmers...'
+          placeholder='Search by name'
           value={searchTerm}
-          onChange={handleSearch}
-          className='w-full'
-          icon={<Search className='h-4 w-4 text-muted-foreground' />}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className='md:w-1/3'
+          disabled={isLoading}
         />
         <Select
-          value={municipalityFilter}
-          onValueChange={(value) => { setMunicipalityFilter(value); setCurrentPage(1); }}
+          value={filterAssociation || undefined}
+          onValueChange={(value: string) =>
+            setFilterAssociation(value === 'all' ? null : value)
+          }
+          disabled={isLoading}
         >
-          <SelectTrigger>
-            <SelectValue placeholder='Filter by Municipality' />
-          </SelectTrigger>
-          <SelectContent>
-            {uniqueMunicipalities.map((municipality) => (
-              <SelectItem key={municipality} value={municipality}>
-                {municipality}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={associationFilter}
-          onValueChange={(value) => { setAssociationFilter(value); setCurrentPage(1); }}
-        >
-          <SelectTrigger>
+          <SelectTrigger className='md:w-1/3'>
             <SelectValue placeholder='Filter by Association' />
           </SelectTrigger>
           <SelectContent>
-            {uniqueAssociations.map((id) => (
-              <SelectItem key={id} value={id}>
-                {id === 'all'
-                  ? 'All'
-                  : (Array.isArray(farmers) &&
-                    farmers.find((farmer: any) => farmer.association_id === id)?.association
-                      ?.name) ||
-                  'All'}
-              </SelectItem>
-            ))}
+            <SelectItem value='all'>All Associations</SelectItem>
+            {associations
+              .filter((assoc) => assoc !== 'all')
+              .map((assoc) => (
+                <SelectItem key={assoc} value={assoc}>
+                  {assoc}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
         <Select
-          value={positionFilter}
-          onValueChange={(value) => { setPositionFilter(value); setCurrentPage(1); }}
+          value={filterPosition || undefined}
+          onValueChange={(value: string) =>
+            setFilterPosition(value === 'all' ? null : value)
+          }
+          disabled={isLoading}
         >
-          <SelectTrigger>
+          <SelectTrigger className='md:w-1/3'>
             <SelectValue placeholder='Filter by Position' />
           </SelectTrigger>
           <SelectContent>
-            {uniquePositions.map((position) => (
-              <SelectItem key={position} value={position}>
-                {position}
-              </SelectItem>
-            ))}
+            <SelectItem value='all'>All Positions</SelectItem>
+            {positions
+              .filter((pos) => pos !== 'all')
+              .map((pos) => (
+                <SelectItem key={pos} value={pos}>
+                  {pos.replace('_', ' ')}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="flex justify-end">
-        <Button
-          variant='outline'
-          onClick={() => {
-            setMunicipalityFilter('All')
-            setAssociationFilter('All')
-            setPositionFilter('All')
-            setCurrentPage(1)
-          }}
-        >
-          <Filter className='mr-2 h-4 w-4' />
-          Clear Filters
-        </Button>
-      </div>
-
-      <div className="rounded-md border">
+      <ScrollArea className='w-full whitespace-nowrap rounded-md border'>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='w-[250px]'>Name</TableHead>
-              <TableHead>RSBSA Number</TableHead>
+              <TableHead className='w-[100px]'>Avatar</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Association</TableHead>
+              <TableHead>Position</TableHead>
               <TableHead>Municipality</TableHead>
               <TableHead>Barangay</TableHead>
-              <TableHead>Association</TableHead>
-              <TableHead className='text-right'>Actions</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedFarmers.map((farmer) => (
-              <TableRow key={farmer.id}>
-                <TableCell className='font-medium'>
-                  <div className='flex items-center'>
-                    <Avatar className='h-8 w-8 mr-2'>
+            {isLoading
+              ? Array.from({ length: itemsPerPage }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className='h-10 w-10 rounded-full' />
+                  </TableCell>
+                  <TableCell><Skeleton className='h-4 w-[200px]' /></TableCell>
+                  <TableCell><Skeleton className='h-4 w-[150px]' /></TableCell>
+                  <TableCell><Skeleton className='h-4 w-[100px]' /></TableCell>
+                  <TableCell><Skeleton className='h-4 w-[120px]' /></TableCell>
+                  <TableCell><Skeleton className='h-4 w-[100px]' /></TableCell>
+                  <TableCell><Skeleton className='h-8 w-[100px]' /></TableCell>
+                </TableRow>
+              ))
+              : paginatedFarmers.map((farmer: any) => (
+                <TableRow key={farmer.id}>
+                  <TableCell>
+                    <Avatar>
                       <AvatarImage
                         src={farmer.avatar}
-                        alt={farmer.firstname}
+                        alt={`${farmer.firstname} ${farmer.lastname}`}
                       />
-                      <AvatarFallback>{farmer.firstname[0]}</AvatarFallback>
+                      <AvatarFallback>
+                        {farmer.firstname[0]}
+                        {farmer.lastname[0]}
+                      </AvatarFallback>
                     </Avatar>
+                  </TableCell>
+                  <TableCell>
                     {farmer.firstname} {farmer.lastname}
-                  </div>
-                </TableCell>
-                <TableCell>{farmer.rsbsa_number}</TableCell>
-                <TableCell>{farmer.municipality}</TableCell>
-                <TableCell>{farmer.barangay}</TableCell>
-                <TableCell>
-                  <p>{farmer.association.name}</p>
-                </TableCell>
-                <TableCell className='text-right'>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='ghost' className='h-8 w-8 p-0'>
-                        <MoreHorizontal className='h-4 w-4' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedFarmer(farmer)}
-                      >
+                  </TableCell>
+                  <TableCell>{farmer.association.name}</TableCell>
+                  <TableCell>{farmer.position.replace('_', ' ')}</TableCell>
+                  <TableCell>{farmer.municipality}</TableCell>
+                  <TableCell>{farmer.barangay}</TableCell>
+                  <TableCell>
+                    <Link href={`/dashboard/${farmer.id}`} passHref>
+                      <Button variant='ghost' size='sm'>
                         <Eye className='mr-2 h-4 w-4' />
-                        View Details
-                      </DropdownMenuItem>
-                      <Link href={`/dashboard/${farmer.id}`}>
-                        <DropdownMenuItem>
-                          <Eye className='mr-2 h-4 w-4' />
-                          View Profile
-                        </DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuItem>
-                        <Edit className='mr-2 h-4 w-4' />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Trash className='mr-2 h-4 w-4' />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                        View Profile
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
-      </div>
+        <ScrollBar orientation='horizontal' />
+      </ScrollArea>
 
-      <div className="flex justify-between items-center mt-4">
-        <div className="text-sm text-muted-foreground">
-          Showing {Math.min(filteredFarmers.length, currentPage * itemsPerPage)} of {filteredFarmers.length} farmers
+      {!isLoading && filteredFarmers.length === 0 && (
+        <div className='text-center py-4'>
+          No farmers found matching the current filters.
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {selectedFarmer && (
-        <Dialog
-          open={!!selectedFarmer}
-          onOpenChange={() => setSelectedFarmer(null)}
-        >
-          <DialogContent className='sm:max-w-[425px]'>
-            <DialogHeader>
-              <DialogTitle>
-                {selectedFarmer.firstname} {selectedFarmer.lastname}
-              </DialogTitle>
-            </DialogHeader>
-            <div className='grid gap-4 py-4'>
-              <div className='flex items-center gap-4'>
-                <Phone className='h-4 w-4 text-muted-foreground' />
-                <span>{selectedFarmer.phone}</span>
-              </div>
-              <div className='flex items-center gap-4'>
-                <MapPin className='h-4 w-4 text-muted-foreground' />
-                <span>
-                  {selectedFarmer.municipality}, {selectedFarmer.barangay}
-                </span>
-              </div>
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label className='text-right'>Association:</Label>
-                <span className='col-span-3'>
-                  {selectedFarmer.association.name}
-                </span>
-              </div>
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label className='text-right'>Position:</Label>
-                <Badge variant='outline' className='col-span-3'>
-                  {selectedFarmer.position}
-                </Badge>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type='button'
-                variant='secondary'
-                onClick={() => setSelectedFarmer(null)}
-              >
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       )}
+
+      <div className='flex justify-between items-center mt-4'>
+        <div>
+          {isLoading ? (
+            <Skeleton className='h-4 w-[100px]' />
+          ) : (
+            `Page ${currentPage} of ${totalPages}`
+          )}
+        </div>
+        <div className='flex gap-2'>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={isLoading || currentPage === 1}
+          >
+            <ChevronLeft className='h-4 w-4 mr-2' />
+            Previous
+          </Button>
+          <Button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={
+              isLoading ||
+              currentPage === totalPages ||
+              filteredFarmers.length === 0
+            }
+          >
+            Next
+            <ChevronRight className='h-4 w-4 ml-2' />
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
-
-export default FarmersTable

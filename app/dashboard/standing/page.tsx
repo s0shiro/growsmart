@@ -1,9 +1,9 @@
-import InspectionTable from './components/InspectionTable'
+import CropInspections from './components/InspectionTable'
 
 const page = () => {
   return (
     <div>
-      <InspectionTable />
+      <CropInspections />
     </div>
   )
 }
