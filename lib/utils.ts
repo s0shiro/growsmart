@@ -13,6 +13,10 @@ export function formatDate(dateString: string) {
   })
 }
 
+export const formatCurrency = (amount: number | undefined) => {
+  return amount !== undefined ? `₱${amount.toLocaleString()}` : 'N/A'
+}
+
 export function getStatusColor(status: string): string {
   console.log(`Status received: ${status}`);
   switch (status.toLowerCase()) {
