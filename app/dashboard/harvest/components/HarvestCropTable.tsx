@@ -44,7 +44,7 @@ interface Crop {
   expenses: number
 }
 
-export default function HarvestTable() {
+export default function HarvestCropTable() {
   const { data: plantings, isFetching } = useFetchPlantings()
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')

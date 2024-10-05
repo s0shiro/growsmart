@@ -166,7 +166,7 @@ export const getHarvestedStatusRecords = async (userID: string) => {
     .select(`
       *,
       technician_farmers (id, firstname, lastname),
-      crops (name)
+      crops (name), crop_varieties (name), harvest_records(harvest_date)
     `) // Selects all fields; you can specify fields if needed
     .eq('status', 'harvested') // Filters records where status is "harvested"
     .eq('user_id', userID) // Filters records by the provided userID
