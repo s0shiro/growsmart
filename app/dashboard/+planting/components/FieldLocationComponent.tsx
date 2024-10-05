@@ -1,3 +1,4 @@
+// FieldLocation.tsx
 import React from 'react'
 import {
   Card,
@@ -18,13 +19,15 @@ import {
 import MapComponent from '@/app/dashboard/(components)/MapComponent'
 
 interface FieldLocationProps {
-  selectedLocation: string
-  onLocationSelect: (locationName: string) => void
-  errorMessage?: string
+  selectedLocation: string;
+  coordinates: [number, number] | null; // Ensure this prop is included
+  onLocationSelect: (locationName: string, coords: [number, number]) => void;
+  errorMessage?: string;
 }
 
 const FieldLocation: React.FC<FieldLocationProps> = ({
   selectedLocation,
+  coordinates,
   onLocationSelect,
   errorMessage,
 }) => {
@@ -52,7 +55,7 @@ const FieldLocation: React.FC<FieldLocationProps> = ({
         <div className='h-[400px] rounded-md overflow-hidden border border-border'>
           <MapComponent onLocationSelect={onLocationSelect} />
         </div>
-        {selectedLocation && (
+        {selectedLocation && coordinates && (
           <div className='flex items-center space-x-2'>
             <Badge variant='secondary' className='text-sm'>
               <MapPin className='w-4 h-4 mr-1' />
@@ -61,7 +64,7 @@ const FieldLocation: React.FC<FieldLocationProps> = ({
             <Button
               variant='ghost'
               size='sm'
-              onClick={() => onLocationSelect('')}
+              onClick={() => onLocationSelect('', [0, 0])}
               className='text-muted-foreground hover:text-foreground'
             >
               Clear

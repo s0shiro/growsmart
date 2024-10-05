@@ -24,17 +24,17 @@ export default function ImprovedPlantingForm() {
 
   const FormSchema = z
     .object({
-      farmerId: z
-        .string().min(1, { message: 'Farmer selection is required' }),
-      cropCategory: z
-        .string().min(1, { message: 'Crop category is required' }),
+      farmerId: z.string().min(1, { message: 'Farmer selection is required' }),
+      cropCategory: z.string().min(1, { message: 'Crop category is required' }),
       landType: z.string().optional(),
       cropType: z.string().min(1, { message: 'Crop name is required' }),
       variety: z.string().min(1, { message: 'Variety is required' }),
       plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
         message: 'Invalid date format for planting date',
       }),
-      fieldLocation: z.string().min(1, { message: 'Field location is required' }),
+      fieldLocation: z
+        .string()
+        .min(1, { message: 'Field location is required' }),
       areaPlanted: z.string().min(1, { message: 'Area planted is required' }),
       quantity: z.string().min(1, { message: 'Quantity is required' }),
       expenses: z.string().min(1, { message: 'Expenses are required' }),
@@ -81,12 +81,16 @@ export default function ImprovedPlantingForm() {
   const plantingDate = watch('plantingDate')
   const selectedCrop = watch('cropType')
 
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
   const [selectedLocation, setSelectedLocation] = useState<string>('')
   const [step, setStep] = useState(1)
 
-  const onLocationSelect = (locationName: string) => {
+  const onLocationSelect = (locationName: string, coords: [number, number]) => {
     setSelectedLocation(locationName)
     setValue('fieldLocation', locationName)
+    setCoordinates(coords) // Store the coordinates
+    console.log('Selected Location:', locationName)
+    console.log('Coordinates:', coords) // Log the coordinates
   }
 
   function calculateHarvestDate(plantingDate: string, cropCategory: string) {
@@ -144,10 +148,13 @@ export default function ImprovedPlantingForm() {
           harvestDate: data.harvestDate,
           landType: data.landType,
           status: status,
+          latitude: coordinates ? coordinates[0] : undefined, // Save latitude
+          longitude: coordinates ? coordinates[1] : undefined, // Save longitude
         })
         console.log('Form submitted successfully')
         form.reset()
         setSelectedLocation('')
+        setCoordinates(null) // Reset coordinates on form reset
         setStep(1)
         toast.success('Crop added successfully!')
         await queryClient.invalidateQueries({ queryKey: ['inspections'] })
@@ -243,6 +250,7 @@ export default function ImprovedPlantingForm() {
             >
               <FieldLocation
                 selectedLocation={selectedLocation}
+                coordinates={coordinates} // Pass coordinates here
                 onLocationSelect={onLocationSelect}
                 errorMessage={form.formState.errors.fieldLocation?.message}
               />

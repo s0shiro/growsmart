@@ -35,6 +35,7 @@ import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import LocationMap from '@/app/dashboard/(components)/LocationMap'
 
 export default function CropsDetailsPage({
   params,
@@ -50,13 +51,13 @@ export default function CropsDetailsPage({
 
   useEffect(() => {
     if (data && data.status === 'harvested') {
-      // Redirect to another page if status is not 'inspection' or 'harvest'
       router.push(`/dashboard/harvested/${params.cropId}`)
     }
-  }, [data, router])
+  }, [data, router, params.cropId])
 
   if (isLoading) return <LoadingSkeleton />
-  if (data && data.status === 'harvested') return <p>harvested already!, redirecting...</p>
+  if (data && data.status === 'harvested')
+    return <p>Harvested already! Redirecting...</p>
   if (error) return <ErrorDisplay error={error} />
   if (!data) return <div>No data found</div>
 
@@ -81,9 +82,10 @@ export default function CropsDetailsPage({
       </Card>
 
       <Tabs defaultValue='details' className='w-full'>
-        <TabsList className='grid w-full grid-cols-2'>
+        <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value='details'>Crop Details</TabsTrigger>
           <TabsTrigger value='visitations'>Visitations</TabsTrigger>
+          <TabsTrigger value='map'>Field Location</TabsTrigger>
         </TabsList>
 
         <TabsContent value='details'>
@@ -162,8 +164,8 @@ export default function CropsDetailsPage({
                 <Avatar className='h-16 w-16'>
                   <AvatarImage src={`${data.technician_farmers?.avatar}`} />
                   <AvatarFallback>
-                    {data.technician_farmers?.firstname}
-                    {data.technician_farmers?.lastname}
+                    {data.technician_farmers?.firstname?.[0]}
+                    {data.technician_farmers?.lastname?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -249,6 +251,24 @@ export default function CropsDetailsPage({
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value='map'>
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-xl font-semibold'>
+                Field Location
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='h-[400px] w-full'>
+                <LocationMap
+                  latitude={data.latitude}
+                  longitude={data.longitude}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   )
@@ -256,7 +276,7 @@ export default function CropsDetailsPage({
 
 function LoadingSkeleton() {
   return (
-    <div className='container mx-auto p-4 space-y-6'>
+    <div className='space-y-6'>
       <Card>
         <CardHeader>
           <Skeleton className='h-8 w-3/4 mb-2' />
@@ -265,9 +285,10 @@ function LoadingSkeleton() {
       </Card>
 
       <Tabs defaultValue='details' className='w-full'>
-        <TabsList className='grid w-full grid-cols-2'>
+        <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value='details'>Crop Details</TabsTrigger>
           <TabsTrigger value='visitations'>Visitations</TabsTrigger>
+          <TabsTrigger value='map'>Map Location</TabsTrigger>
         </TabsList>
 
         <TabsContent value='details'>
@@ -324,6 +345,17 @@ function LoadingSkeleton() {
                   </CardContent>
                 </Card>
               ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value='map'>
+          <Card>
+            <CardHeader>
+              <Skeleton className='h-6 w-1/2 mb-2' />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className='h-[400px] w-full' />
             </CardContent>
           </Card>
         </TabsContent>

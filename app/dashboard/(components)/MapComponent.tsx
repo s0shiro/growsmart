@@ -19,7 +19,7 @@ const Marker = dynamic(
 )
 
 interface MapComponentProps {
-  onLocationSelect: (locationName: string) => void
+  onLocationSelect: (locationName: string, coords: [number, number]) => void
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
@@ -29,7 +29,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
   useEffect(() => {
     // Dynamically import Leaflet and its dependencies
     import('leaflet').then((leaflet) => {
-      // Use type assertion to bypass TypeScript error
       delete (leaflet.Icon.Default.prototype as any)._getIconUrl
       leaflet.Icon.Default.mergeOptions({
         iconRetinaUrl:
@@ -47,24 +46,25 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
     lng: number,
   ): Promise<string> => {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
     )
     const data = await response.json()
-    const displayName = data.display_name
-    const parts = displayName.split(',').slice(0, 4).join(', ')
-    return parts
+    const locationParts = data.display_name.split(',').slice(0, 4)
+    return locationParts.join(', ')
   }
 
   const LocationMarker: React.FC = () => {
     useMapEvents({
       async click(e) {
-        setPosition(e.latlng)
+        setPosition(e.latlng) // Update the position based on the click event
         const locationName = await fetchLocationName(e.latlng.lat, e.latlng.lng)
-        onLocationSelect(locationName)
+
+        // Pass both locationName and coordinates (latitude and longitude) to parent
+        onLocationSelect(locationName, [e.latlng.lat, e.latlng.lng])
       },
     })
 
-    return position === null ? null : <Marker position={position}></Marker>
+    return position === null ? null : <Marker position={position} />
   }
 
   if (!L) {
