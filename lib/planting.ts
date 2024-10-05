@@ -122,7 +122,7 @@ export const getPlantedStatusRecords = async (userID: string) => {
     .select(`
       *,
       technician_farmers (id, firstname, lastname),
-      crops (name)
+      crops (name), crop_varieties (name)
     `) // Selects all fields; you can specify fields if needed
     .or('status.eq.harvest') // Filters records where status is "planted" or "standing"
     .eq('user_id', userID) // Filters records by the provided userID

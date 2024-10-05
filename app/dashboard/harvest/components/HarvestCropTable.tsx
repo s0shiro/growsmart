@@ -1,25 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import {
-  MoreHorizontal,
-  Search,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Loader2,
-} from 'lucide-react'
-import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import React, { useState, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -27,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -36,309 +18,198 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import DialogForm from '../../(components)/forms/DialogForm'
-import HarvestForm from '../../(components)/forms/HarvestForm'
-import { getStatusColor } from '@/lib/utils'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { ChevronLeft, ChevronRight, Wheat } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { formatDate } from '@/lib/utils'
+import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
+import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
+import HarvestForm from '@/app/dashboard/(components)/forms/HarvestForm'
 
-type PlantingRecords = {
-  area_planted: number
-  created_at: string
-  crop_type: string
-  expenses: number
-  farmer_id: string
-  field_location: string
-  harvest_date: string
+interface Crop {
   id: string
-  planting_date: string
-  quantity: number
-  status: string
-  user_id: string
-  variety: string
-  weather_condition: string
+  harvest_date: string
+  farmer_id: string
   technician_farmers: {
-    firstname: string
     lastname: string
+    firstname: string
   }
   crops: {
     name: string
   }
+  crop_varieties: {
+    name: string
+  }
+  quantity: number
+  expenses: number
 }
 
-interface Filters {
-  cropName: string
-  fieldLocation: string
-}
+export default function HarvestTable() {
+  const { data: plantings, isFetching } = useFetchPlantings()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterCrop, setFilterCrop] = useState<string | null>(null)
 
-const HarvestCropTable = () => {
-  const { data, isFetching } = useFetchPlantings()
-  const allPlantingRecords: PlantingRecords[] = data
-    ? (data as PlantingRecords[])
-    : []
-
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [filters, setFilters] = useState<Filters>({
-    cropName: 'all',
-    fieldLocation: 'all',
-  })
-  const [currentPage, setCurrentPage] = useState<number>(1)
   const itemsPerPage = 5
 
-  const cropNames = useMemo(() => {
-    return [
-      'all',
-      ...new Set(allPlantingRecords.map((record) => record.crop_type)),
-    ]
-  }, [allPlantingRecords])
+  const filteredPlantings = useMemo(() => {
+    if (!Array.isArray(plantings)) return []
+    return plantings.filter(
+      (planting: any) =>
+        (planting.technician_farmers.firstname
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          planting.technician_farmers.lastname
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          planting.crops.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (filterCrop === null || planting.crops.name === filterCrop)
+    )
+  }, [plantings, searchTerm, filterCrop])
 
-  const fieldLocations = useMemo(() => {
-    return [
-      'all',
-      ...new Set(allPlantingRecords.map((record) => record.field_location)),
-    ]
-  }, [allPlantingRecords])
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase()
-    setSearchTerm(term)
-    setCurrentPage(1)
-  }
-
-  const handleFilterChange = (type: keyof Filters, value: string) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [type]: value,
-    }))
-    setCurrentPage(1)
-  }
-
-  const clearFilters = () => {
-    setFilters({
-      cropName: 'all',
-      fieldLocation: 'all',
-    })
-    setCurrentPage(1)
-  }
-
-  const filteredRecords = useMemo(() => {
-    return allPlantingRecords.filter((record) => {
-      return (
-        Object.values(record).some((value) =>
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
-        ) &&
-        (filters.cropName === 'all' || record.crop_type === filters.cropName) &&
-        (filters.fieldLocation === 'all' ||
-          record.field_location === filters.fieldLocation)
-      )
-    })
-  }, [allPlantingRecords, searchTerm, filters])
-
-  const pageCount = Math.ceil(filteredRecords.length / itemsPerPage)
-  const paginatedRecords = filteredRecords.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+  const totalPages = Math.ceil(filteredPlantings.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedPlantings = filteredPlantings.slice(
+    startIndex,
+    startIndex + itemsPerPage,
   )
 
-  if (isFetching) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <Loader2 className='h-8 w-8 animate-spin text-primary' />
-      </div>
-    )
-  }
+  const cropTypes = useMemo(
+    () => [
+      ...new Set(
+        Array.isArray(plantings) ? plantings.map((planting: any) => planting.crops.name) : [],
+      ),
+    ],
+    [plantings],
+  )
 
   return (
-    <Card className='w-full max-w-6xl mx-auto overflow-hidden'>
-      <CardHeader className='bg-primary/5 border-b'>
-        <CardTitle className='text-2xl font-bold'>Harvest Crops</CardTitle>
-      </CardHeader>
-      <CardContent className='p-6 space-y-6'>
-        <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
-          <div className='relative flex-grow'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-            <Input
-              placeholder='Search plantings...'
-              value={searchTerm}
-              onChange={handleSearch}
-              className='pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary'
-            />
-          </div>
-          <div className='flex flex-wrap gap-2'>
-            <Select
-              value={filters.cropName}
-              onValueChange={(value) => handleFilterChange('cropName', value)}
-            >
-              <SelectTrigger className='w-[140px]'>
-                <SelectValue placeholder='All Crops' />
-              </SelectTrigger>
-              <SelectContent>
-                {cropNames.map((id) => (
-                  <SelectItem key={id} value={id}>
-                    {id === 'all'
-                      ? 'All'
-                      : (Array.isArray(allPlantingRecords) &&
-                          allPlantingRecords.find(
-                            (crop: any) => crop.crop_type === id,
-                          )?.crops?.name) ||
-                        'Unknown'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={filters.fieldLocation}
-              onValueChange={(value) =>
-                handleFilterChange('fieldLocation', value)
-              }
-            >
-              <SelectTrigger className='w-[140px]'>
-                <SelectValue
-                  placeholder={
-                    filters.fieldLocation === 'all'
-                      ? 'All Locations'
-                      : filters.fieldLocation
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {fieldLocations.map((location) => (
-                  <SelectItem key={location} value={location}>
-                    {location === 'all' ? 'All' : location}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {Object.values(filters).some((filter) => filter !== 'all') && (
-              <Button
-                variant='outline'
-                onClick={clearFilters}
-                className='flex items-center hover:bg-destructive/10 transition-colors duration-300'
-              >
-                <X className='mr-2 h-4 w-4' /> Clear Filters
-              </Button>
-            )}
-          </div>
+    <div>
+      <h1 className='text-2xl font-bold mb-4'>Harvest Crops</h1>
+
+      <div className='flex flex-col md:flex-row gap-4 mb-4'>
+        <Input
+          placeholder='Search by farmer name or crop'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className='md:w-1/2'
+          disabled={isFetching}
+        />
+        <div className='flex-grow'></div>
+        <Select
+          value={filterCrop || undefined}
+          onValueChange={(value: string) =>
+            setFilterCrop(value === 'all' ? null : value)
+          }
+          disabled={isFetching}
+        >
+          <SelectTrigger className='md:w-1/4'>
+            <SelectValue placeholder='Filter by Crop' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Crops</SelectItem>
+            {cropTypes.map((crop) => (
+              <SelectItem key={crop} value={crop}>
+                {crop}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <ScrollArea className='w-full whitespace-nowrap rounded-md border'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Farmer</TableHead>
+              <TableHead>Crop</TableHead>
+              <TableHead>Variety</TableHead>
+              <TableHead>Harvest Date</TableHead>
+              <TableHead>Quantity (kg)</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isFetching
+              ? Array.from({ length: 7 }).map((_, index) => (
+                <TableRow key={index}>
+                  {Array.from({ length: 6 }).map((_, cellIndex) => (
+                    <TableCell key={cellIndex}>
+                      <Skeleton className='h-4 w-[100px]' />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+              : paginatedPlantings.map((planting: any) => (
+                <TableRow key={planting.id}>
+                  <TableCell>{`${planting.technician_farmers.firstname} ${planting.technician_farmers.lastname}`}</TableCell>
+                  <TableCell>{planting.crops.name}</TableCell>
+                  <TableCell>{planting.crop_varieties.name}</TableCell>
+                  <TableCell>{formatDate(planting.harvest_date)}</TableCell>
+                  <TableCell>{planting.quantity.toLocaleString()}</TableCell>
+                  <TableCell>
+                    <DialogForm
+                      id={`create-harvest`}
+                      title='Record Harvest'
+                      description={`Record harvest for ${planting.crops.name}`}
+                      Trigger={
+                        <Button variant='ghost' size='sm'>
+                          <Wheat className='mr-2 h-4 w-4' />
+                          Harvest
+                        </Button>
+                      }
+                      form={
+                        <HarvestForm
+                          plantingID={planting.id}
+                          farmerID={planting.farmer_id}
+                        />
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+        <ScrollBar orientation='horizontal' />
+      </ScrollArea>
+
+      {!isFetching && filteredPlantings.length === 0 && (
+        <div className='text-center py-4'>
+          No harvest records found matching the current filters.
         </div>
-        <div className='rounded-md border overflow-hidden'>
-          <Table>
-            <TableHeader>
-              <TableRow className='bg-muted/50'>
-                <TableHead>Farmer Name</TableHead>
-                <TableHead>Crop Name</TableHead>
-                <TableHead>Field Location</TableHead>
-                <TableHead>Harvest Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <AnimatePresence>
-                {paginatedRecords.map((record, index) => (
-                  <motion.tr
-                    key={record.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <TableCell className='font-medium'>
-                      <p>
-                        {record.technician_farmers?.firstname}{' '}
-                        {record.technician_farmers?.lastname}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <p>{record.crops?.name}</p>
-                    </TableCell>
-                    <TableCell>{record.field_location}</TableCell>
-                    <TableCell>{record.harvest_date}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(record.status)}>
-                        {record.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' className='h-8 w-8 p-0'>
-                            <span className='sr-only'>Open menu</span>
-                            <MoreHorizontal className='h-4 w-4' />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <DropdownMenuItem asChild>
-                            <Link
-                              href={`/dashboard/farmers/${record.farmer_id}`}
-                            >
-                              View Farmer
-                            </Link>
-                          </DropdownMenuItem>
-                          <DialogForm
-                            id='create-harvest'
-                            title='Record Harvest'
-                            description={`Record harvest`}
-                            Trigger={
-                              <DropdownMenuItem
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                Record Harvest
-                              </DropdownMenuItem>
-                            }
-                            form={
-                              <HarvestForm
-                                plantingID={record.id}
-                                farmerID={record.farmer_id}
-                              />
-                            }
-                          />
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </motion.tr>
-                ))}
-              </AnimatePresence>
-            </TableBody>
-          </Table>
+      )}
+
+      <div className='flex justify-between items-center mt-4'>
+        <div>
+          {isFetching ? (
+            <Skeleton className='h-4 w-[100px]' />
+          ) : (
+            `Page ${currentPage} of ${totalPages}`
+          )}
         </div>
-        <div className='flex items-center justify-between'>
-          <p className='text-sm text-muted-foreground'>
-            Showing{' '}
-            {Math.min(
-              filteredRecords.length,
-              (currentPage - 1) * itemsPerPage + 1,
-            )}{' '}
-            to {Math.min(filteredRecords.length, currentPage * itemsPerPage)} of{' '}
-            {filteredRecords.length} entries
-          </p>
-          <div className='flex items-center space-x-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className='transition-all duration-300 hover:bg-primary/10'
-            >
-              <ChevronLeft className='mr-2 h-4 w-4' />
-              Previous
-            </Button>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(pageCount, prev + 1))
-              }
-              disabled={currentPage === pageCount}
-              className='transition-all duration-300 hover:bg-primary/10'
-            >
-              Next
-              <ChevronRight className='ml-2 h-4 w-4' />
-            </Button>
-          </div>
+        <div className='flex gap-2'>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={isFetching || currentPage === 1}
+          >
+            <ChevronLeft className='h-4 w-4 mr-2' />
+            Previous
+          </Button>
+          <Button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={
+              isFetching ||
+              currentPage === totalPages ||
+              filteredPlantings.length === 0
+            }
+          >
+            Next
+            <ChevronRight className='h-4 w-4 ml-2' />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
-
-export default HarvestCropTable
