@@ -51,7 +51,7 @@ function InspectionForm({ plantingID }: { plantingID: string }) {
       toast.success('Successfully record visit!')
       console.log('visit record successfully!')
       await queryClient.invalidateQueries({
-        queryKey: ['history', plantingID],
+        queryKey: ['crop-planting-record', plantingID],
       })
       form.reset()
     } catch (error) {

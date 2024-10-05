@@ -1,37 +1,36 @@
-//LAYOUT.TSX
-
 import { readUserSession } from '@/lib/actions'
 import SheetNav from './(components)/navigation/SheetNav'
 import { redirect } from 'next/navigation'
 import SidebarWithUserSession from './(components)/navigation/SideBarWithUserSession'
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const { data: userSession } = await readUserSession()
-
-  // console.log(userSession)
 
   if (!userSession.user) {
     return redirect('/login')
   }
 
   return (
-    <div className='relative min-h-screen bg-background'>
+    <div className='flex h-screen overflow-hidden bg-background'>
       {/* Sidebar - Fixed on desktop, off-canvas on mobile */}
-      <div className='fixed inset-y-0 left-0 z-40 w-64 bg-background sm:block hidden'>
+      <div className='hidden sm:block w-64 bg-background'>
         <SidebarWithUserSession />
       </div>
 
       {/* Main content area */}
-      <div className='sm:ml-64 flex flex-col min-h-screen'>
+      <div className='flex-1 flex flex-col overflow-hidden'>
         {/* Sticky header */}
-        <div className='sticky top-0 z-30 bg-background shadow'>
+        <div className='flex-shrink-0'>
           <SheetNav />
         </div>
 
-        {/* Main content */}
-        <div className='flex-1 px-2 py-4 overflow-x-auto'>
-          <main className='flex-1 bg-background rounded-lg'>{children}</main>
-        </div>
+        {/* Main content with ScrollArea */}
+        <ScrollArea className="flex-1">
+          <main className='p-2'>
+            {children}
+          </main>
+        </ScrollArea>
       </div>
     </div>
   )

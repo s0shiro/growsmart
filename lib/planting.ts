@@ -180,4 +180,21 @@ export const getHarvestedStatusRecords = async (userID: string) => {
   return data // Returns the queried records
 }
 
+export const getPlantingRecordById = async (plantingID: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select('*, technician_farmers (firstname, lastname, avatar), crop_categories(name), crops (name), crop_varieties (name), inspections(*)')
+    .eq('id', plantingID)
+    .single()
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return
+  }
+
+  return data
+}
+
 

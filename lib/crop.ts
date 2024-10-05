@@ -132,22 +132,6 @@ export const getVarietiesByCrop = async (cropId: string) => {
   return data
 }
 
-export const getCropNameById = async (cropId: string) => {
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('crops')
-    .select('id, name') // Select only the id and name fields
-    .eq('id', cropId) // Match the provided crop ID
-    .single()
-
-  if (error) {
-    console.error('Supabase error:', error.message)
-    return null
-  }
-
-  return data
-}
-
 export const getAllCategoriesWithCropsAndVarieties = async () => {
   const supabase = createClient()
 

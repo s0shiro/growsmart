@@ -211,7 +211,7 @@ export default function FarmerUI() {
                     <TableCell>{farmer.municipality}</TableCell>
                     <TableCell>{farmer.barangay}</TableCell>
                     <TableCell>
-                      <Link href={`/dashboard/${farmer.id}`} passHref>
+                      <Link href={`/dashboard/f/${farmer.id}`} passHref>
                         <Button variant='ghost' size='sm'>
                           <Eye className='mr-2 h-4 w-4' />
                           Profile

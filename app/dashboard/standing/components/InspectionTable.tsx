@@ -156,7 +156,7 @@ export default function CropInspections() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Link href={`/dashboard/standing/${crop.id}`} passHref>
+                      <Link href={`/dashboard/c/${crop.id}`} passHref>
                         <Button variant='ghost' size='sm'>
                           <Eye className='mr-2 h-4 w-4' />
                           View
