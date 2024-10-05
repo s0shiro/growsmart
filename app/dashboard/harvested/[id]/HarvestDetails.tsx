@@ -163,7 +163,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
 
   return (
     <Card className='max-w-6xl mx-auto bg-card text-card-foreground shadow-lg rounded-[var(--radius)] overflow-hidden'>
-      <CardHeader className='bg-primary text-primary-foreground p-6'>
+      <CardHeader className='bg-primary text-primary-foreground p-2 py-4'>
         <div className='flex justify-between items-center'>
           <div>
             <CardTitle className='text-3xl font-bold mb-2'>
@@ -201,7 +201,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className='p-6'>
+      <CardContent className='p-2 py-4'>
         <Tabs
           defaultValue='overview'
           className='w-full'

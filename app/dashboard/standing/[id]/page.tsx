@@ -68,7 +68,7 @@ export default function VisitHistory({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className='container mx-auto p-4 space-y-6'>
+    <div className='space-y-6'>
       <div className='flex justify-between items-center'>
         <div>
           <h1 className='text-4xl font-bold'>Visitation History</h1>
