@@ -33,7 +33,8 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 import InspectionForm from '@/app/dashboard/standing/components/InpectionForm'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function CropsDetailsPage({
   params,
@@ -45,9 +46,17 @@ export default function CropsDetailsPage({
     queryFn: async () => getPlantingRecordById(params.cropId),
   })
 
-  console.log(data)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (data && data.status === 'harvested') {
+      // Redirect to another page if status is not 'inspection' or 'harvest'
+      router.push(`/dashboard/harvested/${params.cropId}`)
+    }
+  }, [data, router])
 
   if (isLoading) return <LoadingSkeleton />
+  if (data && data.status === 'harvested') return <p>harvested already!, redirecting...</p>
   if (error) return <ErrorDisplay error={error} />
   if (!data) return <div>No data found</div>
 

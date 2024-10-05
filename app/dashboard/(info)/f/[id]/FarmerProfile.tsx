@@ -172,7 +172,7 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                 <div className='flex items-center gap-2'>
                   <User className='h-5 w-5 text-primary' />
                   <span className='font-medium'>Association:</span>{' '}
-                  {farmer.association.name}
+                  {farmer.association?.name}
                 </div>
                 <div className='flex items-center gap-2'>
                   <Phone className='h-5 w-5 text-primary' />
