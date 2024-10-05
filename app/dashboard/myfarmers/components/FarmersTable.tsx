@@ -100,51 +100,53 @@ export default function FarmerUI() {
           placeholder='Search by name'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className='md:w-1/3'
+          className='md:w-1/2'
           disabled={isLoading}
         />
-        <Select
-          value={filterAssociation || undefined}
-          onValueChange={(value: string) =>
-            setFilterAssociation(value === 'all' ? null : value)
-          }
-          disabled={isLoading}
-        >
-          <SelectTrigger className='md:w-1/3'>
-            <SelectValue placeholder='Filter by Association' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All Associations</SelectItem>
-            {associations
-              .filter((assoc) => assoc !== 'all')
-              .map((assoc) => (
-                <SelectItem key={assoc} value={assoc}>
-                  {assoc}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={filterPosition || undefined}
-          onValueChange={(value: string) =>
-            setFilterPosition(value === 'all' ? null : value)
-          }
-          disabled={isLoading}
-        >
-          <SelectTrigger className='md:w-1/3'>
-            <SelectValue placeholder='Filter by Position' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All Positions</SelectItem>
-            {positions
-              .filter((pos) => pos !== 'all')
-              .map((pos) => (
-                <SelectItem key={pos} value={pos}>
-                  {pos.replace('_', ' ')}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
+        <div className='flex flex-col md:flex-row gap-4 md:w-1/2'>
+          <Select
+            value={filterAssociation || undefined}
+            onValueChange={(value: string) =>
+              setFilterAssociation(value === 'all' ? null : value)
+            }
+            disabled={isLoading}
+          >
+            <SelectTrigger className='md:w-1/2'>
+              <SelectValue placeholder='Filter by Association' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Associations</SelectItem>
+              {associations
+                .filter((assoc) => assoc !== 'all')
+                .map((assoc) => (
+                  <SelectItem key={assoc} value={assoc}>
+                    {assoc}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterPosition || undefined}
+            onValueChange={(value: string) =>
+              setFilterPosition(value === 'all' ? null : value)
+            }
+            disabled={isLoading}
+          >
+            <SelectTrigger className='md:w-1/2'>
+              <SelectValue placeholder='Filter by Position' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Positions</SelectItem>
+              {positions
+                .filter((pos) => pos !== 'all')
+                .map((pos) => (
+                  <SelectItem key={pos} value={pos}>
+                    {pos.replace('_', ' ')}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <ScrollArea className='w-full whitespace-nowrap rounded-md border'>
@@ -163,49 +165,61 @@ export default function FarmerUI() {
           <TableBody>
             {isLoading
               ? Array.from({ length: itemsPerPage }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton className='h-10 w-10 rounded-full' />
-                  </TableCell>
-                  <TableCell><Skeleton className='h-4 w-[200px]' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-[150px]' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-[100px]' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-[120px]' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-[100px]' /></TableCell>
-                  <TableCell><Skeleton className='h-8 w-[100px]' /></TableCell>
-                </TableRow>
-              ))
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton className='h-10 w-10 rounded-full' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-4 w-[200px]' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-4 w-[150px]' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-4 w-[100px]' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-4 w-[120px]' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-4 w-[100px]' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-8 w-[100px]' />
+                    </TableCell>
+                  </TableRow>
+                ))
               : paginatedFarmers.map((farmer: any) => (
-                <TableRow key={farmer.id}>
-                  <TableCell>
-                    <Avatar>
-                      <AvatarImage
-                        src={farmer.avatar}
-                        alt={`${farmer.firstname} ${farmer.lastname}`}
-                      />
-                      <AvatarFallback>
-                        {farmer.firstname[0]}
-                        {farmer.lastname[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                  </TableCell>
-                  <TableCell>
-                    {farmer.firstname} {farmer.lastname}
-                  </TableCell>
-                  <TableCell>{farmer.association.name}</TableCell>
-                  <TableCell>{farmer.position.replace('_', ' ')}</TableCell>
-                  <TableCell>{farmer.municipality}</TableCell>
-                  <TableCell>{farmer.barangay}</TableCell>
-                  <TableCell>
-                    <Link href={`/dashboard/${farmer.id}`} passHref>
-                      <Button variant='ghost' size='sm'>
-                        <Eye className='mr-2 h-4 w-4' />
-                        View Profile
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
+                  <TableRow key={farmer.id}>
+                    <TableCell>
+                      <Avatar>
+                        <AvatarImage
+                          src={farmer.avatar}
+                          alt={`${farmer.firstname} ${farmer.lastname}`}
+                        />
+                        <AvatarFallback>
+                          {farmer.firstname[0]}
+                          {farmer.lastname[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      {farmer.firstname} {farmer.lastname}
+                    </TableCell>
+                    <TableCell>{farmer.association.name}</TableCell>
+                    <TableCell>{farmer.position.replace('_', ' ')}</TableCell>
+                    <TableCell>{farmer.municipality}</TableCell>
+                    <TableCell>{farmer.barangay}</TableCell>
+                    <TableCell>
+                      <Link href={`/dashboard/${farmer.id}`} passHref>
+                        <Button variant='ghost' size='sm'>
+                          <Eye className='mr-2 h-4 w-4' />
+                          Profile
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
         <ScrollBar orientation='horizontal' />

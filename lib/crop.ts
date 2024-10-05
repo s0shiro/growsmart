@@ -153,7 +153,7 @@ export const getAllCategoriesWithCropsAndVarieties = async () => {
 
   const { data, error } = await supabase
     .from('crop_categories')
-    .select('*, crops (*, crop_varieties (*))')
+    .select('id, name, crops (id, name, crop_varieties (id, name))')
 
   if (error) {
     console.error('Supabase error:', error.message)
