@@ -31,7 +31,7 @@ export const login = async (formData: {
     password,
   })
 
-  // If there's an error during login, redirect to login with a message
+  // If there's an error during login, return the error message
   if (error) {
     return { message: 'Invalid email or password.' }
   }
