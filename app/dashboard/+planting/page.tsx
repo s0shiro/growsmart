@@ -148,8 +148,8 @@ export default function ImprovedPlantingForm() {
           harvestDate: data.harvestDate,
           landType: data.landType,
           status: status,
-          latitude: coordinates ? coordinates[0] : undefined, // Save latitude
-          longitude: coordinates ? coordinates[1] : undefined, // Save longitude
+          latitude: coordinates ? coordinates[0] : 0, // Save latitude
+          longitude: coordinates ? coordinates[1] : 0, // Save longitude
         })
         console.log('Form submitted successfully')
         form.reset()

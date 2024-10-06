@@ -42,9 +42,13 @@ const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude }) => {
   const [zoom, setZoom] = useState<number>(12)
 
   useEffect(() => {
-    if (latitude !== null && longitude !== null) {
+    if (typeof window !== 'undefined' && latitude !== null && longitude !== null) {
       setPosition(new LatLng(latitude, longitude))
       setZoom(15) // Set zoom level to 15 when position is updated
+    }
+
+    return () => {
+      setPosition(null)
     }
   }, [latitude, longitude])
 
@@ -56,6 +60,7 @@ const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude }) => {
     <MapContainer
       center={position}
       zoom={zoom}
+      scrollWheelZoom={false}
       style={{ height: '400px', width: '100%' }}
     >
       <TileLayer

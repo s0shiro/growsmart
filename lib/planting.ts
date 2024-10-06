@@ -17,8 +17,8 @@ type PlantingRecordData = {
   status: string
   cropCategory: string
   landType?: string
-  latitude?: number
-  longitude?: number
+  latitude: number
+  longitude: number
 }
 
 type PlantingRecord = {
@@ -35,8 +35,8 @@ type PlantingRecord = {
   status: string
   crop_categoryId: string
   land_type?: string
-  latitude?: number
-  longitude?: number
+  latitude: number
+  longitude: number
 }
 
 export const addPlantingRecord = async (data: PlantingRecordData) => {

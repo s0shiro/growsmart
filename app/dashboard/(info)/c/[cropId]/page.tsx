@@ -26,20 +26,19 @@ import {
   PlusCircleIcon,
   AlertTriangleIcon,
   CheckCircleIcon,
-  Plus,
   ExternalLinkIcon,
 } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import InspectionForm from '@/app/dashboard/standing/components/InpectionForm'
-import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import LocationMap from '@/app/dashboard/(components)/LocationMap'
+import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 
 export default function CropsDetailsPage({
-  params,
-}: {
+                                           params,
+                                         }: {
   params: { cropId: string }
 }) {
   const { data, error, isLoading } = useQuery({
@@ -60,6 +59,19 @@ export default function CropsDetailsPage({
     return <p>Harvested already! Redirecting...</p>
   if (error) return <ErrorDisplay error={error} />
   if (!data) return <div>No data found</div>
+
+  const calculateDaysDifference = (date: string) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const targetDate = new Date(date)
+    targetDate.setHours(0, 0, 0, 0)
+    const differenceInTime = targetDate.getTime() - today.getTime()
+    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24))
+    return differenceInDays
+  }
+
+  const daysSincePlanting = calculateDaysDifference(data.planting_date)
+  const daysUntilHarvest = calculateDaysDifference(data.harvest_date)
 
   return (
     <div className='space-y-6'>
@@ -82,108 +94,135 @@ export default function CropsDetailsPage({
       </Card>
 
       <Tabs defaultValue='details' className='w-full'>
-        <TabsList className='grid w-full grid-cols-3'>
+        <TabsList className='grid w-full grid-cols-2'>
           <TabsTrigger value='details'>Crop Details</TabsTrigger>
           <TabsTrigger value='visitations'>Visitations</TabsTrigger>
-          <TabsTrigger value='map'>Field Location</TabsTrigger>
         </TabsList>
 
         <TabsContent value='details'>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <Card>
-              <CardHeader>
-                <CardTitle className='text-xl font-semibold'>
-                  Planting Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='flex items-center gap-2'>
-                  <CalendarIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Planting Date:</span>{' '}
-                  {formatDate(data.planting_date)}
-                </div>
-                <div className='flex items-center gap-2'>
-                  <MapPinIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Field Location:</span>{' '}
-                  {data.field_location}
-                </div>
-                <div className='flex items-center gap-2'>
-                  <CropIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Land Type:</span>{' '}
-                  {data.land_type || 'Not specified'}
-                </div>
-                <div className='flex items-center gap-2'>
-                  <ScaleIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Area Planted:</span>{' '}
-                  {data.area_planted} ha
-                </div>
-                <div className='flex items-center gap-2'>
-                  <LeafIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Quantity:</span> {data.quantity}{' '}
-                  kg
-                </div>
-              </CardContent>
-            </Card>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+            <div className='lg:col-span-2 space-y-6'>
+              <Card>
+                <CardHeader>
+                  <CardTitle className='text-xl font-semibold'>
+                    Crop Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='grid sm:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <h3 className='font-medium'>Planting Details</h3>
+                    <div className='flex items-center gap-2'>
+                      <CalendarIcon className='h-4 w-4 text-primary' />
+                      <span>Planted: {formatDate(data.planting_date)}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <CropIcon className='h-4 w-4 text-primary' />
+                      <span>Land Type: {data.land_type || 'Not specified'}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <ScaleIcon className='h-4 w-4 text-primary' />
+                      <span>Area: {data.area_planted} ha</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <LeafIcon className='h-4 w-4 text-primary' />
+                      <span>Quantity: {data.quantity} kg</span>
+                    </div>
+                  </div>
+                  <div className='space-y-2'>
+                    <h3 className='font-medium'>Harvest Information</h3>
+                    <div className='flex items-center gap-2'>
+                      <CalendarIcon className='h-4 w-4 text-primary' />
+                      <span>Expected: {formatDate(data.harvest_date)}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <BanknoteIcon className='h-4 w-4 text-primary' />
+                      <span>Expenses: {formatCurrency(data.expenses)}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <TagIcon className='h-4 w-4 text-primary' />
+                      <span>Category: {data.crop_categories?.name}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className='text-xl font-semibold'>
-                  Harvest Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='flex items-center gap-2'>
-                  <CalendarIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>
-                    Expected Harvest Date:
-                  </span>{' '}
-                  {formatDate(data.harvest_date)}
-                </div>
-                <div className='flex items-center gap-2'>
-                  <BanknoteIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Expenses:</span>{' '}
-                  {formatCurrency(data.expenses)}
-                </div>
-                <div className='flex items-center gap-2'>
-                  <TagIcon className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Category:</span>{' '}
-                  {data.crop_categories?.name}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className='text-xl font-semibold'>
+                    Field Location
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='h-[400px] w-full rounded-lg overflow-hidden'>
+                    <LocationMap
+                      latitude={data.latitude}
+                      longitude={data.longitude}
+                    />
+                  </div>
+                  <div className='flex items-center gap-2 text-sm text-muted-foreground mt-4'>
+                    <MapPinIcon className='h-4 w-4' />
+                    <span>{data.field_location}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          <Card className='mt-6'>
-            <CardHeader>
-              <CardTitle className='text-xl font-semibold'>
-                Farmer Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className='flex items-center justify-between'>
-              <div className='flex items-center gap-4'>
-                <Avatar className='h-16 w-16'>
-                  <AvatarImage src={`${data.technician_farmers?.avatar}`} />
-                  <AvatarFallback>
-                    {data.technician_farmers?.firstname?.[0]}
-                    {data.technician_farmers?.lastname?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className='text-lg font-medium'>
+            <div className='space-y-6'>
+              <Card>
+                <CardHeader>
+                  <CardTitle className='text-xl font-semibold'>
+                    Farmer Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='flex flex-col items-center text-center'>
+                  <Avatar className='h-24 w-24 mb-4'>
+                    <AvatarImage src={`${data.technician_farmers?.avatar}`} />
+                    <AvatarFallback>
+                      {data.technician_farmers?.firstname?.[0]}
+                      {data.technician_farmers?.lastname?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <h3 className='text-lg font-medium mb-1'>
                     {data.technician_farmers?.firstname}{' '}
                     {data.technician_farmers?.lastname}
-                  </p>
-                  <p className='text-sm text-muted-foreground'>Farmer</p>
-                </div>
-              </div>
-              <Link href={`/dashboard/f/${data.farmer_id}`} passHref>
-                <Button variant='outline'>
-                  View Profile
-                  <ExternalLinkIcon className='ml-2 h-4 w-4' />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+                  </h3>
+                  <p className='text-sm text-muted-foreground mb-4'>Farmer</p>
+                  <Link href={`/dashboard/f/${data.farmer_id}`} passHref>
+                    <Button variant='outline' className='w-full'>
+                      View Profile
+                      <ExternalLinkIcon className='ml-2 h-4 w-4' />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className='text-xl font-semibold'>
+                    Quick Stats
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-2'>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-sm'>Days Since Planting:</span>
+                    <Badge variant='secondary'>
+                      {Math.abs(daysSincePlanting)}
+                    </Badge>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-sm'>Days Until Harvest:</span>
+                    <Badge variant='secondary'>
+                      {daysUntilHarvest < 0 ? 'Overdue' : daysUntilHarvest}
+                    </Badge>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-sm'>Total Visitations:</span>
+                    <Badge variant='secondary'>{data.inspections.length}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value='visitations'>
@@ -251,24 +290,6 @@ export default function CropsDetailsPage({
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value='map'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-xl font-semibold'>
-                Field Location
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='h-[400px] w-full'>
-                <LocationMap
-                  latitude={data.latitude}
-                  longitude={data.longitude}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   )
@@ -285,43 +306,69 @@ function LoadingSkeleton() {
       </Card>
 
       <Tabs defaultValue='details' className='w-full'>
-        <TabsList className='grid w-full grid-cols-3'>
+        <TabsList className='grid w-full grid-cols-2'>
           <TabsTrigger value='details'>Crop Details</TabsTrigger>
           <TabsTrigger value='visitations'>Visitations</TabsTrigger>
-          <TabsTrigger value='map'>Map Location</TabsTrigger>
         </TabsList>
 
         <TabsContent value='details'>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            {[...Array(2)].map((_, index) => (
-              <Card key={index}>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+            <div className='lg:col-span-2 space-y-6'>
+              <Card>
                 <CardHeader>
-                  <Skeleton className='h-6 w-1/2 mb-2' />
+                  <Skeleton className='h-6 w-1/3 mb-2' />
                 </CardHeader>
-                <CardContent>
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className='h-4 w-full mb-2' />
+                <CardContent className='grid sm:grid-cols-2 gap-4'>
+                  {[...Array(2)].map((_, index) => (
+                    <div key={index} className='space-y-2'>
+                      <Skeleton className='h-4 w-1/2 mb-2' />
+                      {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className='h-4 w-full' />
+                      ))}
+                    </div>
                   ))}
                 </CardContent>
               </Card>
-            ))}
-          </div>
 
-          <Card className='mt-6'>
-            <CardHeader>
-              <Skeleton className='h-6 w-1/2 mb-2' />
-            </CardHeader>
-            <CardContent className='flex items-center justify-between'>
-              <div className='flex items-center gap-4'>
-                <Skeleton className='h-16 w-16 rounded-full' />
-                <div>
-                  <Skeleton className='h-6 w-40 mb-2' />
-                  <Skeleton className='h-4 w-24' />
-                </div>
-              </div>
-              <Skeleton className='h-10 w-32' />
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader>
+                  <Skeleton className='h-6 w-1/3 mb-2' />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className='h-[400px] w-full mb-4' />
+                  <Skeleton className='h-4 w-2/3' />
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className='space-y-6'>
+              <Card>
+                <CardHeader>
+                  <Skeleton className='h-6 w-1/2 mb-2' />
+                </CardHeader>
+                <CardContent className='flex flex-col items-center'>
+                  <Skeleton className='h-24 w-24 rounded-full mb-4' />
+                  <Skeleton className='h-6 w-1/2 mb-2' />
+                  <Skeleton className='h-4 w-1/3 mb-4' />
+                  <Skeleton className='h-10 w-full' />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <Skeleton className='h-6 w-1/2 mb-2' />
+                </CardHeader>
+                <CardContent className='space-y-2'>
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className='flex justify-between items-center'>
+                      <Skeleton className='h-4 w-1/3' />
+                      <Skeleton className='h-6 w-16' />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value='visitations'>
@@ -345,17 +392,6 @@ function LoadingSkeleton() {
                   </CardContent>
                 </Card>
               ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='map'>
-          <Card>
-            <CardHeader>
-              <Skeleton className='h-6 w-1/2 mb-2' />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className='h-[400px] w-full' />
             </CardContent>
           </Card>
         </TabsContent>
