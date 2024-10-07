@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { login } from '@/lib/auth'
 import React, { useState } from 'react'
 import { useTransition } from 'react'
-import { ArrowRight, Mail, Lock } from 'lucide-react'
+import { ArrowRight, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 const initState = { message: null as string | null }
 
@@ -17,9 +17,12 @@ export default function Login({
 }: {
   searchParams: { message: string }
 }) {
-  const [formState, setFormState] = useState<{ message: string | null }>(initState)
+  const [formState, setFormState] = useState<{ message: string | null }>(
+    initState,
+  )
   const [isPending, startTransition] = useTransition()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -29,6 +32,10 @@ export default function Login({
       setFormState(result)
       setErrorMessage(result.message)
     })
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -85,13 +92,29 @@ export default function Login({
             <div className='relative'>
               <Input
                 id='password'
-                type='password'
+                type={showPassword ? 'text' : 'password'}
                 name='password'
                 placeholder='••••••••'
                 required
-                className='pl-10 w-full bg-background'
+                className='pl-10 pr-10 w-full bg-background'
               />
               <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5' />
+              <Button
+                type='button'
+                variant='ghost'
+                size='sm'
+                className='absolute right-1 top-1/2 transform -translate-y-1/2'
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? (
+                  <EyeOff className='h-5 w-5 text-muted-foreground' />
+                ) : (
+                  <Eye className='h-5 w-5 text-muted-foreground' />
+                )}
+                <span className='sr-only'>
+                  {showPassword ? 'Hide password' : 'Show password'}
+                </span>
+              </Button>
             </div>
           </div>
           <Button
