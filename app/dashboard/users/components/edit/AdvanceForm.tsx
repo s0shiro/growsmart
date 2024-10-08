@@ -28,6 +28,7 @@ import { toast } from 'sonner'
 import { Member } from '@/lib/types'
 import { updateMemberAdvanceAndMetadataById } from '../../actions'
 import { useTransition } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 const FormSchema = z.object({
   role: z.enum(['admin', 'technician']),
@@ -42,6 +43,7 @@ export default function AdvanceForm({
   onUpdate: (updatedMember: Member) => void
 }) {
   const [isPending, startTransition] = useTransition()
+  const queryClient = useQueryClient()
 
   const roles = ['admin', 'technician']
   const status = ['active', 'resigned']
@@ -84,9 +86,10 @@ export default function AdvanceForm({
         })
       } else {
         toast('Successfully updated.')
-        document.getElementById('edit-member')?.click()
         // Call the onUpdate function with the updated member data
         onUpdate({ ...permission, role: data.role, status: data.status })
+        document.getElementById('edit-member')?.click()
+        queryClient.invalidateQueries({ queryKey: ['members'] })
       }
     })
   }

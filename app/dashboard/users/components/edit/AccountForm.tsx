@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import { Member } from '@/lib/types'
 import { useTransition } from 'react'
 import { updateAccountById } from '../../actions'
+import { useQueryClient } from '@tanstack/react-query'
 
 const FormSchema = z
   .object({
@@ -35,6 +36,7 @@ const FormSchema = z
 
 export default function AccountForm({ permission }: { permission: Member }) {
   const [isPending, startTransition] = useTransition()
+  const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -65,6 +67,7 @@ export default function AccountForm({ permission }: { permission: Member }) {
       } else {
         toast('Success', { description: 'Successfully updated.' })
         document.getElementById('edit-member')?.click()
+        queryClient.invalidateQueries({ queryKey: ['members'] })
       }
     })
   }

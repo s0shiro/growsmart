@@ -15,6 +15,7 @@ export default function EditForm({
   const handleUpdate = (updatedMember: Member) => {
     // Call the updateMember function passed as a prop
     updateMember(updatedMember)
+    document.getElementById('edit-user')?.click()
   }
 
   return (

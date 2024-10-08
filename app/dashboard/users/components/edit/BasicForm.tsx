@@ -70,7 +70,7 @@ export default function BasicForm({
         })
         document.getElementById('edit-member')?.click()
         // Invalidate the relevant query
-        queryClient.invalidateQueries({ queryKey: ['users'] })
+        queryClient.invalidateQueries({ queryKey: ['members'] })
       }
     })
   }
