@@ -26,13 +26,32 @@ export async function readAssociations() {
 
   const supabase = await createClient()
 
-  const { data, error } = await supabase.from('association').select('*')
+  const { data: associations, error: associationsError } = await supabase
+    .from('association')
+    .select('*')
 
-  if (error) {
-    console.error('Supabase error:', error.message)
+  if (associationsError) {
+    console.error('Supabase error:', associationsError.message)
+    return { error: associationsError.message }
   }
 
-  return data
+  const associationsWithCounts = await Promise.all(
+    associations.map(async (association) => {
+      const { count, error: countError } = await supabase
+        .from('technician_farmers')
+        .select('*', { count: 'exact' })
+        .eq('association_id', association.id)
+
+      if (countError) {
+        console.error('Supabase error:', countError.message)
+        return { ...association, memberCount: 0 }
+      }
+
+      return { ...association, memberCount: count ?? 0 }
+    }),
+  )
+
+  return associationsWithCounts
 }
 
 export async function readAssociationById(id: string) {

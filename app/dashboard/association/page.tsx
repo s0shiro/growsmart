@@ -1,10 +1,9 @@
-import ListOfAssociations from './components/AssociationTable'
-import CreateAssociationButton from './components/create/AssociationFormButton'
+import AssociationsList from './components/AssociationsList'
 
 const AssociationPage = () => {
   return (
     <div>
-      <ListOfAssociations />
+      <AssociationsList />
     </div>
   )
 }
