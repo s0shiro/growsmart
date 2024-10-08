@@ -65,10 +65,12 @@ const Side = ({
   userSession,
   isOpen,
   onClose,
+  isMobile,
 }: {
   userSession: any
   isOpen: boolean
   onClose: () => void
+  isMobile: boolean
 }) => {
   const role = userSession?.user?.user_metadata?.role
   const links =
@@ -83,9 +85,10 @@ const Side = ({
   return (
     <aside
       className={clsx(
-        'w-64 bg-card flex flex-col h-screen overflow-y-auto transition-all duration-300 ease-in-out fixed lg:sticky top-0 left-0 z-40',
-        isOpen ? 'translate-x-0' : '-translate-x-full',
-        'lg:translate-x-0',
+        'bg-card flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out',
+        isOpen ? 'w-64' : 'w-16',
+        isMobile && 'fixed left-0 top-0 z-40',
+        isMobile && !isOpen && '-translate-x-full',
       )}
     >
       <div className='flex items-center h-16 px-4 border-b border-border'>
@@ -95,44 +98,62 @@ const Side = ({
             alt='Organization Logo'
             width={40}
             height={40}
-            className='transition-all group-hover:scale-110'
+            className='transition-all group-hover:scale-110 flex-shrink-0'
           />
-          <span className='text-xl font-semibold text-foreground ml-2'>
-            GrowSmart
-          </span>
+          {isOpen && (
+            <span className='text-xl font-semibold text-foreground ml-2 whitespace-nowrap'>
+              GrowSmart
+            </span>
+          )}
         </div>
-        <Button variant='ghost' className='lg:hidden ml-auto' onClick={onClose}>
-          <X className='h-6 w-6' />
-        </Button>
+        {isMobile && (
+          <Button variant='ghost' className='ml-auto' onClick={onClose}>
+            <X className='h-6 w-6' />
+          </Button>
+        )}
       </div>
-      <nav className='flex-1 px-4 py-4'>
+      <nav
+        className={clsx(
+          'flex-1 overflow-y-auto',
+          isOpen ? 'px-4' : 'px-2',
+          'py-4',
+        )}
+      >
         {links.map(({ href, Icon, label }) => (
           <Button
             key={label}
             variant={isActive(path, href) ? 'secondary' : 'ghost'}
-            className='w-full justify-start mb-2'
+            className={clsx(
+              'w-full justify-start mb-2',
+              !isOpen && 'justify-center p-0',
+            )}
             asChild
           >
             <Link href={href}>
-              <Icon className='mr-2 h-4 w-4' />
-              {label}
+              <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+              {isOpen && <span>{label}</span>}
             </Link>
           </Button>
         ))}
         {role === 'technician' && (
           <>
             <Separator className='my-4' />
-            <div className='font-semibold mb-2'>Productions</div>
+            <div className={clsx('font-semibold mb-2', !isOpen && 'sr-only')}>
+              Productions
+            </div>
             {productionLinks.map(({ href, Icon, label }) => (
               <Button
                 key={label}
                 variant={isActive(path, href) ? 'secondary' : 'ghost'}
-                className='w-full justify-start mb-2'
+                className={clsx(
+                  'w-full justify-start mb-2',
+                  !isOpen && 'justify-center p-0',
+                )}
                 asChild
               >
                 <Link href={href}>
-                  <Icon className='mr-2 h-4 w-4' />
-                  {label}
+                  <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                  {isOpen && <span>{label}</span>}
                 </Link>
               </Button>
             ))}
@@ -141,45 +162,60 @@ const Side = ({
         {role === 'admin' && (
           <>
             <Separator className='my-4' />
-            <div className='font-semibold mb-2'>Profiling</div>
+            <div className={clsx('font-semibold mb-2', !isOpen && 'sr-only')}>
+              Profiling
+            </div>
             {profilingLinks.map(({ href, Icon, label }) => (
               <Button
                 key={label}
                 variant={isActive(path, href) ? 'secondary' : 'ghost'}
-                className='w-full justify-start mb-2'
+                className={clsx(
+                  'w-full justify-start mb-2',
+                  !isOpen && 'justify-center p-0',
+                )}
                 asChild
               >
                 <Link href={href}>
-                  <Icon className='mr-2 h-4 w-4' />
-                  {label}
+                  <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                  {isOpen && <span>{label}</span>}
                 </Link>
               </Button>
             ))}
           </>
         )}
       </nav>
-      <div className='px-4 py-4 border-t border-border'>
-        <Button variant='ghost' className='w-full justify-start mb-4'>
-          <Settings className='mr-2 h-4 w-4' />
-          Settings
+      <div
+        className={clsx('px-4 py-4 border-t border-border', !isOpen && 'px-2')}
+      >
+        <Button
+          variant='ghost'
+          className={clsx(
+            'w-full justify-start mb-4',
+            !isOpen && 'justify-center p-0',
+          )}
+        >
+          <Settings className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+          {isOpen && <span>Settings</span>}
         </Button>
-        <div className='flex items-center'>
-          <Image
-            src='https://i.pinimg.com/originals/7c/af/16/7caf16ffec532599adf6c6a9ee863754.jpg'
-            alt='User Avatar'
-            width={40}
-            height={40}
-            className='rounded-full'
-          />
-          <div className='ml-3'>
-            <p className='text-sm font-semibold text-primary-foreground'>
-              {userSession?.user?.user_metadata?.full_name || 'User Name'}
-            </p>
-            <p className='text-xs text-muted-foreground'>
-              {role.charAt(0).toUpperCase() + role.slice(1)}
-            </p>
+        {isOpen && (
+          <div className='flex items-center'>
+            <Image
+              src='https://i.pinimg.com/originals/7c/af/16/7caf16ffec532599adf6c6a9ee863754.jpg'
+              alt='User Avatar'
+              width={40}
+              height={40}
+              className='rounded-full'
+            />
+            <div className='ml-3'>
+              <p className='text-sm font-semibold text-primary-foreground'>
+                {userSession?.user?.user_metadata?.full_name || 'User Name'}
+              </p>
+              <p className='text-xs text-muted-foreground'>
+                {role.charAt(0).toUpperCase() + role.slice(1)}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </aside>
   )
