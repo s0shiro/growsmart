@@ -42,6 +42,7 @@ import DeleteUser from './DeleteUser'
 import { Member } from '@/lib/types'
 import CreateForm from './create/CreateForm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useQuery } from '@tanstack/react-query'
 
 export default function UsersTable() {
   const [members, setMembers] = useState<Member[]>([])
@@ -51,15 +52,25 @@ export default function UsersTable() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 4
 
+  const fetchMembers = async () => {
+    const response = await fetch('/api/members')
+    if (!response.ok) {
+      throw new Error('Network response was not ok')
+    }
+    return response.json()
+  }
+
+  const { data, error, isLoading } = useQuery<Member[], Error>({
+    queryKey: ['members'],
+    queryFn: fetchMembers,
+  })
+
   useEffect(() => {
-    async function fetchMembers() {
-      const response = await fetch('/api/members')
-      const data: Member[] = await response.json()
+    if (data) {
       setMembers(data)
       setFilteredMembers(data)
     }
-    fetchMembers()
-  }, [])
+  }, [data])
 
   const handleSearch = useCallback(
     (term: string) => {
@@ -128,7 +139,7 @@ export default function UsersTable() {
   const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
   const paginatedMembers = filteredMembers.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   )
 
   return (
@@ -261,29 +272,32 @@ export default function UsersTable() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-between items-center mt-4">
-        <div className="text-sm text-muted-foreground">
-          Showing {Math.min(filteredMembers.length, currentPage * itemsPerPage)} of {filteredMembers.length} users
+      <div className='flex justify-between items-center mt-4'>
+        <div className='text-sm text-muted-foreground'>
+          Showing {Math.min(filteredMembers.length, currentPage * itemsPerPage)}{' '}
+          of {filteredMembers.length} users
         </div>
-        <div className="flex items-center space-x-2">
+        <div className='flex items-center space-x-2'>
           <Button
-            variant="outline"
-            size="sm"
+            variant='outline'
+            size='sm'
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className='h-4 w-4' />
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className='text-sm text-muted-foreground'>
             Page {currentPage} of {totalPages}
           </span>
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            variant='outline'
+            size='sm'
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className='h-4 w-4' />
           </Button>
         </div>
       </div>
