@@ -93,7 +93,7 @@ export const getAssociationDetails = async (associationId: string) => {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select('*') // Assuming there is a relationship to fetch user details
+    .select(`*, association(name)`) // Assuming there is a relationship to fetch user details
     .eq('association_id', associationId)
 
   if (error) {

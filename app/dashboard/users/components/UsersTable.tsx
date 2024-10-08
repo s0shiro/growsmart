@@ -284,7 +284,7 @@ export default function UsersTable() {
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src={`/placeholder.svg?text=${member.users.full_name?.charAt(0)}`}
+                            src='https://i.pinimg.com/564x/0e/9c/c6/0e9cc65bde115ecfa5ba8056d877690a.jpg'
                             alt={member.users.full_name}
                           />
                           <AvatarFallback>
