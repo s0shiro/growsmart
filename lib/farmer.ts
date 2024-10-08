@@ -41,13 +41,15 @@ export const getListOfFarmers = async (userId: string) => {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select(`
+    .select(
+      `
       *,
       association(
         id,
         name
       )
-    `)
+    `,
+    )
     .eq('user_id', userId)
     .order('firstname', { ascending: true }) // Orders by lastname in ascending order
 
@@ -63,7 +65,9 @@ export const getOneFarmer = async (farmerId: string) => {
 
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select(`*, planting_records(*, crop_categories(name), crops(name), crop_varieties(name)), association(name)`)
+    .select(
+      `*, planting_records(*, crop_categories(name), crops(name), crop_varieties(name)), association(name)`,
+    )
     .eq('id', farmerId)
     .single()
 
@@ -94,7 +98,7 @@ export const getAllFarmers = async () => {
 
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select()
+    .select(`*, association(name)`)
     .order('created_at', { ascending: false }) // Orders by created_at in descending order
 
   if (error) {

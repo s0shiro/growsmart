@@ -1,9 +1,9 @@
-import FarmersTable from './components/FarmersTable'
+import FarmersList from './components/FarmersList'
 
 const page = () => {
   return (
     <div>
-      <FarmersTable />
+      <FarmersList />
     </div>
   )
 }
