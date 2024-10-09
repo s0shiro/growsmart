@@ -1,29 +1,48 @@
 import { createClient } from '@/utils/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 
-const initUser = {
+interface UserProfile {
+  created_at: string
+  email: string
+  full_name: string
+  id: string
+}
+
+const initUser: UserProfile = {
   created_at: '',
   email: '',
   full_name: '',
   id: '',
 }
 
+const supabase = createClient()
+
 export default function useUser() {
-  return useQuery({
+  return useQuery<UserProfile>({
     queryKey: ['user'],
     queryFn: async () => {
-      const supabase = createClient()
-      const { data } = await supabase.auth.getSession()
+      const { data: authData, error: authError } = await supabase.auth.getUser()
 
-      if (data.session?.user) {
-        const { data: user } = await supabase
+      if (authError) {
+        console.error('Error fetching authenticated user:', authError)
+        return initUser
+      }
+
+      if (authData.user) {
+        const { data: user, error: userError } = await supabase
           .from('users')
           .select('*')
-          .eq('id', data.session.user.id)
+          .eq('id', authData.user.id)
           .single()
 
-        return user
+        if (userError) {
+          console.error('Error fetching user profile:', userError)
+          return initUser
+        }
+
+        return user as UserProfile
       }
+
       return initUser
     },
   })

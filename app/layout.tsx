@@ -2,8 +2,8 @@ import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import QueryProvider from '@/providers/QueryProvider'
-import { Toaster } from 'sonner'
 import { EdgeStoreProvider } from '@/lib/edgestore'
+import { Toaster } from '@/components/ui/toaster'
 
 export const metadata = {
   title: 'GrowSmart',
