@@ -76,7 +76,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Scrollable content area */}
-        <div className='flex-1 overflow-auto p-2'>
+        <div className='flex-1 overflow-auto p-2 md:p-8 lg:p-8'>
           <main className='bg-background rounded-lg max-w-5xl mx-auto'>
             {children}
           </main>

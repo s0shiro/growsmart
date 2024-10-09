@@ -14,9 +14,10 @@ import CropDetails from '@/app/dashboard/+planting/components/CropDetailsCompone
 import FieldLocation from '@/app/dashboard/+planting/components/FieldLocationComponent'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
-import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
+import { useToast } from '@/components/hooks/use-toast'
+import { formatDate } from '@/lib/utils'
 
 export default function ImprovedPlantingForm() {
   const { data: allCropData = [] } = useGetAllCropData()
@@ -84,6 +85,7 @@ export default function ImprovedPlantingForm() {
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
   const [selectedLocation, setSelectedLocation] = useState<string>('')
   const [step, setStep] = useState(1)
+  const { toast } = useToast()
 
   const onLocationSelect = (locationName: string, coords: [number, number]) => {
     setSelectedLocation(locationName)
@@ -156,11 +158,18 @@ export default function ImprovedPlantingForm() {
         setSelectedLocation('')
         setCoordinates(null) // Reset coordinates on form reset
         setStep(1)
-        toast.success('Crop added successfully!')
+        toast({
+          title: 'Planting Added!🎉',
+          description: `Expected harvest ${formatDate(data.harvestDate)}📅.`,
+        })
         await queryClient.invalidateQueries({ queryKey: ['inspections'] })
       } catch (error) {
         console.error('Failed to submit form:', error)
-        toast.error('Failed to submit form. Please try again later.')
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong."',
+          description: 'Please try again later.',
+        })
       }
     })
   }
