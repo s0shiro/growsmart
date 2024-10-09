@@ -24,8 +24,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import useReadInspections from '@/hooks/crop/useReadInspection'
 import { formatDate } from '@/lib/utils'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-//TODO: Define Crop interface
 interface Crop {
   id: string
   planting_date: string
@@ -38,6 +38,9 @@ interface Crop {
   crops: {
     name: string
   }
+  crop_categories: {
+    name: string
+  }
 }
 
 export default function CropInspections() {
@@ -45,6 +48,7 @@ export default function CropInspections() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCrop, setFilterCrop] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('all')
 
   const itemsPerPage = 5
 
@@ -59,9 +63,11 @@ export default function CropInspections() {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           crop.crops.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (filterCrop === null || crop.crops.name === filterCrop),
+        (filterCrop === null || crop.crops.name === filterCrop) &&
+        (activeTab === 'all' ||
+          crop.crop_categories.name.toLowerCase() === activeTab.toLowerCase()),
     )
-  }, [crops, searchTerm, filterCrop])
+  }, [crops, searchTerm, filterCrop, activeTab])
 
   const totalPages = Math.ceil(filteredCrops.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -90,6 +96,19 @@ export default function CropInspections() {
   return (
     <div>
       <h1 className='text-2xl font-bold mb-4'>Standing Crops</h1>
+
+      <Tabs
+        defaultValue='all'
+        className='w-full mb-4'
+        onValueChange={setActiveTab}
+      >
+        <TabsList>
+          <TabsTrigger value='all'>All</TabsTrigger>
+          <TabsTrigger value='rice'>Rice</TabsTrigger>
+          <TabsTrigger value='corn'>Corn</TabsTrigger>
+          <TabsTrigger value='high-value'>High Value</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <div className='flex flex-col md:flex-row gap-4 mb-4'>
         <Input
