@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 
 export const recordInspection = async (data: {
   plantingID: string
+  farmerID: string
   dateOfInspection: string
   damagedQuantity: number
   damagedReason: string
@@ -13,6 +14,7 @@ export const recordInspection = async (data: {
 
   const inspectionData = {
     planting_id: data.plantingID,
+    farmer_id: data.farmerID,
     date: data.dateOfInspection,
     findings: data.findings,
     damaged: data.damagedQuantity,

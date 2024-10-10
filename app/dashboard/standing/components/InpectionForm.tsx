@@ -14,9 +14,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { recordInspection } from '@/lib/inspection'
-import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
-import { updateStatusWhenAddHarvest } from '@/lib/planting'
+import { useToast } from '@/components/hooks/use-toast'
+import { formatDate } from '@/lib/utils'
 
 const FormSchema = z.object({
   dateOfInspection: z.string().refine((val) => !isNaN(Date.parse(val)), {
@@ -29,31 +29,41 @@ const FormSchema = z.object({
   findings: z.string().optional(),
 })
 
-function InspectionForm({ plantingID }: { plantingID: string }) {
+function InspectionForm({
+  plantingID,
+  farmerID,
+}: {
+  plantingID: string
+  farmerID: string
+}) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
   })
 
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const res = await recordInspection({
         plantingID: plantingID,
+        farmerID: farmerID,
         dateOfInspection: data.dateOfInspection,
         damagedQuantity: data.damagedQuantity,
         damagedReason: data.damagedReason,
         findings: data.findings,
       })
-
+      toast({
+        title: 'Visitation Added!🎉',
+        description: `Visited at ${formatDate(data.dateOfInspection)}📅.`,
+      })
       document.getElementById('create-visit')?.click()
-      toast.success('Successfully record visit!')
       console.log('visit record successfully!')
       await queryClient.invalidateQueries({
         queryKey: ['crop-planting-record', plantingID],
       })
-      form.reset()
+      //   form.reset()
     } catch (error) {
       console.error('Failed to submit form:', error)
     }

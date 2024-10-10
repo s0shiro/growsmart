@@ -37,8 +37,8 @@ import LocationMap from '@/app/dashboard/(components)/LocationMap'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 
 export default function CropsDetailsPage({
-                                           params,
-                                         }: {
+  params,
+}: {
   params: { cropId: string }
 }) {
   const { data, error, isLoading } = useQuery({
@@ -117,7 +117,9 @@ export default function CropsDetailsPage({
                     </div>
                     <div className='flex items-center gap-2'>
                       <CropIcon className='h-4 w-4 text-primary' />
-                      <span>Land Type: {data.land_type || 'Not specified'}</span>
+                      <span>
+                        Land Type: {data.land_type || 'Not specified'}
+                      </span>
                     </div>
                     <div className='flex items-center gap-2'>
                       <ScaleIcon className='h-4 w-4 text-primary' />
@@ -242,7 +244,12 @@ export default function CropsDetailsPage({
                     Add Visitation
                   </Button>
                 }
-                form={<InspectionForm plantingID={params.cropId} />}
+                form={
+                  <InspectionForm
+                    plantingID={params.cropId}
+                    farmerID={data.farmer_id}
+                  />
+                }
               />
             </CardHeader>
             <CardContent>
@@ -360,7 +367,10 @@ function LoadingSkeleton() {
                 </CardHeader>
                 <CardContent className='space-y-2'>
                   {[...Array(3)].map((_, index) => (
-                    <div key={index} className='flex justify-between items-center'>
+                    <div
+                      key={index}
+                      className='flex justify-between items-center'
+                    >
                       <Skeleton className='h-4 w-1/3' />
                       <Skeleton className='h-6 w-16' />
                     </div>

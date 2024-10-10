@@ -15,12 +15,12 @@ import SelectField from '../../(components)/forms/CustomSelectField'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { addCrop } from '@/lib/crop'
-import { toast } from 'sonner'
 import { useTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
+import { useToast } from '@/components/hooks/use-toast'
 
 const FormSchema = z.object({
   cropCategory: z.string(),
@@ -71,8 +71,8 @@ const CropForm = () => {
   const isNewCrop = form.watch('isNewCrop')
   const isNewVariety = form.watch('isNewVariety')
   const selectedCategoryData = Array.isArray(categories)
-  ? categories.find((category: any) => category.id === selectedCategory)
-  : undefined
+    ? categories.find((category: any) => category.id === selectedCategory)
+    : undefined
   const crops = selectedCategoryData?.crops || []
   const selectedCrop = form.watch('cropName')
   const selectedCropData = crops.find((crop: any) => crop.id === selectedCrop)
@@ -80,15 +80,24 @@ const CropForm = () => {
 
   const [isPending, startTransition] = useTransition()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     if (isNewCrop && !data.newCropName) {
-      toast.error('Please enter a new crop name.')
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!⚠',
+        description: `Please enter a new crop name.`,
+      })
       return
     }
 
     if (isNewVariety && !data.newVarietyName) {
-      toast.error('Please enter a new variety name.')
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!⚠',
+        description: `Please enter a new variety name.`,
+      })
       return
     }
 
@@ -107,15 +116,32 @@ const CropForm = () => {
         if (res.error) {
           const errorMessage =
             typeof res.error === 'string' ? res.error : res.error.message
-          toast.error(`Failed to save crop: ${errorMessage}`)
+          toast({
+            variant: 'destructive',
+            title: 'Uh oh! Something went wrong.',
+            description: `Please try again later.'`,
+          })
         } else {
           document.getElementById('create-trigger')?.click()
-          toast.success('Crop added successfully!')
-          form.reset()
-          await queryClient.invalidateQueries({ queryKey: ['registered-crops'] })
+          toast({
+            title: 'Crop registered!🎉',
+            description: `You have registered ${
+              isNewCrop ? data.newCropName : data.cropName
+            } with ${
+              isNewVariety ? data.newVarietyName : data.cropVariety
+            } variety.`,
+          })
+          //   form.reset()
+          await queryClient.invalidateQueries({
+            queryKey: ['registered-crops'],
+          })
         }
       } catch (error) {
-        toast.error('Unexpected error occurred.')
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
+          description: `Unexpected error occurred.'`,
+        })
       }
     })
   }
