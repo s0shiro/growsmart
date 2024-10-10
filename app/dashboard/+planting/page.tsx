@@ -65,7 +65,7 @@ export default function ImprovedPlantingForm() {
   })
 
   const queryClient = useQueryClient()
-  const { data: farmers } = useFetchFarmersByUserId()
+  const { data: farmers, isFetching } = useFetchFarmersByUserId()
   const { watch, setValue } = form
 
   const categoryNames = categories.reduce(
@@ -202,6 +202,7 @@ export default function ImprovedPlantingForm() {
                   <FarmerSelection
                     control={form.control}
                     farmers={farmers || []}
+                    isLoading={isFetching}
                   />
                 </CardContent>
               </Card>
