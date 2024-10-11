@@ -35,114 +35,154 @@ export default function DamageReport() {
     from: undefined,
     to: undefined,
   })
-
   const handlePrint = () => {
     if (printableRef.current) {
       const printContent = printableRef.current.innerHTML
-      const printWindow = window.open('', '_blank')
+
+      const printWindow = window.open('', 'PRINT', 'height=600,width=800')
+
+      const isValidDate = (date: any) =>
+        date instanceof Date && !isNaN(date.getTime())
 
       if (printWindow) {
         printWindow.document.write(`
           <html>
             <head>
               <title>Damage Report</title>
-             <style>
-  /* Reset and box-sizing rule */
-  *, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+              <style>
+                /* Reset and box-sizing rule */
+                *, *::before, *::after {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+                }
 
-  @page {
-    size: portrait;
-    margin: 10mm;
-  }
+                @page {
+                  size: portrait;
+                  margin: 10mm;
+                }
 
-  body {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 12px;
-    margin: 0;
-    padding: 5px;
-    color: #333;
-  }
+                body {
+                  font-family: 'Times New Roman', Times, serif;
+                  font-size: 12px;
+                  margin: 0;
+                  padding: 5px;
+                  color: #333;
+                }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
+                .header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                }
 
-  th, td {
-    border: 1px solid #000;
-    padding: 5px; /* Consolidated padding for both th and td */
-    text-align: center;
-    font-size: 10px;
-  }
+                .logo {
+                  border-radius: 50%;
+                  width: 100px;
+                  height: 100px;
+                }
 
-  th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
+                .org-info {
+                  flex-grow: 1;
+                  margin-left: 8px;
+                }
 
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
+                .org-info h2 {
+                  font-size: 16px;
+                  font-weight: bold;
+                  color: #003366;
+                }
 
-  .header {
-    text-align: center;
-    margin-bottom: 10px; /* Control space between header and the rest */
-  }
+                .org-info p {
+                  font-size: 12px;
+                  margin-bottom: 2px;
+                }
 
-  .title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #003366;
-  }
+                .title {
+                  font-size: 11px;
+                  font-weight: bold;
+                  text-align: center;
+                  color: #003366;
+                  margin-bottom: 5px;
+                }
 
-  h2 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 5px 0; /* Small margin between title and subtitle */
-  }
+                .date-range {
+                  font-size: 8px;
+                  color: #6c757d;
+                }
 
-  p {
-    font-size: 12px;
-    margin: 5px 0; /* Control spacing between date and headers */
-  }
+                table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-bottom: 20px;
+                }
 
-  .subheader {
-    margin-bottom: 2px;
-    display: flex;
-    justify-content: space-between;
-  }
+                th, td {
+                  border: 1px solid #000;
+                  padding: 5px;
+                  text-align: center;
+                  font-size: 10px;
+                }
 
-  @media print {
-    .no-print {
-      display: none !important;
-    }
-    body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-  }
-</style>
+                th {
+                  background-color: #f4f4f4;
+                  font-weight: bold;
+                }
 
+                tr:nth-child(even) {
+                  background-color: #f9f9f9;
+                }
+
+                .subheader {
+                  margin-bottom: 2px;
+                  display: flex;
+                  justify-content: space-between;
+                }
+
+                p {
+                  font-size: 12px;
+
+                }
+
+                @media print {
+                  .no-print {
+                    display: none !important;
+                  }
+                  body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                  }
+                }
+              </style>
             </head>
             <body>
+              <div class="header">
+                <img src="/no-bg.png" alt="Logo" class="logo"/>
+                <div class="org-info">
+                  <h2>Marinduque Provincial Agriculture Office</h2>
+                  <p>Capitol Compound, Boac, Philippines</p>
+                </div>
+              </div>
+              <div class="title">DAMAGE(S) REPORT</div>
+              <div class="title">${activeCategory.toUpperCase()} PROGRAM</div>
+              <div class="title date-range"> ${isValidDate(dateRange.from) && isValidDate(dateRange.to) ? `${formatDate(dateRange.from)} - ${formatDate(dateRange.to)}` : ''}</div>
               ${printContent}
             </body>
           </html>
         `)
+        // Close the document stream for rendering
         printWindow.document.close()
+
+        // Ensure the window is fully loaded before triggering the print
         printWindow.focus()
 
+        // Delay the print action to ensure everything is rendered
         setTimeout(() => {
-          printWindow.print()
-          printWindow.close()
-        }, 250)
+          printWindow.print() // Trigger the print dialog
+          printWindow.close() // Close the popup after printing
+        }, 500) // Delay to give the new window enough time to load
       } else {
-        alert('Please allow popups for this website')
+        alert('Please enable popups to allow printing.')
       }
     }
   }
@@ -252,7 +292,7 @@ export default function DamageReport() {
   )
 
   return (
-    <div className='container mx-auto p-4'>
+    <div className=''>
       <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 no-print'>
         <div className='w-full sm:w-auto'>
           <Popover>
@@ -313,15 +353,15 @@ export default function DamageReport() {
       </div>
 
       <div ref={printableRef}>
-        <div className='header text-center mb-2'>
+        <div className='no-print header text-center mb-2'>
           <p className='title text-xl font-bold'>DAMAGE REPORT</p>
           <p className='text-lg font-semibold'>
-            {activeCategory.toUpperCase()} CROP PROGRAM
+            {activeCategory.toUpperCase()} PROGRAM
           </p>
           <p className='no-print text-sm'>
             {dateRange.from && dateRange.to
-              ? `From ${format(dateRange.from, 'MMMM d, yyyy')} to ${format(dateRange.to, 'MMMM d, yyyy')}`
-              : 'All Dates'}
+              ? `${formatDate(dateRange.from)} - ${formatDate(dateRange.to)}`
+              : ''}
           </p>
         </div>
 
@@ -338,7 +378,7 @@ export default function DamageReport() {
             onValueChange={setActiveCategory}
             className='mb-6'
           >
-            <TabsList className='w-full sm:w-auto'>
+            <TabsList className='no-print w-full sm:w-auto'>
               <TabsTrigger value='All'>All</TabsTrigger>
               <TabsTrigger value='Rice'>Rice</TabsTrigger>
               <TabsTrigger value='Corn'>Corn</TabsTrigger>
@@ -347,11 +387,15 @@ export default function DamageReport() {
           </Tabs>
         </div>
 
-        <ScrollArea className='w-full whitespace-nowrap rounded-md border mt-4'>
-          <div className='p-2'>
+        <ScrollArea
+          className='w-full whitespace-nowrap rounded-md border mt-4'
+          style={{ height: '400px' }}
+        >
+          <div className='p-2' style={{ minHeight: '100%' }}>
             {isLoading ? renderSkeletonTable() : renderTable(filteredData)}
           </div>
           <ScrollBar orientation='horizontal' className='no-print' />
+          <ScrollBar orientation='vertical' className='no-print' />
         </ScrollArea>
       </div>
     </div>
