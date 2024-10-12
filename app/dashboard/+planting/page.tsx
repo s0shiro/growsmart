@@ -29,6 +29,7 @@ export default function ImprovedPlantingForm() {
       cropCategory: z.string().min(1, { message: 'Crop category is required' }),
       landType: z.string().optional(),
       waterSupply: z.string().optional(),
+      remarks: z.string(),
       cropType: z.string().min(1, { message: 'Crop name is required' }),
       variety: z.string().min(1, { message: 'Variety is required' }),
       plantingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
@@ -152,6 +153,7 @@ export default function ImprovedPlantingForm() {
           landType: data.landType,
           waterSupply: data.waterSupply,
           status: status,
+          remarks: data.remarks,
           latitude: coordinates ? coordinates[0] : 0, // Save latitude
           longitude: coordinates ? coordinates[1] : 0, // Save longitude
         })

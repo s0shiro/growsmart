@@ -23,6 +23,7 @@ import {
   CloudSun,
   DollarSign,
   Clock,
+  FileText,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
@@ -69,43 +70,29 @@ const CropDetails: React.FC<CropDetailsProps> = ({
   const fieldConfigs = [
     {
       name: 'cropCategory',
-      placeholder: 'Select Category',
-      label: 'Crop Category',
+      placeholder: 'Select category',
+      label: 'Crop category',
       type: 'select',
       icon: Sprout,
     },
     {
       name: 'cropType',
-      placeholder: 'Select Crop Name',
-      label: 'Crop Name',
+      placeholder: 'Select crop name',
+      label: 'Crop name',
       type: 'select',
       icon: Apple,
     },
     {
       name: 'variety',
-      placeholder: 'Select Variety',
+      placeholder: 'Select variety',
       label: 'Variety',
       type: 'select',
       icon: Leaf,
     },
     {
-      name: 'landType',
-      placeholder: 'Select Land Type',
-      label: 'Land Type',
-      type: 'select',
-      icon: CloudSun,
-      options: ['lowland', 'upland'],
-      showIf: (category: string) => {
-        const categoryName = categories
-          .find((c) => c.id === category)
-          ?.name?.toLowerCase()
-        return categoryName === 'rice'
-      },
-    },
-    {
       name: 'waterSupply',
-      placeholder: 'Select Water Supply',
-      label: 'Water Supply',
+      placeholder: 'Select water supply',
+      label: 'Water supply',
       type: 'select',
       icon: Droplet,
       options: ['irrigated', 'rainfed'],
@@ -117,16 +104,43 @@ const CropDetails: React.FC<CropDetailsProps> = ({
       },
     },
     {
+      name: 'landType',
+      placeholder: 'Select land type',
+      label: 'Land type',
+      type: 'select',
+      icon: CloudSun,
+      options: ['lowland', 'upland'],
+      showIf: (category: string) => {
+        const categoryName = categories
+          .find((c) => c.id === category)
+          ?.name?.toLowerCase()
+        return categoryName === 'rice'
+      },
+    },
+    {
+      name: 'remarks',
+      placeholder: 'Select remarks',
+      label: 'Remarks',
+      type: 'select',
+      icon: FileText,
+      options: [
+        'newly planted/seedling',
+        'vegetative',
+        'reproductive',
+        'maturing',
+      ],
+    },
+    {
       name: 'plantingDate',
       placeholder: 'Select date',
-      label: 'Planting Date',
+      label: 'Planting date',
       type: 'date',
       icon: Calendar,
     },
     {
       name: 'areaPlanted',
       placeholder: 'Enter area',
-      label: 'Area Planted (ha)',
+      label: 'Area planted (ha)',
       type: 'number',
       icon: MapPin,
     },
@@ -331,7 +345,11 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                       varieties,
                       !selectedCrop,
                     )
-                  } else if (name === 'landType' || name === 'waterSupply') {
+                  } else if (
+                    name === 'landType' ||
+                    name === 'waterSupply' ||
+                    name === 'remarks'
+                  ) {
                     return renderSelect(
                       name,
                       label,

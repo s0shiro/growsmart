@@ -18,6 +18,7 @@ type PlantingRecordData = {
   cropCategory: string
   landType?: string
   waterSupply?: string
+  remarks: string
   latitude: number
   longitude: number
 }
@@ -37,6 +38,7 @@ type PlantingRecord = {
   crop_categoryId: string
   land_type?: string
   water_supply?: string
+  remarks: string
   latitude: number
   longitude: number
 }
@@ -50,6 +52,7 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     farmer_id: data.farmerId || '',
     crop_type: data.cropType,
     variety: data.variety,
+    remarks: data.remarks,
     planting_date: data.plantingDate,
     field_location: data.fieldLocation,
     area_planted: parseFloat(data.areaPlanted),
