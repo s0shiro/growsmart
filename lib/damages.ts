@@ -10,6 +10,7 @@ export const getAllDamagesDuringVisitation = async () => {
     .select(
       `*, planting_records(crop_categoryId(name), crop_type(name), variety(name)), technician_farmers(firstname, lastname)`,
     )
+    .gt('damaged', 0) // Add this line to filter damages greater than 0
     .order('damaged', { ascending: false })
     .order('created_at', { ascending: false })
 
