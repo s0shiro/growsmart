@@ -1,9 +1,10 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import { LatLng, Icon } from 'leaflet'
 
-// Import the default marker icon
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
@@ -21,7 +22,6 @@ const Marker = dynamic(
   { ssr: false },
 )
 
-// Create the default icon for the marker
 const defaultIcon = new Icon({
   iconUrl: markerIcon.src,
   iconRetinaUrl: markerIcon2x.src,
@@ -35,16 +35,25 @@ const defaultIcon = new Icon({
 interface LocationMapProps {
   latitude: number | null
   longitude: number | null
+  showHighRes: boolean
 }
 
-const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude }) => {
+export default function LocationMap({
+  latitude,
+  longitude,
+  showHighRes,
+}: LocationMapProps) {
   const [position, setPosition] = useState<LatLng | null>(null)
   const [zoom, setZoom] = useState<number>(12)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && latitude !== null && longitude !== null) {
+    if (
+      typeof window !== 'undefined' &&
+      latitude !== null &&
+      longitude !== null
+    ) {
       setPosition(new LatLng(latitude, longitude))
-      setZoom(15) // Set zoom level to 15 when position is updated
+      setZoom(15)
     }
 
     return () => {
@@ -57,19 +66,26 @@ const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude }) => {
   }
 
   return (
-    <MapContainer
-      center={position}
-      zoom={zoom}
-      scrollWheelZoom={false}
-      style={{ height: '400px', width: '100%' }}
-    >
-      <TileLayer
-        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      <Marker position={position} icon={defaultIcon} />
-    </MapContainer>
+    <div className='relative h-full w-full'>
+      <MapContainer
+        center={position}
+        zoom={zoom}
+        scrollWheelZoom={false}
+        style={{ height: '400px', width: '100%' }}
+      >
+        <TileLayer
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {showHighRes && (
+          <TileLayer
+            url={`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`}
+            attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
+            errorTileUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          />
+        )}
+        <Marker position={position} icon={defaultIcon} />
+      </MapContainer>
+    </div>
   )
 }
-
-export default LocationMap

@@ -33,10 +33,12 @@ import {
 import { formatDate, formatCurrency } from '@/lib/utils'
 import InspectionForm from '@/app/dashboard/standing/components/InpectionForm'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LocationMap from '@/app/dashboard/(components)/LocationMap'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 
 export default function CropsDetailsPage({
   params,
@@ -47,6 +49,7 @@ export default function CropsDetailsPage({
     queryKey: ['crop-planting-record', params.cropId],
     queryFn: async () => getPlantingRecordById(params.cropId),
   })
+  const [showHighRes, setShowHighRes] = useState(false)
 
   const router = useRouter()
 
@@ -173,16 +176,27 @@ export default function CropsDetailsPage({
               </Card>
 
               <Card>
-                <CardHeader>
+                <CardHeader className='flex flex-row items-center justify-between'>
                   <CardTitle className='text-xl font-semibold'>
                     Field Location
                   </CardTitle>
+                  <div className='flex items-center space-x-2'>
+                    <Switch
+                      id='high-res-toggle'
+                      checked={showHighRes}
+                      onCheckedChange={setShowHighRes}
+                    />
+                    <Label htmlFor='high-res-toggle'>
+                      {showHighRes ? 'High-Res' : 'Standard'} Map
+                    </Label>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className='h-[400px] w-full rounded-lg overflow-hidden'>
                     <LocationMap
                       latitude={data.latitude}
                       longitude={data.longitude}
+                      showHighRes={showHighRes}
                     />
                   </div>
                   <div className='flex items-center gap-2 text-sm text-muted-foreground mt-4'>
