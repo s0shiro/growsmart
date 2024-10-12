@@ -10,7 +10,7 @@ export default function RicePlantingReport() {
   const handlePrint = () => {
     if (printableRef.current) {
       const printContent = printableRef.current.innerHTML
-      const printWindow = window.open('', '_blank')
+      const printWindow = window.open('', 'PRINT', 'height=600,width=800')
 
       if (printWindow) {
         printWindow.document.write(`
@@ -18,12 +18,18 @@ export default function RicePlantingReport() {
             <head>
               <title>Rice Planting Report</title>
               <style>
+               *, *::before, *::after {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+                }
+
                 @page {
                   size: landscape;
                   margin: 10mm;
                 }
                 body {
-                  font-family: Arial, sans-serif;
+                  font-family: 'Times New Roman', Times, serif;
                   width: 100%;
                   height: 100%;
                   margin: 0;
@@ -53,7 +59,7 @@ export default function RicePlantingReport() {
                   width: 100px;
                   height: 100px;
                 }
-                          .org-info {
+                .org-info {
                   flex-grow: 1;
                   margin-left: 8px;
                 }
