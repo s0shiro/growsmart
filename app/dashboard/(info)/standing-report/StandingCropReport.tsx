@@ -137,8 +137,10 @@ export default function StandingCropReport() {
   if (error) return <div>Error: {error.message}</div>
 
   // Process the data
-  const municipalityData = data.filter((item) =>
-    item.field_location.includes(selectedMunicipality),
+  const municipalityData = data.filter(
+    (item) =>
+      item.field_location.includes(selectedMunicipality) &&
+      item.crop_categories.name === 'corn',
   )
   const barangays = [
     ...new Set(
@@ -223,7 +225,7 @@ export default function StandingCropReport() {
             REGIONAL FIELD OFFICE MIMAROPA
           </h2>
           <p className='text-md'>
-            DRY SEASON 2024 Planting Report - {selectedMunicipality}
+            DRY SEASON 2024 Corn Planting Report - {selectedMunicipality}
           </p>
         </div>
 
