@@ -94,7 +94,21 @@ const CropDetails: React.FC<CropDetailsProps> = ({
       label: 'Land Type',
       type: 'select',
       icon: CloudSun,
-      options: ['rainfed', 'irrigated', 'lowland', 'upland'],
+      options: ['lowland', 'upland'],
+      showIf: (category: string) => {
+        const categoryName = categories
+          .find((c) => c.id === category)
+          ?.name?.toLowerCase()
+        return categoryName === 'rice'
+      },
+    },
+    {
+      name: 'waterSupply',
+      placeholder: 'Select Water Supply',
+      label: 'Water Supply',
+      type: 'select',
+      icon: Droplet,
+      options: ['irrigated', 'rainfed'],
       showIf: (category: string) => {
         const categoryName = categories
           .find((c) => c.id === category)
@@ -148,6 +162,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
         ?.name?.toLowerCase()
       if (categoryName && categoryName !== 'rice') {
         setValue('landType', '')
+        setValue('waterSupply', '')
       }
     }
   }, [selectedCategory, categories, setValue])
@@ -294,6 +309,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                         setValue('cropType', '')
                         setValue('variety', '')
                         setValue('landType', '')
+                        setValue('waterSupply', '')
                       },
                     )
                   } else if (name === 'cropType') {
@@ -315,7 +331,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                       varieties,
                       !selectedCrop,
                     )
-                  } else if (name === 'landType') {
+                  } else if (name === 'landType' || name === 'waterSupply') {
                     return renderSelect(
                       name,
                       label,

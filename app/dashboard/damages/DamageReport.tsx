@@ -48,7 +48,7 @@ export default function DamageReport() {
         printWindow.document.write(`
           <html>
             <head>
-              <title>Damage Report</title>
+              <title>${activeCategory} Damage(s) Report</title>
               <style>
                 /* Reset and box-sizing rule */
                 *, *::before, *::after {
