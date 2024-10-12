@@ -27,6 +27,8 @@ import {
   AlertTriangleIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
+  Droplet,
+  FileText,
 } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import InspectionForm from '@/app/dashboard/standing/components/InpectionForm'
@@ -75,7 +77,15 @@ export default function CropsDetailsPage({
 
   return (
     <div className='space-y-6'>
-      <Card className='bg-gradient-to-r from-primary to-primary-foreground text-primary-foreground'>
+      <Card
+        className={`${
+          data.crop_categories?.name === 'rice'
+            ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+            : data.crop_categories?.name === 'corn'
+              ? 'bg-gradient-to-r from-orange-400 to-orange-600'
+              : 'bg-gradient-to-r from-primary to-primary-foreground'
+        } text-primary-foreground`}
+      >
         <CardHeader>
           <div className='flex justify-between items-start'>
             <div>
@@ -115,12 +125,22 @@ export default function CropsDetailsPage({
                       <CalendarIcon className='h-4 w-4 text-primary' />
                       <span>Planted: {formatDate(data.planting_date)}</span>
                     </div>
-                    <div className='flex items-center gap-2'>
-                      <CropIcon className='h-4 w-4 text-primary' />
-                      <span>
-                        Land Type: {data.land_type || 'Not specified'}
-                      </span>
-                    </div>
+                    {data.crop_categories?.name === 'rice' && (
+                      <>
+                        <div className='flex items-center gap-2'>
+                          <CropIcon className='h-4 w-4 text-primary' />
+                          <span>
+                            Land Type: {data.land_type || 'Not applicable'}
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <Droplet className='h-4 w-4 text-primary' />
+                          <span>
+                            Water Supply: {data.water_supply || 'Not specified'}
+                          </span>
+                        </div>
+                      </>
+                    )}
                     <div className='flex items-center gap-2'>
                       <ScaleIcon className='h-4 w-4 text-primary' />
                       <span>Area: {data.area_planted} ha</span>
@@ -128,6 +148,10 @@ export default function CropsDetailsPage({
                     <div className='flex items-center gap-2'>
                       <LeafIcon className='h-4 w-4 text-primary' />
                       <span>Quantity: {data.quantity} kg</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <FileText className='h-4 w-4 text-primary' />
+                      <span>Remarks: {data.remarks}</span>
                     </div>
                   </div>
                   <div className='space-y-2'>
