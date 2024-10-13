@@ -44,7 +44,7 @@ export default function FieldLocation({
   onLocationSelect,
   errorMessage,
 }: FieldLocationProps) {
-  const [showMapTiler, setShowMapTiler] = useState(true)
+  const [showMapTiler, setShowMapTiler] = useState(false)
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [tempLocation, setTempLocation] = useState('')
   const [tempCoordinates, setTempCoordinates] = useState<
