@@ -1,10 +1,12 @@
+import MonthlyCornHarvesting from './new-report'
 import PrintURLButton from './PrintUrlButton'
 
 const page = () => {
   return (
     <div>
       {' '}
-      <PrintURLButton />
+      {/* <PrintURLButton /> */}
+      <MonthlyCornHarvesting />
     </div>
   )
 }
