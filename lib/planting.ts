@@ -16,8 +16,11 @@ type PlantingRecordData = {
   harvestDate: string
   status: string
   cropCategory: string
-  landType?: string
-  waterSupply?: string
+  categorySpecific: {
+    landType?: string
+    waterSupply?: string
+    classification?: string // Added classification
+  }
   remarks: string
   latitude: number
   longitude: number
@@ -36,8 +39,11 @@ type PlantingRecord = {
   harvest_date: string
   status: string
   crop_categoryId: string
-  land_type?: string
-  water_supply?: string
+  category_specific: {
+    landType?: string
+    waterSupply?: string
+    classification?: string // Added classification
+  }
   remarks: string
   latitude: number
   longitude: number
@@ -61,8 +67,11 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     harvest_date: data.harvestDate,
     status: data.status,
     crop_categoryId: data.cropCategory,
-    land_type: data.landType,
-    water_supply: data.waterSupply,
+    category_specific: {
+      landType: data.categorySpecific.landType,
+      waterSupply: data.categorySpecific.waterSupply,
+      classification: data.categorySpecific.classification,
+    },
     latitude: data.latitude,
     longitude: data.longitude,
   }

@@ -27,8 +27,11 @@ export default function ImprovedPlantingForm() {
     .object({
       farmerId: z.string().min(1, { message: 'Farmer selection is required' }),
       cropCategory: z.string().min(1, { message: 'Crop category is required' }),
-      landType: z.string().optional(),
-      waterSupply: z.string().optional(),
+      categorySpecific: z.object({
+        landType: z.string().optional(),
+        waterSupply: z.string().optional(),
+        classification: z.string().optional(),
+      }),
       remarks: z.string(),
       cropType: z.string().min(1, { message: 'Crop name is required' }),
       variety: z.string().min(1, { message: 'Variety is required' }),
@@ -47,22 +50,36 @@ export default function ImprovedPlantingForm() {
     })
     .refine(
       (data) => {
-        const { cropCategory, landType } = data
+        const { cropCategory, categorySpecific } = data
         const isRice =
           categories.find((c) => c.id === cropCategory)?.name?.toLowerCase() ===
           'rice'
-        return !isRice || (isRice && landType)
+        return !isRice || (isRice && categorySpecific.landType)
       },
       {
         message: 'Land type is required for rice crops',
-        path: ['landType'],
+        path: ['categorySpecific', 'landType'],
       },
     )
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      landType: '',
+      farmerId: '',
+      cropCategory: '',
+      categorySpecific: {
+        landType: '',
+        waterSupply: '',
+        classification: '',
+      },
+      remarks: '',
+      cropType: '',
+      variety: '',
+      plantingDate: '',
+      fieldLocation: '',
+      areaPlanted: '',
+      quantity: '',
+      expenses: '',
+      harvestDate: '',
     },
   })
 
@@ -82,7 +99,6 @@ export default function ImprovedPlantingForm() {
   const selectedFarmer = watch('farmerId')
   const selectedCategory = watch('cropCategory')
   const plantingDate = watch('plantingDate')
-  const selectedCrop = watch('cropType')
 
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
   const [selectedLocation, setSelectedLocation] = useState<string>('')
@@ -92,9 +108,9 @@ export default function ImprovedPlantingForm() {
   const onLocationSelect = (locationName: string, coords: [number, number]) => {
     setSelectedLocation(locationName)
     setValue('fieldLocation', locationName)
-    setCoordinates(coords) // Store the coordinates
+    setCoordinates(coords)
     console.log('Selected Location:', locationName)
-    console.log('Coordinates:', coords) // Log the coordinates
+    console.log('Coordinates:', coords)
   }
 
   function calculateHarvestDate(plantingDate: string, cropCategory: string) {
@@ -123,16 +139,6 @@ export default function ImprovedPlantingForm() {
     }
   }, [plantingDate, selectedCategory, setValue, categoryNames])
 
-  useEffect(() => {
-    if (selectedCategory) {
-      const categoryName = categoryNames[selectedCategory] || 'Unknown Category'
-      console.log(categoryName)
-      if (categoryName.toLowerCase() !== 'rice') {
-        setValue('landType', '')
-      }
-    }
-  }, [selectedCategory, categoryNames, setValue])
-
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
       try {
@@ -150,17 +156,20 @@ export default function ImprovedPlantingForm() {
           quantity: data.quantity,
           expenses: data.expenses,
           harvestDate: data.harvestDate,
-          landType: data.landType,
-          waterSupply: data.waterSupply,
+          categorySpecific: {
+            landType: data.categorySpecific.landType,
+            waterSupply: data.categorySpecific.waterSupply,
+            classification: data.categorySpecific.classification,
+          },
           status: status,
           remarks: data.remarks,
-          latitude: coordinates ? coordinates[0] : 0, // Save latitude
-          longitude: coordinates ? coordinates[1] : 0, // Save longitude
+          latitude: coordinates ? coordinates[0] : 0,
+          longitude: coordinates ? coordinates[1] : 0,
         })
         console.log('Form submitted successfully')
         form.reset()
         setSelectedLocation('')
-        setCoordinates(null) // Reset coordinates on form reset
+        setCoordinates(null)
         setStep(1)
         toast({
           title: 'Planting Added!🎉',
@@ -235,12 +244,7 @@ export default function ImprovedPlantingForm() {
                   <CardTitle className='text-2xl'>Crop Details</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CropDetails
-                    control={form.control}
-                    setValue={setValue}
-                    selectedCategory={selectedCategory}
-                    selectedCrop={selectedCrop}
-                  />
+                  <CropDetails control={form.control} setValue={setValue} />
                 </CardContent>
               </Card>
               <div className='flex justify-between mt-4'>
@@ -264,7 +268,7 @@ export default function ImprovedPlantingForm() {
             >
               <FieldLocation
                 selectedLocation={selectedLocation}
-                coordinates={coordinates} // Pass coordinates here
+                coordinates={coordinates}
                 onLocationSelect={onLocationSelect}
                 errorMessage={form.formState.errors.fieldLocation?.message}
               />
@@ -278,7 +282,7 @@ export default function ImprovedPlantingForm() {
                     isPending ||
                     (categoryNames[selectedCategory]?.toLowerCase() ===
                       'rice' &&
-                      !form.watch('landType'))
+                      !form.watch('categorySpecific.landType'))
                   }
                 >
                   {isPending ? 'Submitting...' : 'Submit'}

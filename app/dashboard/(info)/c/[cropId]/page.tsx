@@ -29,6 +29,7 @@ import {
   ExternalLinkIcon,
   Droplet,
   FileText,
+  Shapes,
 } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import InspectionForm from '@/app/dashboard/standing/components/InpectionForm'
@@ -133,13 +134,25 @@ export default function CropsDetailsPage({
                         <div className='flex items-center gap-2'>
                           <CropIcon className='h-4 w-4 text-primary' />
                           <span>
-                            Land Type: {data.land_type || 'Not applicable'}
+                            Land Type:{' '}
+                            {data.category_specific.landType ||
+                              'Not applicable'}
                           </span>
                         </div>
                         <div className='flex items-center gap-2'>
                           <Droplet className='h-4 w-4 text-primary' />
                           <span>
-                            Water Supply: {data.water_supply || 'Not specified'}
+                            Water Supply:{' '}
+                            {data.category_specific.waterSupply ||
+                              'Not specified'}
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <Shapes className='h-4 w-4 text-primary' />
+                          <span>
+                            Classification:{' '}
+                            {data.category_specific.classification ||
+                              'Not specified'}
                           </span>
                         </div>
                       </>

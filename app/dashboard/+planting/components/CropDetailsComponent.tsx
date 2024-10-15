@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Control, UseFormSetValue, useWatch } from 'react-hook-form'
 import {
   FormField,
@@ -21,9 +21,10 @@ import {
   MapPin,
   Droplet,
   CloudSun,
-  DollarSign,
+  Banknote,
   Clock,
   FileText,
+  Shapes,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
@@ -46,19 +47,18 @@ import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 interface CropDetailsProps {
   control: Control<any>
   setValue: UseFormSetValue<any>
-  selectedCategory: string
-  selectedCrop: string
 }
 
-const CropDetails: React.FC<CropDetailsProps> = ({
-  control,
-  setValue,
-  selectedCategory,
-  selectedCrop,
-}) => {
+const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
   const { data: allCropData = [] } = useGetAllCropData()
 
   const categories = Array.isArray(allCropData) ? allCropData : []
+
+  const formValues = useWatch({ control })
+  const selectedCategory = formValues.cropCategory
+  const selectedCrop = formValues.cropType
+  const selectedWaterSupply = formValues.categorySpecific?.waterSupply
+
   const crops = selectedCategory
     ? categories.find((category: any) => category.id === selectedCategory)
         ?.crops || []
@@ -66,6 +66,11 @@ const CropDetails: React.FC<CropDetailsProps> = ({
   const varieties = selectedCrop
     ? crops.find((crop: any) => crop.id === selectedCrop)?.crop_varieties || []
     : []
+
+  const getCategoryNameById = (id: string) => {
+    const category = categories.find((category: any) => category.id === id)
+    return category ? category.name?.toLowerCase() : ''
+  }
 
   const fieldConfigs = [
     {
@@ -84,38 +89,43 @@ const CropDetails: React.FC<CropDetailsProps> = ({
     },
     {
       name: 'variety',
-      placeholder: 'Select variety',
+      placeholder: 'Select Variety',
       label: 'Variety',
       type: 'select',
       icon: Leaf,
     },
     {
-      name: 'waterSupply',
+      name: 'categorySpecific.waterSupply',
       placeholder: 'Select water supply',
       label: 'Water supply',
       type: 'select',
       icon: Droplet,
       options: ['irrigated', 'rainfed'],
-      showIf: (category: string) => {
-        const categoryName = categories
-          .find((c) => c.id === category)
-          ?.name?.toLowerCase()
-        return categoryName === 'rice'
-      },
+      showIf: (category: string) => getCategoryNameById(category) === 'rice',
     },
     {
-      name: 'landType',
+      name: 'categorySpecific.landType',
       placeholder: 'Select land type',
       label: 'Land type',
       type: 'select',
       icon: CloudSun,
-      options: ['lowland', 'upland'],
-      showIf: (category: string) => {
-        const categoryName = categories
-          .find((c) => c.id === category)
-          ?.name?.toLowerCase()
-        return categoryName === 'rice'
-      },
+      options: ['lowland', 'upland', 'none'],
+      showIf: (category: string) => getCategoryNameById(category) === 'rice',
+    },
+    {
+      name: 'categorySpecific.classification',
+      placeholder: 'Select classification',
+      label: 'Classification',
+      type: 'select',
+      icon: Shapes,
+      options: [
+        'Hybrid',
+        'Registered',
+        'Certified',
+        'Good Quality',
+        'Farmer Saved Seeds',
+      ],
+      showIf: (category: string) => getCategoryNameById(category) === 'rice',
     },
     {
       name: 'remarks',
@@ -153,10 +163,10 @@ const CropDetails: React.FC<CropDetailsProps> = ({
     },
     {
       name: 'expenses',
-      placeholder: 'Enter expenses',
-      label: 'Expenses',
+      placeholder: 'Enter cost',
+      label: 'Production cost',
       type: 'number',
-      icon: DollarSign,
+      icon: Banknote,
     },
     {
       name: 'harvestDate',
@@ -166,20 +176,6 @@ const CropDetails: React.FC<CropDetailsProps> = ({
       icon: Clock,
     },
   ]
-
-  const formValues = useWatch({ control })
-
-  useEffect(() => {
-    if (selectedCategory) {
-      const categoryName = categories
-        .find((c) => c.id === selectedCategory)
-        ?.name?.toLowerCase()
-      if (categoryName && categoryName !== 'rice') {
-        setValue('landType', '')
-        setValue('waterSupply', '')
-      }
-    }
-  }, [selectedCategory, categories, setValue])
 
   const renderSelect = (
     name: string,
@@ -200,9 +196,21 @@ const CropDetails: React.FC<CropDetailsProps> = ({
             onValueChange={(value) => {
               field.onChange(value)
               onChange?.(value)
+
+              // Set landType to "none" and disable it when waterSupply is "irrigated"
+              if (
+                name === 'categorySpecific.waterSupply' &&
+                value === 'irrigated'
+              ) {
+                setValue('categorySpecific.landType', 'none')
+              }
             }}
             value={field.value}
-            disabled={disabled}
+            disabled={
+              disabled ||
+              (name === 'categorySpecific.landType' &&
+                selectedWaterSupply === 'irrigated')
+            }
           >
             <FormControl>
               <SelectTrigger>
@@ -298,15 +306,7 @@ const CropDetails: React.FC<CropDetailsProps> = ({
         <CardContent>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             {fieldConfigs.map(
-              ({
-                name,
-                placeholder,
-                label,
-                type,
-                icon: Icon,
-                options,
-                showIf,
-              }) => {
+              ({ name, placeholder, label, type, options, showIf }) => {
                 if (showIf && !showIf(formValues.cropCategory)) {
                   return null
                 }
@@ -322,8 +322,9 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                       (value) => {
                         setValue('cropType', '')
                         setValue('variety', '')
-                        setValue('landType', '')
-                        setValue('waterSupply', '')
+                        setValue('categorySpecific.landType', '')
+                        setValue('categorySpecific.waterSupply', '')
+                        setValue('categorySpecific.classification', '')
                       },
                     )
                   } else if (name === 'cropType') {
@@ -346,8 +347,9 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                       !selectedCrop,
                     )
                   } else if (
-                    name === 'landType' ||
-                    name === 'waterSupply' ||
+                    name === 'categorySpecific.landType' ||
+                    name === 'categorySpecific.waterSupply' ||
+                    name === 'categorySpecific.classification' ||
                     name === 'remarks'
                   ) {
                     return renderSelect(
@@ -415,7 +417,9 @@ const CropDetails: React.FC<CropDetailsProps> = ({
                       ? varieties.find(
                           (variety: any) => variety.id === formValues[name],
                         )?.name
-                      : formValues[name]
+                      : name.startsWith('categorySpecific.')
+                        ? formValues.categorySpecific?.[name.split('.')[1]]
+                        : formValues[name]
 
               const isSet = value && value !== 'Not set'
 
