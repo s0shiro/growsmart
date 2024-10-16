@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,6 +11,7 @@ import {
 } from '@/components/ui/select'
 import { formatDate } from '@/lib/utils'
 import useFetchMonthlyPlantingCorn from '@/hooks/reports/useFetchMonthlyPlantingCorn'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 const municipalities = [
   'Boac',
@@ -19,12 +22,18 @@ const municipalities = [
   'Torrijos',
 ]
 
-export default function CornPlantingReport() {
+export default function CornMonthlyPlantingAccomplishment() {
   const { data } = useFetchMonthlyPlantingCorn()
   const [selectedMunicipality, setSelectedMunicipality] = useState<
     string | null
   >(null)
   const printableRef = useRef<HTMLDivElement>(null)
+
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth() + 1
+  const isFirstHalf = currentMonth >= 1 && currentMonth <= 6
+
+  const formattedDate = formatDate(currentDate)
 
   const processedData = useMemo(() => {
     if (!selectedMunicipality) return {}
@@ -47,7 +56,7 @@ export default function CornPlantingReport() {
       }
     } = {}
 
-    data.forEach((item) => {
+    data?.forEach((item) => {
       const [barangay, municipality] = item.field_location.split(', ')
       if (municipality !== selectedMunicipality) return
 
@@ -98,10 +107,15 @@ export default function CornPlantingReport() {
             <head>
               <title>Corn Planting Report - August 31, 2024</title>
               <style>
+               *, *::before, *::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+               }
                 @page { size: portrait; }
                 body {
                   font-family: Arial, sans-serif;
-                  font-size: 12px;
+                  font-size: 9px;
                   -webkit-print-color-adjust: exact;
                   print-color-adjust: exact;
                 }
@@ -117,16 +131,110 @@ export default function CornPlantingReport() {
                   text-align: left;
                   font-size: 10px;
                 }
+                th {
+                  text-align: center;
+                  font-weight: bold;
+                }
+                .date-text {
+                    text-align: center;
+                    font-weight: bold;
+                    margin-bottom: 8px;
+                }
+                .month {
+                  color: #c7bbc90;
+                }
+                .header-info {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                }
+                .region {
+                    margin-bottom: 8px;
+                }
+                .municipality, .barangay {
+                    padding: 4px;
+                    font-weight: bold;
+                }
+                .checkbox-container {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: flex-start;
+              }
+              .checkbox-label {
+                    display: flex;
+                    align-items: center;
+                    margin: 3px 0;
+              }
+
+              .checkbox-label input {
+                margin-right: 5px;
+              }
                 .municipality {
                   background-color: #0000FF !important;
                   color: white !important;
-                  font-weight: bold;
+                }
+                .barangay {
+                  background-color: #f0f0f0 !important;
+                }
+                .print-center { text-align: center; }
+                .brgy-total { background-color: #FFA500 !important; }
+                .grand-total {
+                  background-color: #00FF00 !important;
                 }
                 .total { font-weight: bold; }
+                .signature-section {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-top: 30px;
+                }
+                .signature-block {
+                  text-align: center;
+                }
+                .signature-line {
+                  width: 200px;
+                  border-top: 1px solid black;
+                  margin-top: 30px;
+                }
               </style>
             </head>
             <body>
+            <div class="date-text">
+              <p>CORN PROGRAM</p>
+              <p>MONTHLY PLANTING ACCOMPLISHMENT REPORT</p>
+              <p class="month">For the Month of: ${formattedDate}</p>
+            </div>
+            <div class="header-info">
+              <div>
+                <p class="region"><strong>REGION:</strong> RFO IVB</p>
+                <p><strong>PROVINCE:</strong> MARINDUQUE</p>
+              </div>
+              <div class="checkbox-container">
+                <label class="checkbox-label">
+                 <input type="checkbox" ${isFirstHalf ? 'checked' : ''}>
+                  <span>JANUARY - JUNE</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" ${!isFirstHalf ? 'checked' : ''}>
+                  <span>JULY - DECEMBER</span>
+                </label>
+              </div>
+            </div>
               ${printContent}
+              <div class="signature-section">
+                <div class="signature-block">
+                  <p>Prepared by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>JERALD B. MABUTI</strong></p>
+                  <p>Corn AEW</p>
+                </div>
+                <div class="signature-block">
+                  <p>Certified true and correct:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>VANESSA TAYABA</strong></p>
+                  <p>Municipal Agricultural Officer</p>
+                </div>
+              </div>
             </body>
           </html>
         `)
@@ -143,7 +251,7 @@ export default function CornPlantingReport() {
   }
 
   return (
-    <div className='container mx-auto p-4'>
+    <div className='p-4'>
       <div className='mb-4'>
         <Select onValueChange={(value) => setSelectedMunicipality(value)}>
           <SelectTrigger className='w-[180px]'>
@@ -158,116 +266,70 @@ export default function CornPlantingReport() {
           </SelectContent>
         </Select>
       </div>
-
-      <div ref={printableRef}>
-        <table
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            border: '1px solid black',
-          }}
-        >
-          <thead>
-            <tr>
-              <th
-                colSpan={5}
-                style={{
-                  border: '1px solid black',
-                  textAlign: 'center',
-                  padding: '4px',
-                }}
-              >
-                As of August 31, 2024
-              </th>
-            </tr>
-            <tr>
-              <th
-                style={{
-                  border: '1px solid black',
-                  padding: '4px',
-                  width: '20%',
-                }}
-              >
-                MUNICIPALITY
-              </th>
-              <th
-                style={{
-                  border: '1px solid black',
-                  padding: '4px',
-                  width: '20%',
-                  textAlign: 'center',
-                }}
-              >
-                VARIETY (GMO, HYBRID,
-                <br />
-                OPV, GREEN
-                <br />
-                CORN/SWEET CORN,
-                <br />
-                TRADITIONAL)
-              </th>
-              <th
-                style={{
-                  border: '1px solid black',
-                  padding: '4px',
-                  width: '20%',
-                  textAlign: 'center',
-                }}
-              >
-                YELLOW
-                <br />
-                Area Planted
-                <br />
-                (ha)
-              </th>
-              <th
-                style={{
-                  border: '1px solid black',
-                  padding: '4px',
-                  width: '20%',
-                  textAlign: 'center',
-                }}
-              >
-                WHITE
-                <br />
-                Area Planted
-                <br />
-                (ha)
-              </th>
-              <th
-                style={{
-                  border: '1px solid black',
-                  padding: '4px',
-                  width: '20%',
-                  textAlign: 'center',
-                }}
-              >
-                TOTAL
-                <br />
-                Area Planted
-                <br />
-                (ha)
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedMunicipality && (
-              <>
+      <ScrollArea className='w-full rounded-md border'>
+        <div ref={printableRef}>
+          {selectedMunicipality && (
+            <table className='w-full border-collapse border-2 border-[hsl(var(--border))] text-xs'>
+              <thead>
                 <tr>
+                  <th
+                    colSpan={5}
+                    className='border border-[hsl(var(--border))] p-1 text-center'
+                  >
+                    As of {formattedDate}
+                  </th>
+                </tr>
+                <tr>
+                  <th className='border border-[hsl(var(--border))] p-1'>
+                    MUNICIPALITY
+                  </th>
+                  <th className='border border-[hsl(var(--border))] p-1 text-center'>
+                    VARIETY (GMO, HYBRID,
+                    <br />
+                    OPV, GREEN
+                    <br />
+                    CORN/SWEET CORN,
+                    <br />
+                    TRADITIONAL)
+                  </th>
+                  <th className='border border-[hsl(var(--border))] p-1 text-center'>
+                    YELLOW
+                    <br />
+                    Area Planted
+                    <br />
+                    (ha)
+                  </th>
+                  <th className='border border-[hsl(var(--border))] p-1 text-center'>
+                    WHITE
+                    <br />
+                    Area Planted
+                    <br />
+                    (ha)
+                  </th>
+                  <th className='border border-[hsl(var(--border))] p-1 text-center'>
+                    TOTAL
+                    <br />
+                    Area Planted
+                    <br />
+                    (ha)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className='municipality'>
                   <td
                     colSpan={5}
-                    style={{ border: '1px solid black', padding: '4px' }}
-                    className='municipality'
+                    className='border border-[hsl(var(--border))] p-1'
                   >
                     {selectedMunicipality.toUpperCase()}
                   </td>
                 </tr>
                 {Object.entries(processedData).map(([barangay, data]) => (
                   <React.Fragment key={barangay}>
-                    <tr>
+                    <tr className='barangay'>
                       <td
                         colSpan={5}
-                        style={{ border: '1px solid black', padding: '4px' }}
+                        className='border border-[hsl(var(--border))] p-1'
                       >
                         {barangay}
                       </td>
@@ -276,46 +338,21 @@ export default function CornPlantingReport() {
                       info.entries.map(
                         (entry, index) =>
                           entry.area > 0 && (
-                            <tr key={`${barangay}-Yellow-${variety}-${index}`}>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                  paddingLeft: '20px',
-                                }}
-                              >
+                            <tr
+                              key={`${barangay}-Yellow-${variety}-${index}`}
+                              className='bg-yellow-100 dark:bg-yellow-700'
+                            >
+                              <td className='border border-[hsl(var(--border))] p-1 pl-6'>
                                 {entry.farmer}
                               </td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                  textAlign: 'center',
-                                }}
-                              >
+                              <td className='border border-[hsl(var(--border))] p-1 text-center print-center'>
                                 {variety}
                               </td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                  textAlign: 'center',
-                                }}
-                              >
+                              <td className='border border-[hsl(var(--border))] p-1 text-center print-center'>
                                 {entry.area.toFixed(4)}
                               </td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                }}
-                              ></td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                }}
-                              ></td>
+                              <td className='border border-[hsl(var(--border))] p-1'></td>
+                              <td className='border border-[hsl(var(--border))] p-1'></td>
                             </tr>
                           ),
                       ),
@@ -325,102 +362,51 @@ export default function CornPlantingReport() {
                         (entry, index) =>
                           entry.area > 0 && (
                             <tr key={`${barangay}-White-${variety}-${index}`}>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                  paddingLeft: '20px',
-                                }}
-                              >
+                              <td className='border border-[hsl(var(--border))] p-1 pl-6'>
                                 {entry.farmer}
                               </td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                  textAlign: 'center',
-                                }}
-                              >
+                              <td className='border border-[hsl(var(--border))] p-1 text-center print-center'>
                                 {variety}
                               </td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                }}
-                              ></td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                  textAlign: 'center',
-                                }}
-                              >
+                              <td className='border border-[hsl(var(--border))] p-1'></td>
+                              <td className='border border-[hsl(var(--border))] p-1 text-center print-center'>
                                 {entry.area.toFixed(4)}
                               </td>
-                              <td
-                                style={{
-                                  border: '1px solid black',
-                                  padding: '4px',
-                                }}
-                              ></td>
+                              <td className='border border-[hsl(var(--border))] p-1'></td>
                             </tr>
                           ),
                       ),
                     )}
-                    <tr>
+                    <tr className='font-bold brgy-total '>
                       <td
                         colSpan={4}
-                        style={{
-                          border: '1px solid black',
-                          padding: '4px',
-                          fontWeight: 'bold',
-                          textAlign: 'right',
-                        }}
+                        className='border border-[hsl(var(--border))] p-1 text-right'
                       >
-                        TOTAL:
+                        Total:
                       </td>
-                      <td
-                        style={{
-                          border: '1px solid black',
-                          padding: '4px',
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                        }}
-                      >
+                      <td className='border border-[hsl(var(--border))] p-1 text-center'>
                         {data.total.toFixed(4)}
                       </td>
                     </tr>
                   </React.Fragment>
                 ))}
-                <tr>
+                <tr className='font-bold bg-green-500 grand-total'>
                   <td
                     colSpan={4}
-                    style={{
-                      border: '1px solid black',
-                      padding: '4px',
-                      fontWeight: 'bold',
-                      textAlign: 'right',
-                    }}
+                    className='border border-[hsl(var(--border))] p-1 text-right'
                   >
                     GRAND TOTAL:
                   </td>
-                  <td
-                    style={{
-                      border: '1px solid black',
-                      padding: '4px',
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
-                  >
+                  <td className='border border-[hsl(var(--border))] p-1 text-center'>
                     {grandTotal.toFixed(4)}
                   </td>
                 </tr>
-              </>
-            )}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          )}
+        </div>
+        <ScrollBar orientation='horizontal' />
+      </ScrollArea>
       <Button
         onClick={handlePrint}
         className='mt-4'
