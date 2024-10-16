@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Printer, X } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -10,41 +9,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from '@/components/ui/dialog'
 import useFetchCornStandingCrops from '@/hooks/crop/useFetchCornStandingCrops'
+import { formatDate } from '@/lib/utils'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
-export default function StandingCropReport() {
+const municipalities = [
+  'Boac',
+  'Buenavista',
+  'Gasan',
+  'Mogpog',
+  'Santa Cruz',
+  'Torrijos',
+]
+
+export default function CornStandingCrop() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, error } = useFetchCornStandingCrops()
-  const [selectedMunicipality, setSelectedMunicipality] = useState('Gasan')
-  const [preparedBy, setPreparedBy] = useState('JOHN DOE')
-  const [certifiedBy, setCertifiedBy] = useState('JANE DOE')
-  const [showPreview, setShowPreview] = useState(false)
+  const [selectedMunicipality, setSelectedMunicipality] = useState<
+    string | null
+  >(null)
 
-  const municipalities = [
-    'Boac',
-    'Buenavista',
-    'Gasan',
-    'Mogpog',
-    'Santa Cruz',
-    'Torrijos',
-  ]
-
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  const currentDate = new Date()
+  const formattedDate = formatDate(currentDate)
 
   const handlePrint = () => {
     if (printableRef.current) {
@@ -53,112 +39,147 @@ export default function StandingCropReport() {
 
       if (printWindow) {
         printWindow.document.write(`
-          <html>
+          <!DOCTYPE html>
+          <html lang="en">
             <head>
-              <title>Corn Planting Report - ${selectedMunicipality}</title>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Corn Standing Crop Report - ${selectedMunicipality}</title>
               <style>
                 *, *::before, *::after {
+                  box-sizing: border-box;
                   margin: 0;
                   padding: 0;
-                  box-sizing: border-box;
                 }
-
                 @page {
                   size: landscape;
                   margin: 10mm;
                 }
                 body {
-                  font-family: 'Arial', 'Helvetica', sans-serif;
-                  width: 100%;
-                  height: 100%;
-                  margin: 0;
-                  padding: 0;
+                  font-family: Arial, sans-serif;
                   font-size: 9px;
+                  line-height: 1.5;
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
                 }
                 table {
-                  border-collapse: collapse;
                   width: 100%;
-                  font-size: 8px;
+                  border-collapse: collapse;
+                  border: 2px solid black;
                 }
                 th, td {
                   border: 1px solid black;
-                  padding: 2px;
+                  padding: 4px;
                   text-align: center;
+                  font-size: 8px;
                 }
                 th {
                   background-color: #f2f2f2;
+                  font-weight: bold;
                 }
                 .header {
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
+                  margin-bottom: 20px;
                 }
                 .logo {
-                  border-radius: 50%;
                   width: 80px;
                   height: 80px;
                 }
                 .org-info {
-                  flex-grow: 1;
-                  margin-left: 8px;
+                  text-align: center;
                 }
-                .org-info h2 {
-                  font-size: 14px;
-                  font-weight: bold;
-                  color: #003366;
+                .org-info h1 {
+                  font-size: 16px;
+                  margin-bottom: 5px;
                 }
                 .org-info p {
-                  font-size: 10px;
-                  margin-bottom: 2px;
+                  font-size: 12px;
+                  margin-bottom: 3px;
+                }
+                .report-title {
+                  text-align: center;
+                  font-size: 14px;
+                  font-weight: bold;
+                  margin-bottom: 10px;
                 }
                 .yellow { background-color: #FFFF00; }
                 .white { background-color: #FFFFFF; }
                 .grand-total { background-color: #FFFF00; }
                 .marinduque { background-color: #00FFFF; }
                 .municipality { background-color: #D3D3D3; }
+                .province, .municipal {text-align: left;}
+                .municipal {padding-left: 12px;}
                 .grand-total-row { background-color: #90EE90; }
                 .signature-section {
                   display: flex;
                   justify-content: space-between;
-                  align-items: center;
-                  margin-top: 2rem;
+                  margin-top: 30px;
                 }
                 .signature-block {
                   text-align: center;
-
-                  margin: 0 1rem;
                 }
-                .signature-name {
-                  margin-top: 1.5rem;
-                  font-weight: bold;
+                .signature-line {
+                  width: 200px;
+                  border-top: 1px solid black;
+                  margin-top: 30px;
                 }
                 .date-text {
                   text-align: center;
                   font-weight: bold;
                   margin-bottom: 8px;
                 }
-                @media print {
-                  body {
-                    print-color-adjust: exact;
-                    -webkit-print-color-adjust: exact;
-                  }
+                .checkbox-container {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: flex-start;
+                }
+                .checkbox-label {
+                  display: flex;
+                  align-items: center;
+                  margin: 3px 0;
+                }
+                .checkbox-label input {
+                  margin-right: 5px;
                 }
               </style>
             </head>
             <body>
-              <div class="header">
-                <img src="/no-bg.png" alt="Logo" class="logo"/>
+              <!--<div class="header">
+                <img src="/no-bg.png" alt="Logo" class="logo">
                 <div class="org-info">
-                  <h2>Marinduque Provincial Agriculture Office</h2>
+                  <h1>Marinduque Provincial Agriculture Office</h1>
                   <p>Capitol Compound, Boac, Philippines</p>
                 </div>
-              </div>
+              </div>-->
               <div class="date-text">
-                <p>CORN</p>
-                <p>STANDING CROP</p>
-                <p>As of ${currentDate}</p>
+                <p>CORN PROGRAM</p>
+                <p>STANDING CROP REPORT</p>
+                <p>As of ${formattedDate}</p>
+              </div>
+              <div class="header-info">
+                <div>
+                  <p><strong>REGION:</strong> RFO IVB</p>
+                  <p><strong>PROVINCE:</strong> MARINDUQUE</p>
+                </div>
               </div>
               ${printContent}
+              <div class="signature-section">
+                <div class="signature-block">
+                  <p>Prepared by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>JERALD B. MABUTI</strong></p>
+                  <p>Corn AEW</p>
+                </div>
+                <div class="signature-block">
+                  <p>Certified true and correct:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>VANESSA TAYABA</strong></p>
+                  <p>Municipal Agricultural Officer</p>
+                </div>
+              </div>
             </body>
           </html>
         `)
@@ -238,155 +259,131 @@ export default function StandingCropReport() {
   }
 
   return (
-    <div className='container mx-auto p-4'>
-      <Card className='mb-6'>
-        <CardHeader>
-          <CardTitle>Generate Corn Standing Crop Report</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end'>
-            <div className='space-y-2'>
-              <Label htmlFor='municipality'>Municipality</Label>
-              <Select
-                onValueChange={setSelectedMunicipality}
-                defaultValue={selectedMunicipality}
-              >
-                <SelectTrigger id='municipality' className='w-full'>
-                  <SelectValue placeholder='Select municipality' />
-                </SelectTrigger>
-                <SelectContent>
-                  {municipalities.map((municipality) => (
-                    <SelectItem key={municipality} value={municipality}>
-                      {municipality}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='preparedBy'>Prepared by</Label>
-              <Input
-                id='preparedBy'
-                type='text'
-                placeholder='Prepared by'
-                value={preparedBy}
-                onChange={(e) => setPreparedBy(e.target.value)}
-              />
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='certifiedBy'>Certified by</Label>
-              <Input
-                id='certifiedBy'
-                type='text'
-                placeholder='Certified by'
-                value={certifiedBy}
-                onChange={(e) => setCertifiedBy(e.target.value)}
-              />
-            </div>
-          </div>
-          <Button onClick={() => setShowPreview(true)} className='w-full mt-4'>
-            Generate Report
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className='max-w-[90vw] max-h-[90vh] overflow-y-auto'>
-          <DialogHeader>
-            <DialogTitle>Corn Standing Crop Report Preview</DialogTitle>
-            <DialogDescription>
-              Review the report before printing. Click the Print Report button
-              to print.
-            </DialogDescription>
-          </DialogHeader>
-          <div className='flex justify-between items-center mb-4'>
-            <Button onClick={handlePrint}>
-              <Printer className='mr-2 h-4 w-4' /> Print Report
-            </Button>
-            <DialogClose asChild>
-              <Button variant='outline'>
-                <X className='mr-2 h-4 w-4' /> Close Preview
-              </Button>
-            </DialogClose>
-          </div>
-          <div ref={printableRef} className='text-[9px] font-sans'>
-            {/* <div className='header'>
-              <h1 className='text-xl font-bold'>Department of Agriculture</h1>
-              <h2 className='text-lg font-semibold'>
-                REGIONAL FIELD OFFICE MIMAROPA
-              </h2>
-              <p className='text-md'>
-                DRY SEASON 2024 Corn Planting Report - {selectedMunicipality}
-              </p>
-            </div> */}
-
-            <table className='w-full text-[8px]'>
+    <div className='p-4'>
+      <div className='mb-4'>
+        <Select onValueChange={(value) => setSelectedMunicipality(value)}>
+          <SelectTrigger className='w-[180px]'>
+            <SelectValue placeholder='Select Municipality' />
+          </SelectTrigger>
+          <SelectContent>
+            {municipalities.map((municipality) => (
+              <SelectItem key={municipality} value={municipality}>
+                {municipality}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <ScrollArea className='w-full rounded-md border'>
+        <div ref={printableRef}>
+          {selectedMunicipality && (
+            <table className='w-full border-collapse border-2 border-[hsl(var(--border))] text-xs'>
               <thead>
                 <tr>
-                  <th rowSpan={2}>Province/ Ecosystem</th>
-                  <th colSpan={5} className='yellow'>
+                  <th
+                    rowSpan={2}
+                    className='border border-[hsl(var(--border))] p-1'
+                  >
+                    Province/ Ecosystem
+                  </th>
+                  <th
+                    colSpan={5}
+                    className='border border-[hsl(var(--border))] p-1 yellow'
+                  >
                     YELLOW
                   </th>
-                  <th colSpan={5} className='white'>
+                  <th
+                    colSpan={5}
+                    className='border border-[hsl(var(--border))] p-1 white'
+                  >
                     WHITE
                   </th>
-                  <th colSpan={5} className='grand-total'>
+                  <th
+                    colSpan={5}
+                    className='border border-[hsl(var(--border))] p-1 grand-total'
+                  >
                     GRAND TOTAL
                   </th>
                 </tr>
                 <tr>
-                  <th>Newly Planted/ Seedling Stage (ha)</th>
-                  <th>Vegetative Stage (ha)</th>
-                  <th>Reproductive Stage (ha)</th>
-                  <th>Maturing Stage (ha)</th>
-                  <th>TOTAL</th>
-                  <th>Newly Planted/ Seedling Stage (ha)</th>
-                  <th>Vegetative Stage (ha)</th>
-                  <th>Reproductive Stage (ha)</th>
-                  <th>Maturing Stage (ha)</th>
-                  <th>TOTAL</th>
-                  <th>Newly Planted/ Seedling Stage (ha)</th>
-                  <th>Vegetative Stage (ha)</th>
-                  <th>Reproductive Stage (ha)</th>
-                  <th>Maturing Stage (ha)</th>
-                  <th>TOTAL</th>
+                  {['YELLOW', 'WHITE', 'GRAND TOTAL'].map((category) => (
+                    <React.Fragment key={category}>
+                      <th className='border border-[hsl(var(--border))] p-1'>
+                        Newly Planted/ Seedling Stage (ha)
+                      </th>
+                      <th className='border border-[hsl(var(--border))] p-1'>
+                        Vegetative Stage (ha)
+                      </th>
+                      <th className='border border-[hsl(var(--border))] p-1'>
+                        Reproductive Stage (ha)
+                      </th>
+                      <th className='border border-[hsl(var(--border))] p-1'>
+                        Maturing Stage (ha)
+                      </th>
+                      <th className='border border-[hsl(var(--border))] p-1'>
+                        TOTAL
+                      </th>
+                    </React.Fragment>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 <tr className='marinduque'>
-                  <td>MARINDUQUE</td>
-                  {[...Array(15)].map((_, index) => (
-                    <td key={index}></td>
-                  ))}
+                  <td
+                    colSpan={16}
+                    className='border border-[hsl(var(--border))] p-1 text-left province'
+                  >
+                    MARINDUQUE
+                  </td>
                 </tr>
                 <tr className='municipality'>
-                  <td>{selectedMunicipality.toUpperCase()}</td>
-                  {[...Array(15)].map((_, index) => (
-                    <td key={index}></td>
-                  ))}
+                  <td
+                    colSpan={16}
+                    className='border border-[hsl(var(--border))] p-1 text-left municipal'
+                  >
+                    {selectedMunicipality.toUpperCase()}
+                  </td>
                 </tr>
                 {barangays.map((barangay) => (
                   <tr key={barangay}>
-                    <td>{barangay}</td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1 text-left'>
+                      {barangay}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {getCropData(
                         barangay,
                         'Yellow',
                         'newly planted/seedling',
                       )}
                     </td>
-                    <td>{getCropData(barangay, 'Yellow', 'vegetative')}</td>
-                    <td>{getCropData(barangay, 'Yellow', 'reproductive')}</td>
-                    <td>{getCropData(barangay, 'Yellow', 'maturing')}</td>
-                    <td>{getTotalForCrop(barangay, 'Yellow')}</td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getCropData(barangay, 'Yellow', 'vegetative')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getCropData(barangay, 'Yellow', 'reproductive')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getCropData(barangay, 'Yellow', 'maturing')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getTotalForCrop(barangay, 'Yellow')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {getCropData(barangay, 'White', 'newly planted/seedling')}
                     </td>
-                    <td>{getCropData(barangay, 'White', 'vegetative')}</td>
-                    <td>{getCropData(barangay, 'White', 'reproductive')}</td>
-                    <td>{getCropData(barangay, 'White', 'maturing')}</td>
-                    <td>{getTotalForCrop(barangay, 'White')}</td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getCropData(barangay, 'White', 'vegetative')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getCropData(barangay, 'White', 'reproductive')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getCropData(barangay, 'White', 'maturing')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
+                      {getTotalForCrop(barangay, 'White')}
+                    </td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {sumValues(
                         getCropData(
                           barangay,
@@ -400,25 +397,26 @@ export default function StandingCropReport() {
                         ),
                       )}
                     </td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {sumValues(
                         getCropData(barangay, 'Yellow', 'vegetative'),
+
                         getCropData(barangay, 'White', 'vegetative'),
                       )}
                     </td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {sumValues(
                         getCropData(barangay, 'Yellow', 'reproductive'),
                         getCropData(barangay, 'White', 'reproductive'),
                       )}
                     </td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {sumValues(
                         getCropData(barangay, 'Yellow', 'maturing'),
                         getCropData(barangay, 'White', 'maturing'),
                       )}
                     </td>
-                    <td>
+                    <td className='border border-[hsl(var(--border))] p-1'>
                       {sumValues(
                         getTotalForCrop(barangay, 'Yellow'),
                         getTotalForCrop(barangay, 'White'),
@@ -427,64 +425,80 @@ export default function StandingCropReport() {
                   </tr>
                 ))}
                 <tr className='grand-total-row'>
-                  <td>GRAND TOTAL</td>
-                  <td>
+                  <td className='border border-[hsl(var(--border))] p-1 font-bold text-left'>
+                    GRAND TOTAL
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
                     {getGrandTotalForStage('newly planted/seedling', 'Yellow')}
                   </td>
-                  <td>{getGrandTotalForStage('vegetative', 'Yellow')}</td>
-                  <td>{getGrandTotalForStage('reproductive', 'Yellow')}</td>
-                  <td>{getGrandTotalForStage('maturing', 'Yellow')}</td>
-                  <td>{getTotalForCrop('', 'Yellow')}</td>
-                  <td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotalForStage('vegetative', 'Yellow')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotalForStage('reproductive', 'Yellow')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotalForStage('maturing', 'Yellow')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getTotalForCrop('', 'Yellow')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
                     {getGrandTotalForStage('newly planted/seedling', 'White')}
                   </td>
-                  <td>{getGrandTotalForStage('vegetative', 'White')}</td>
-                  <td>{getGrandTotalForStage('reproductive', 'White')}</td>
-                  <td>{getGrandTotalForStage('maturing', 'White')}</td>
-                  <td>{getTotalForCrop('', 'White')}</td>
-                  <td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotalForStage('vegetative', 'White')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotalForStage('reproductive', 'White')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotalForStage('maturing', 'White')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getTotalForCrop('', 'White')}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
                     {sumValues(
                       getGrandTotalForStage('newly planted/seedling', 'Yellow'),
                       getGrandTotalForStage('newly planted/seedling', 'White'),
                     )}
                   </td>
-                  <td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
                     {sumValues(
                       getGrandTotalForStage('vegetative', 'Yellow'),
                       getGrandTotalForStage('vegetative', 'White'),
                     )}
                   </td>
-                  <td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
                     {sumValues(
                       getGrandTotalForStage('reproductive', 'Yellow'),
                       getGrandTotalForStage('reproductive', 'White'),
                     )}
                   </td>
-                  <td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
                     {sumValues(
                       getGrandTotalForStage('maturing', 'Yellow'),
                       getGrandTotalForStage('maturing', 'White'),
                     )}
                   </td>
-                  <td>{getGrandTotal()}</td>
+                  <td className='border border-[hsl(var(--border))] p-1'>
+                    {getGrandTotal()}
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <div className='signature-section'>
-              <div className='signature-block'>
-                <p>Prepared by:</p>
-                <p className='signature-name font-bold'>{preparedBy}</p>
-                <p>Corn AEW</p>
-              </div>
-              <div className='signature-block'>
-                <p>Certified true and correct:</p>
-                <p className='signature-name font-bold'>{certifiedBy}</p>
-                <p>Municipal Agricultural Officer</p>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          )}
+        </div>
+        <ScrollBar orientation='horizontal' />
+      </ScrollArea>
+      <Button
+        onClick={handlePrint}
+        className='mt-4'
+        disabled={!selectedMunicipality}
+      >
+        Print
+      </Button>
     </div>
   )
 }
