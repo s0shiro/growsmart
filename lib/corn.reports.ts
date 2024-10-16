@@ -34,3 +34,61 @@ export const getHarvestedCornCropsData = async () => {
 
   return filteredData.length > 0 ? filteredData : null
 }
+
+export const getStandingCornCrops = async () => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select(
+      `crop_categoryId(name), crop_type(name), field_location, area_planted, planting_date, remarks, farmer_id(firstname, lastname)`,
+    )
+    .eq('status', 'inspection')
+    .eq('crop_categoryId.name', 'corn') // Filter by crop category name
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return []
+  }
+
+  // Filter out records where crop_categoryId is null
+  const filteredData = data.filter((record) => record.crop_categoryId !== null)
+
+  return filteredData
+}
+
+export const getMonthlyCornPlantingAccomplishment = async () => {
+  const supabase = createClient()
+
+  const startOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1,
+  )
+  const startOfNextMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    1,
+  )
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select(
+      `crop_categoryId(name), crop_type(name), variety(name), field_location, farmer_id(firstname, lastname), area_planted, planting_date`,
+    )
+    .eq('crop_categoryId.name', 'corn')
+    .gte('planting_date', startOfMonth.toISOString())
+    .lt('planting_date', startOfNextMonth.toISOString())
+    .order('field_location', { ascending: true })
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return null
+  }
+
+  if (data.length === 0) {
+    return null
+  }
+
+  return data
+}
