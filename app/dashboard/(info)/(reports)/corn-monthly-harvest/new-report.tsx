@@ -95,20 +95,19 @@ export default function MonthlyCornHarvesting() {
               .region {
                 margin-bottom: 8px;
               }
-              .signatures {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 50px;
-                font-size: 12px;
-              }
-              .signature-block {
-                text-align: center;
-              }
-              .signature-line {
-                width: 200px;
-                border-top: 1px solid black;
-                margin-top: 30px;
-              }
+              .signature-section {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-top: 30px;
+                }
+                .signature-block {
+                  text-align: center;
+                }
+                .signature-line {
+                  width: 200px;
+                  border-top: 1px solid black;
+                  margin-top: 30px;
+                }
               .checkbox-container {
                 display: flex;
                 flex-direction: column;
@@ -154,20 +153,20 @@ export default function MonthlyCornHarvesting() {
               </div>
             </div>
             ${printContent}
-            <div class="signatures">
-              <div class="signature-block">
-                <p>Prepared by:</p>
-                <div class="signature-line"></div>
-                <p><strong>JERALD B. MABUTI</strong></p>
-                <p>Corn AEW</p>
+           <div class="signature-section">
+                <div class="signature-block">
+                  <p>Prepared by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>JERALD B. MABUTI</strong></p>
+                  <p>Corn AEW</p>
+                </div>
+                <div class="signature-block">
+                  <p>Certified true and correct:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>VANESSA TAYABA</strong></p>
+                  <p>Municipal Agricultural Officer</p>
+                </div>
               </div>
-              <div class="signature-block">
-                <p>Certified true and correct:</p>
-                <div class="signature-line"></div>
-                <p><strong>VANESSA TAYABA</strong></p>
-                <p>Municipal Agricultural Officer</p>
-              </div>
-            </div>
           </body>
         </html>
         `)
