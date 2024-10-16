@@ -1,4 +1,4 @@
-import { getStandingCornCrops } from '@/lib/inspection'
+import { getStandingCornCrops } from '@/lib/corn.reports'
 import { useQuery } from '@tanstack/react-query'
 
 const useFetchCornStandingCrops = () => {
