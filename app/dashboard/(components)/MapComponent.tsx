@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
@@ -30,6 +28,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
   const [position, setPosition] = useState<LatLng | null>(null)
   const [L, setL] = useState<typeof import('leaflet') | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     import('leaflet').then((leaflet) => {
@@ -42,6 +41,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
       })
       setL(leaflet)
+      setLoading(false)
     })
   }, [])
 
@@ -49,13 +49,21 @@ const MapComponent: React.FC<MapComponentProps> = ({
     lat: number,
     lng: number,
   ): Promise<string> => {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-    )
-    const data = await response.json()
-    const { village, town, county, state } = data.address
-    const locationParts = [village, town, county, state].filter(Boolean)
-    return locationParts.join(', ')
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      )
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const data = await response.json()
+      const { village, town, county, state } = data.address
+      const locationParts = [village, town, county, state].filter(Boolean)
+      return locationParts.join(', ')
+    } catch (error) {
+      console.error('Failed to fetch location name:', error)
+      return 'Unknown location'
+    }
   }
 
   const LocationMarker: React.FC = () => {
@@ -68,6 +76,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
     })
 
     return position === null ? null : <Marker position={position} />
+  }
+
+  if (loading) {
+    return <div>Loading map...</div>
   }
 
   if (!L) {

@@ -32,7 +32,7 @@ import {
   Shapes,
 } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import InspectionForm from '@/app/dashboard/standing/components/InpectionForm'
+import InspectionForm from '@/app/dashboard/(components)/forms/InpectionForm'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -205,7 +205,7 @@ export default function CropsDetailsPage({
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className='h-[400px] w-full rounded-lg overflow-hidden'>
+                  <div className='h-[400px] w-full rounded-lg overflow-hidden relative z-0'>
                     <LocationMap
                       latitude={data.latitude}
                       longitude={data.longitude}
