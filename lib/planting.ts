@@ -47,12 +47,46 @@ type PlantingRecord = {
   remarks: string
   latitude: number
   longitude: number
+  location_id: string
 }
 
 export const addPlantingRecord = async (data: PlantingRecordData) => {
   const user = await getCurrentUser()
   const supabase = createClient()
 
+  // Split the full location (barangay, municipality, province)
+  const [barangay, municipality, province] = data.fieldLocation
+    .split(',')
+    .map((part) => part.trim())
+
+  // Check or insert into 'locations' table
+  let locationId
+  const { data: existingLocation, error: locationError } = await supabase
+    .from('locations')
+    .select('id')
+    .eq('barangay', barangay)
+    .eq('municipality', municipality)
+    .eq('province', province)
+    .single()
+
+  if (locationError || !existingLocation) {
+    // Insert new location if it doesn't exist
+    const { data: newLocation, error: insertLocationError } = await supabase
+      .from('locations')
+      .insert([{ barangay, municipality, province }])
+      .select('id')
+      .single()
+
+    if (insertLocationError) {
+      console.error('Failed to insert location:', insertLocationError.message)
+      return
+    }
+    locationId = newLocation.id
+  } else {
+    locationId = existingLocation.id
+  }
+
+  // Insert planting record with both location_id and fieldLocation
   const plantingRecord: PlantingRecord = {
     user_id: user?.id || '',
     farmer_id: data.farmerId || '',
@@ -60,7 +94,7 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     variety: data.variety,
     remarks: data.remarks,
     planting_date: data.plantingDate,
-    field_location: data.fieldLocation,
+    field_location: data.fieldLocation, // Keep field_location temporarily
     area_planted: parseFloat(data.areaPlanted),
     quantity: parseFloat(data.quantity),
     expenses: parseFloat(data.expenses),
@@ -74,6 +108,7 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     },
     latitude: data.latitude,
     longitude: data.longitude,
+    location_id: locationId, // Use the normalized location_id
   }
 
   const { error } = await supabase
