@@ -21,7 +21,7 @@ export default function useFetchFarmersByUserId() {
 
       if (data.session?.user) {
         const farmers = await getListOfFarmers(data.session.user.id)
-        console.log("successfully fetched farmers!")
+        console.log('successfully fetched farmers!')
         return farmers
       }
       return [initFarmer]
