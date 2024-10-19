@@ -6,7 +6,11 @@ import { Printer } from 'lucide-react'
 import useFetchMonthlyPlantingRice from '@/hooks/reports/useFetchMonthlyPlantingRice'
 
 type PlantingData = {
-  field_location: string
+  location_id: {
+    barangay: string
+    municipality: string
+    province: string
+  }
   area_planted: number
   planting_date: string
   category_specific: {
@@ -67,7 +71,7 @@ export default function RicePlantingReport() {
     )
 
     data.forEach((item: PlantingData) => {
-      const [_, municipality, __] = item.field_location.split(', ')
+      const { municipality } = item.location_id
       if (!municipalities.includes(municipality.toUpperCase())) return
 
       const { waterSupply, landType, classification } = item.category_specific

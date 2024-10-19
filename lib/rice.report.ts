@@ -19,7 +19,7 @@ export const getPlantingRiceCropForTheCurrentMonth = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `crop_categoryId!inner(name), crop_type(name), variety(name), field_location, farmer_id(id, firstname, lastname), area_planted, planting_date, category_specific`,
+      `crop_categoryId!inner(name), crop_type(name), variety(name), farmer_id(id, firstname, lastname), area_planted, planting_date, category_specific, location_id(barangay, municipality, province)`,
     )
     .eq('crop_categoryId.name', 'rice')
     .gte('planting_date', startOfMonth.toISOString())
