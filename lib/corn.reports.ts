@@ -40,7 +40,7 @@ export const getStandingCornCrops = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `crop_categoryId!inner(name), crop_type(name), field_location, area_planted, planting_date, remarks, farmer_id(firstname, lastname)`,
+      `crop_categoryId!inner(name), crop_type(name), area_planted, planting_date, remarks, farmer_id(firstname, lastname), location_id(barangay, municipality, province)`,
     )
     .eq('status', 'inspection')
     .eq('crop_categoryId.name', 'corn') // Filter by crop category name

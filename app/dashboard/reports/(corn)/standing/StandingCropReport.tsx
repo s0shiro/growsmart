@@ -147,13 +147,6 @@ export default function CornStandingCrop() {
               </style>
             </head>
             <body>
-              <!--<div class="header">
-                <img src="/no-bg.png" alt="Logo" class="logo">
-                <div class="org-info">
-                  <h1>Marinduque Provincial Agriculture Office</h1>
-                  <p>Capitol Compound, Boac, Philippines</p>
-                </div>
-              </div>-->
               <div class="date-text">
                 <p>CORN PROGRAM</p>
                 <p>STANDING CROP REPORT</p>
@@ -201,19 +194,17 @@ export default function CornStandingCrop() {
 
   // Process the data
   const municipalityData = data?.filter((item: any) =>
-    item.field_location.includes(selectedMunicipality),
+    item.location_id.municipality.includes(selectedMunicipality),
   )
   const barangays = [
-    ...new Set(
-      municipalityData?.map((item) => item.field_location.split(', ')[0]),
-    ),
+    ...new Set(municipalityData?.map((item) => item.location_id.barangay)),
   ]
 
   const getCropData = (barangay: string, cropType: string, stage: string) => {
     const value = municipalityData
       ?.filter(
         (item: any) =>
-          item.field_location.startsWith(barangay) &&
+          item.location_id.barangay === barangay &&
           item.crop_type.name === cropType &&
           item.remarks === stage,
       )
@@ -226,7 +217,7 @@ export default function CornStandingCrop() {
     const value = municipalityData
       ?.filter(
         (item) =>
-          item.field_location.startsWith(barangay) &&
+          item.location_id.barangay === barangay &&
           item.crop_type.name === cropType,
       )
       .reduce((sum, item) => sum + item.area_planted, 0)
@@ -400,7 +391,6 @@ export default function CornStandingCrop() {
                     <td className='border border-[hsl(var(--border))] p-1'>
                       {sumValues(
                         getCropData(barangay, 'Yellow', 'vegetative'),
-
                         getCropData(barangay, 'White', 'vegetative'),
                       )}
                     </td>
