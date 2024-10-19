@@ -315,10 +315,18 @@ export default function RicePlantingReport() {
               </th>
             </tr>
             <tr>
-              <th className='rainfed-lowland'>HYBRID</th>
-              <th className='rainfed-lowland'>REGISTERED</th>
-              <th className='rainfed-lowland'>CERTIFIED</th>
-              <th className='rainfed-lowland'>GOOD QUALITY</th>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+                HYBRID
+              </th>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+                REGISTERED
+              </th>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+                CERTIFIED
+              </th>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+                GOOD QUALITY
+              </th>
               <th className='rainfed-lowland'>FARMER SAVED SEEDS</th>
               <th className='rainfed-lowland'>TOTAL</th>
               <th className='rainfed-upland'>HYBRID</th>

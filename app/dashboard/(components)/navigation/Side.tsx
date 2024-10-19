@@ -20,12 +20,33 @@ import {
   FileText,
   X,
   TriangleAlert,
+  BarChart,
+  Clock4,
+  CalendarCheck, Calendar, TreePine, Wheat
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
@@ -55,6 +76,67 @@ const defaultLinks = [
   { href: '/dashboard/announcement', Icon: Megaphone, label: 'Announcement' },
 ]
 
+const reportLinks = [
+  {
+    category: 'Rice',
+    Icon: Wheat,
+    links: [
+      {
+        href: '/dashboard/reports/rice/standing',
+        label: 'Standing Crops',
+        Icon: Clock4,
+      },
+      {
+        href: '/dashboard/rice/planting',
+        label: 'Monthly Planting',
+        Icon: Calendar,
+      },
+      {
+        href: '/dashboard/reports/rice/monthly',
+        label: 'Monthly Harvest',
+        Icon: CalendarCheck,
+      },
+    ],
+  },
+  {
+    category: 'Corn',
+    Icon: TreePine,
+    links: [
+      {
+        href: '/dashboard/corn/standing',
+        label: 'Standing Crops',
+        Icon: Clock4,
+      },
+      {
+        href: '/dashboard/corn/monthly-planting',
+        label: 'Monthly Planting',
+        Icon: Calendar,
+      },
+      {
+        href: '/dashboard/corn/monthly-harvest',
+        label: 'Monthly Harvest',
+        Icon: CalendarCheck,
+      },
+    ],
+  },
+  {
+    category: 'High Value',
+    Icon: Sprout,
+    links: [
+      {
+        href: '/dashboard/reports/high-value/standing',
+        label: 'Standing Crops',
+        Icon: Clock4,
+      },
+      {
+        href: '/dashboard/reports/high-value/monthly',
+        label: 'Monthly Harvest',
+        Icon: CalendarCheck,
+      },
+    ],
+  },
+]
+
 const isActive = (path: string, route: string) => {
   if (route === '/dashboard') {
     return path === '/dashboard'
@@ -64,11 +146,11 @@ const isActive = (path: string, route: string) => {
 }
 
 const Side = ({
-  userSession,
-  isOpen,
-  onClose,
-  isMobile,
-}: {
+                userSession,
+                isOpen,
+                onClose,
+                isMobile,
+              }: {
   userSession: any
   isOpen: boolean
   onClose: () => void
@@ -87,7 +169,7 @@ const Side = ({
   return (
     <aside
       className={clsx(
-        'bg-card flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out',
+        'bg-card flex flex-col h-screen transition-all duration-300 ease-in-out',
         isOpen ? 'w-64' : 'w-16',
         isMobile && 'fixed left-0 top-0 z-40',
         isMobile && !isOpen && '-translate-x-full',
@@ -114,91 +196,161 @@ const Side = ({
           </Button>
         )}
       </div>
-      <nav
-        className={clsx(
-          'flex-1 overflow-y-auto',
-          isOpen ? 'px-4' : 'px-2',
-          'py-4',
-        )}
-      >
-        {links.map(({ href, Icon, label }) => (
-          <Button
-            key={label}
-            variant={isActive(path, href) ? 'secondary' : 'ghost'}
-            className={clsx(
-              'w-full justify-start mb-2',
-              !isOpen && 'justify-center p-0',
-            )}
-            asChild
-          >
-            <Link href={href}>
-              <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
-              {isOpen && <span>{label}</span>}
-            </Link>
-          </Button>
-        ))}
-        {role === 'technician' && (
-          <>
-            <Separator className='my-4' />
-            <div className={clsx('font-semibold mb-2', !isOpen && 'sr-only')}>
-              Productions
-            </div>
-            {productionLinks.map(({ href, Icon, label }) => (
-              <Button
-                key={label}
-                variant={isActive(path, href) ? 'secondary' : 'ghost'}
-                className={clsx(
-                  'w-full justify-start mb-2',
-                  !isOpen && 'justify-center p-0',
-                )}
-                asChild
-              >
-                <Link href={href}>
-                  <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
-                  {isOpen && <span>{label}</span>}
-                </Link>
-              </Button>
-            ))}
-          </>
-        )}
-        {role === 'admin' && (
-          <>
-            <Separator className='my-4' />
-            <div className={clsx('font-semibold mb-2', !isOpen && 'sr-only')}>
-              Profiling
-            </div>
-            {profilingLinks.map(({ href, Icon, label }) => (
-              <Button
-                key={label}
-                variant={isActive(path, href) ? 'secondary' : 'ghost'}
-                className={clsx(
-                  'w-full justify-start mb-2',
-                  !isOpen && 'justify-center p-0',
-                )}
-                asChild
-              >
-                <Link href={href}>
-                  <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
-                  {isOpen && <span>{label}</span>}
-                </Link>
-              </Button>
-            ))}
-          </>
-        )}
-      </nav>
+      <ScrollArea className="flex-1">
+        <nav
+          className={clsx(
+            isOpen ? 'px-4' : 'px-2',
+            'py-4',
+          )}
+        >
+          {links.map(({ href, Icon, label }) => (
+            <TooltipProvider key={label}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={isActive(path, href) ? 'secondary' : 'ghost'}
+                    className={clsx(
+                      'w-full justify-start mb-2',
+                      !isOpen && 'justify-center p-0',
+                    )}
+                    asChild
+                  >
+                    <Link href={href}>
+                      <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                      {isOpen && <span>{label}</span>}
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                {!isOpen && <TooltipContent side="right">{label}</TooltipContent>}
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+          {role === 'technician' && (
+            <>
+              <Separator className='my-4' />
+              <div className={clsx('text-sm font-medium text-muted-foreground mb-2', !isOpen && 'sr-only')}>
+                Productions
+              </div>
+              {productionLinks.map(({ href, Icon, label }) => (
+                <TooltipProvider key={label}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={isActive(path, href) ? 'secondary' : 'ghost'}
+                        className={clsx(
+                          'w-full justify-start mb-2',
+                          !isOpen && 'justify-center p-0',
+                        )}
+                        asChild
+                      >
+                        <Link href={href}>
+                          <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                          {isOpen && <span>{label}</span>}
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    {!isOpen && <TooltipContent side="right">{label}</TooltipContent>}
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+            </>
+          )}
+          {role === 'admin' && (
+            <>
+              <Separator className='my-4' />
+              <div className={clsx('text-sm font-medium text-muted-foreground mb-2', !isOpen && 'sr-only')}>
+                Profiling
+              </div>
+              {profilingLinks.map(({ href, Icon, label }) => (
+                <TooltipProvider key={label}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={isActive(path, href) ? 'secondary' : 'ghost'}
+                        className={clsx(
+                          'w-full justify-start mb-2',
+                          !isOpen && 'justify-center p-0',
+                        )}
+                        asChild
+                      >
+                        <Link href={href}>
+                          <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                          {isOpen && <span>{label}</span>}
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    {!isOpen && <TooltipContent side="right">{label}</TooltipContent>}
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+            </>
+          )}
+          {(role === 'admin' || role === 'technician') && (
+            <>
+              <Separator className='my-4' />
+              <div className={clsx('text-sm font-medium text-muted-foreground mb-2', !isOpen && 'sr-only')}>
+                Generate Reports
+              </div>
+              <Accordion type="single" collapsible className="w-full">
+                {reportLinks.map((category) => (
+                  <AccordionItem value={category.category} key={category.category}>
+                    <AccordionTrigger className="py-2">
+                      <div className={clsx('flex items-center', !isOpen && 'justify-center')}>
+                        <category.Icon className='h-4 w-4' />
+                        {isOpen && <span className="ml-2">{category.category}</span>}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {category.links.map((link) => (
+                        <TooltipProvider key={link.label}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant={isActive(path, link.href) ? 'secondary' : 'ghost'}
+                                className={clsx(
+                                  'w-full justify-start mb-2',
+                                  isOpen ? 'pl-6' : 'justify-center p-0',
+                                )}
+                                asChild
+                              >
+                                <Link href={link.href}>
+                                  <link.Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                                  {isOpen && <span>{link.label}</span>}
+                                </Link>
+                              </Button>
+                            </TooltipTrigger>
+                            {!isOpen && <TooltipContent side='right'>{link.label}</TooltipContent>}
+                          </Tooltip>
+                        </TooltipProvider>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </>
+          )}
+        </nav>
+      </ScrollArea>
       <div
         className={clsx('px-4 py-4 border-t border-border', !isOpen && 'px-2')}
       >
-        <Button
-          variant='ghost'
-          className={clsx(
-            'w-full justify-start mb-4',
-            !isOpen && 'justify-center p-0',
-          )}
-        >
-          <Settings className={clsx('h-4 w-4', isOpen && 'mr-2')} />
-          {isOpen && <span>Settings</span>}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                className={clsx(
+                  'w-full justify-start mb-4',
+                  !isOpen && 'justify-center p-0',
+                )}
+              >
+                <Settings className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                {isOpen && <span>Settings</span>}
+              </Button>
+            </TooltipTrigger>
+            {!isOpen && <TooltipContent side="right">Settings</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
         {isOpen && (
           <div className='flex items-center'>
             <Image

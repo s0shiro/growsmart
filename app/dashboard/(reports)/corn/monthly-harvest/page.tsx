@@ -1,5 +1,5 @@
 import MonthlyCornHarvesting from './new-report'
-import PrintURLButton from './PrintUrlButton'
+import PrintURLButton from '../../../(info)/(reports)/corn-monthly-harvest/PrintUrlButton'
 
 const page = () => {
   return (

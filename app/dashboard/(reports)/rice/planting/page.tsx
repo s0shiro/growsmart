@@ -1,4 +1,4 @@
-import RicePlantingReport from './RicePlantingReport'
+import RicePlantingReport from '../RicePlantingReport'
 
 const page = () => {
   return (
