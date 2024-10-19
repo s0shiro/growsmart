@@ -14,12 +14,20 @@ import { formatDate } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 type CornData = {
-  field_location: string
+  location_id: {
+    barangay: string
+    province: string
+    municipality: string
+  }
   crop_categoryId: { name: string }
   crop_type: { name: string }
   variety: { name: string }
   farmer_id: { lastname: string; firstname: string }
-  harvest_records: { area_harvested: number; yield_quantity: number }[]
+  harvest_records: {
+    harvest_date: string
+    area_harvested: number
+    yield_quantity: number
+  }[]
 }
 
 const calculateProduction = (yieldQuantity: number): number => {
@@ -198,7 +206,7 @@ export default function MonthlyCornHarvesting() {
     } = {}
 
     data.forEach((item) => {
-      const [barangay, municipality] = item.field_location.split(', ')
+      const { barangay, municipality } = item.location_id
 
       if (selectedMunicipality && municipality !== selectedMunicipality) {
         return

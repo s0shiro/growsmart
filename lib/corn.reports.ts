@@ -8,7 +8,7 @@ export const getHarvestedCornCropsData = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `crop_categoryId!inner(name), crop_type(name), variety(name), field_location, farmer_id(firstname, lastname), harvest_records(area_harvested, yield_quantity, harvest_date)`,
+      `crop_categoryId!inner(name), crop_type(name), variety(name), farmer_id(firstname, lastname), harvest_records(area_harvested, yield_quantity, harvest_date), location_id(barangay, municipality, province)`,
     )
     .eq('status', 'harvested')
     .eq('crop_categoryId.name', 'corn') // Filter by crop category name
@@ -71,7 +71,7 @@ export const getMonthlyCornPlantingAccomplishment = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `crop_categoryId!inner(name), crop_type(name), variety(name), field_location, farmer_id(firstname, lastname), area_planted, planting_date`,
+      `crop_categoryId!inner(name), crop_type(name), variety(name), farmer_id(firstname, lastname), area_planted, planting_date, location_id(barangay, municipality, province)`,
     )
     .eq('crop_categoryId.name', 'corn')
     .gte('planting_date', startOfMonth.toISOString())

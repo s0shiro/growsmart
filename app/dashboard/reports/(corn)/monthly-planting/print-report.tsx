@@ -57,7 +57,7 @@ export default function CornMonthlyPlantingAccomplishment() {
     } = {}
 
     data?.forEach((item) => {
-      const [barangay, municipality] = item.field_location.split(', ')
+      const { barangay, municipality } = item.location_id
       if (municipality !== selectedMunicipality) return
 
       if (!barangays[barangay]) {
@@ -105,7 +105,7 @@ export default function CornMonthlyPlantingAccomplishment() {
         printWindow.document.write(`
           <html>
             <head>
-              <title>Corn Planting Report - August 31, 2024</title>
+              <title>Corn Planting Report - ${formattedDate}</title>
               <style>
                *, *::before, *::after {
                 margin: 0;
