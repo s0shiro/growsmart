@@ -59,6 +59,12 @@ interface Inspection {
   damaged_reason: string
 }
 
+type Location = {
+  barangay: string
+  municipality: string
+  province: string
+}
+
 interface HarvestRecord {
   id: string
   profit: number
@@ -81,7 +87,7 @@ interface HarvestData {
   crop_type: string
   variety: string
   planting_date: string
-  field_location: string
+  location_id: Location
   area_planted: number
   quantity: number
   expenses: number
@@ -125,6 +131,8 @@ const CustomTooltip = ({
 
 export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
   const [activeTab, setActiveTab] = useState('overview')
+
+  const { barangay, municipality, province } = harvest.location_id
 
   const latestHarvest = harvest.harvest_records[0]
 
@@ -248,7 +256,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                           Field Location
                         </span>
                         <Badge variant='outline'>
-                          {harvest.field_location}
+                          {`${barangay}, ${municipality}, ${province}`}
                         </Badge>
                       </li>
                       <li className='flex items-center justify-between'>

@@ -32,7 +32,6 @@ type PlantingRecord = {
   crop_type: string
   variety: string
   planting_date: string
-  field_location: string
   area_planted: number
   quantity: number
   expenses: number
@@ -94,7 +93,6 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
     variety: data.variety,
     remarks: data.remarks,
     planting_date: data.plantingDate,
-    field_location: data.fieldLocation, // Keep field_location temporarily
     area_planted: parseFloat(data.areaPlanted),
     quantity: parseFloat(data.quantity),
     expenses: parseFloat(data.expenses),
@@ -248,7 +246,31 @@ export const getPlantingRecordById = async (plantingID: string) => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      '*, technician_farmers (firstname, lastname, avatar), crop_categories(name), crops (name), crop_varieties (name), inspections(*)',
+      `
+        *,
+        location_id (
+          barangay,
+          municipality,
+          province
+        ),
+        technician_farmers (
+          firstname,
+          lastname,
+          avatar
+        ),
+        crop_categories (
+          name
+        ),
+        crops (
+          name
+        ),
+        crop_varieties (
+          name
+        ),
+        inspections (
+          *
+        )
+      `,
     )
     .eq('id', plantingID)
     .single()

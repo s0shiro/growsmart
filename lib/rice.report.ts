@@ -24,7 +24,6 @@ export const getPlantingRiceCropForTheCurrentMonth = async () => {
     .eq('crop_categoryId.name', 'rice')
     .gte('planting_date', startOfMonth.toISOString())
     .lt('planting_date', startOfNextMonth.toISOString())
-    .order('field_location', { ascending: true })
 
   if (error) {
     console.error('Supabase error:', error.message)
@@ -35,5 +34,9 @@ export const getPlantingRiceCropForTheCurrentMonth = async () => {
     return null
   }
 
-  return data
+  const sortedData = data.sort((a, b) =>
+    a.location_id.barangay.localeCompare(b.location_id.barangay),
+  )
+
+  return sortedData
 }

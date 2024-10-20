@@ -12,7 +12,6 @@ const initPlantings = {
   crop_type: '',
   variety: '',
   planting_date: '',
-  field_location: '',
   area_planted: 0,
   quantity: 0,
   weather_condition: '',

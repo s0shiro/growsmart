@@ -52,6 +52,8 @@ export default function CropsDetailsPage({
   })
   const [showHighRes, setShowHighRes] = useState(false)
 
+  const { barangay, municipality, province } = data?.location_id || {}
+
   const router = useRouter()
 
   useEffect(() => {
@@ -214,7 +216,9 @@ export default function CropsDetailsPage({
                   </div>
                   <div className='flex items-center gap-2 text-sm text-muted-foreground mt-4'>
                     <MapPinIcon className='h-4 w-4' />
-                    <span>{data.field_location}</span>
+                    <span>
+                      {barangay}, {municipality}, {province}
+                    </span>
                   </div>
                 </CardContent>
               </Card>

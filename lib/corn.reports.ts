@@ -71,12 +71,11 @@ export const getMonthlyCornPlantingAccomplishment = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `crop_categoryId!inner(name), crop_type(name), variety(name), farmer_id(firstname, lastname), area_planted, planting_date, location_id(barangay, municipality, province)`,
+      `crop_categoryId!inner(name), crop_type(name), variety(name), farmer_id(firstname, lastname), area_planted, planting_date, location_id!inner(barangay, municipality, province)`,
     )
     .eq('crop_categoryId.name', 'corn')
     .gte('planting_date', startOfMonth.toISOString())
     .lt('planting_date', startOfNextMonth.toISOString())
-    .order('field_location', { ascending: true })
 
   if (error) {
     console.error('Supabase error:', error.message)
@@ -87,5 +86,10 @@ export const getMonthlyCornPlantingAccomplishment = async () => {
     return null
   }
 
-  return data
+  // Sort data by barangay
+  const sortedData = data.sort((a, b) =>
+    a.location_id.barangay.localeCompare(b.location_id.barangay),
+  )
+
+  return sortedData
 }
