@@ -12,12 +12,22 @@ type Context = {
   userRole: 'admin' | 'technician'
 }
 
-async function createContext({ req }: CreateContextOptions): Promise<Context> {
-  const { id, role } = await getUserSession(req)
+// async function createContext({ req }: CreateContextOptions): Promise<Context> {
+//   const { id, role } = await getUserSession(req)
 
+//   return {
+//     userId: id,
+//     userRole: role,
+//   }
+// }
+
+// Temporarily disable user context creation
+async function createContext({ req }: CreateContextOptions): Promise<Context> {
+  // const { id, role } = await getUserSession(req)
+  // Return a default context
   return {
-    userId: id,
-    userRole: role,
+    userId: 'defaultUserId',
+    userRole: 'technician',
   }
 }
 
@@ -47,7 +57,9 @@ const edgeStoreRouter = es.router({
       maxSize: 1024 * 1024, // 1MB
     })
     // Define the path for the route
-    .input(z.object({ type: z.enum(['post', 'profile', "avatar", "harvests"]) }))
+    .input(
+      z.object({ type: z.enum(['post', 'profile', 'avatar', 'harvests']) }),
+    )
     //eg. post/cute.jpg
     .path(({ input }) => [{ type: input.type }]),
 

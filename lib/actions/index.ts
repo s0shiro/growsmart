@@ -6,7 +6,11 @@ import { User } from '@supabase/supabase-js'
 export async function readUserSession() {
   const supabase = await createSupbaseServerClientReadOnly()
 
-  return supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  return { data: { user } }
 }
 
 // import { create } from 'zustand'
