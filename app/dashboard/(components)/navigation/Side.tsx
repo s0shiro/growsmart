@@ -86,7 +86,7 @@ export default function Sidebar({
   onClose: () => void
   isMobile: boolean
 }) {
-  const role = userSession?.user?.user_metadata?.role
+  const role = userSession.role
   const links =
     role === 'admin'
       ? adminLinks
@@ -302,10 +302,11 @@ export default function Sidebar({
             />
             <div className='ml-3'>
               <p className='text-sm font-semibold text-primary-foreground'>
-                {userSession?.user?.user_metadata?.full_name || 'User Name'}
+                {userSession.fullName || 'User Name'}
               </p>
               <p className='text-xs text-muted-foreground'>
-                {role.charAt(0).toUpperCase() + role.slice(1)}
+                {userSession.role.charAt(0).toUpperCase() +
+                  userSession.role.slice(1)}
               </p>
             </div>
           </div>

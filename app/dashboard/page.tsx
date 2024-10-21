@@ -1,53 +1,23 @@
-'use client'
+import { readUserSession } from '@/lib/actions'
+import { redirect } from 'next/navigation'
+import DashboardClient from './(components)/dashboard-client'
 
-import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
-import StatCard from '@/components/StatCard'
-import { BarChart2, ShoppingBag, Zap } from 'lucide-react'
-import SalesOverviewChart from './(components)/charts/SalesOverviewChart'
-import CategoryDistributionChart from './(components)/charts/CategoryDistributionChart'
-import SalesChannelChart from './(components)/charts/SalesChannelChart'
-import FarmersCountCard from './(components)/FarmersCountCard'
+export default async function DashboardPage() {
+  const { data } = await readUserSession()
 
-export default function Dashboard() {
-  return (
-    <>
-      <Card className='px-4 py-6'>
-        <CardContent>
-          <motion.div
-            className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <FarmersCountCard />
-            <StatCard
-              name='Pending Harvest'
-              icon={ShoppingBag}
-              value='567'
-              color='#EC4899'
-            />
-            <StatCard
-              name='Harvested Farms'
-              icon={Zap}
-              value='200'
-              color='#6366F1'
-            />
-            <StatCard
-              name='Conversion Rate'
-              icon={BarChart2}
-              value='12.5%'
-              color='#10B981'
-            />
-          </motion.div>
+  if (!data.user) {
+    redirect('/login')
+  }
 
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-            <SalesOverviewChart />
-            <CategoryDistributionChart />
-            <SalesChannelChart />
-          </div>
-        </CardContent>
-      </Card>
-    </>
-  )
+  // Extract only the necessary, serializable data
+  const serializableUserData = {
+    id: data.user.id,
+    email: data.user.email,
+    fullName: data.user.user_metadata.full_name,
+    role: data.user.user_metadata.role,
+    status: data.user.user_metadata.status,
+    lastSignInAt: data.user.last_sign_in_at,
+  }
+
+  return <DashboardClient userData={serializableUserData} />
 }
