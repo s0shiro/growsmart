@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const url =
-    'https://psgc.gitlab.io/api/provinces/174000000/municipalities.json'
+  const url = process.env.MARINDUQUE_API_URL
+
+  if (!url) {
+    throw new Error(
+      'MARINDUQUE_API_URL is not defined in the environment variables',
+    )
+  }
 
   try {
     const response = await fetch(url)
