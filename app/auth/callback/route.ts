@@ -11,12 +11,15 @@ export async function GET(request: Request) {
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
       if (error) throw error
+
+      // Email is automatically confirmed when using the signup link
+      // You can add additional logic here if needed
     } catch (error) {
       console.error('Auth error:', error)
       return NextResponse.redirect(`${requestUrl.origin}/auth-error`)
     }
   }
 
-  // Redirect to the dashboard after successful signup
+  // Redirect to the dashboard after successful signup and email confirmation
   return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
 }

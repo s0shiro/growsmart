@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       await supabase.auth.admin.createUser({
         email,
         password,
-        email_confirm: true,
+        email_confirm: false,
         user_metadata: {
           full_name: name,
           role,
@@ -29,17 +29,18 @@ export async function POST(request: Request) {
 
     if (!userData.user) throw new Error('User creation failed')
 
-    // Generate magic link for email verification
-    const { data: magicLinkData, error: magicLinkError } =
+    // Generate signup link for email verification
+    const { data: signupLinkData, error: signupLinkError } =
       await supabase.auth.admin.generateLink({
-        type: 'magiclink',
+        type: 'signup',
         email,
+        password,
         options: {
           redirectTo: `${origin}/auth/callback`,
         },
       })
 
-    if (magicLinkError) throw magicLinkError
+    if (signupLinkError) throw signupLinkError
 
     // Send email
     await resend.emails.send({
@@ -48,12 +49,12 @@ export async function POST(request: Request) {
       subject: 'Welcome to Growsmart!',
       react: GrowsmartWelcomeEmail({
         name,
-        signupLink: magicLinkData.properties.action_link,
+        signupLink: signupLinkData.properties.action_link,
       }),
     })
 
     return NextResponse.json({
-      message: 'User created and invited successfully',
+      message: 'User created and invitation sent successfully',
     })
   } catch (error) {
     console.error('Error creating user:', error)

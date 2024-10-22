@@ -60,6 +60,7 @@ export async function createMember(data: {
 }
 
 //Updating user for admin only
+//TODO: Also update the metadata of the user
 export async function updateMemberBasicById(
   id: string,
   data: {
