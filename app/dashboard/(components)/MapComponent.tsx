@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react'
+'use client'
+
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
-import type { LatLng } from 'leaflet'
+import type { LatLng, LatLngExpression, Map as LeafletMap } from 'leaflet'
 import { useMapEvents } from 'react-leaflet'
+import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
@@ -16,64 +21,109 @@ const Marker = dynamic(
   () => import('react-leaflet').then((mod) => mod.Marker),
   { ssr: false },
 )
+const ScaleControl = dynamic(
+  () => import('react-leaflet').then((mod) => mod.ScaleControl),
+  { ssr: false },
+)
+const FullscreenControl = dynamic(
+  () => import('react-leaflet-fullscreen').then((mod) => mod.FullscreenControl),
+  { ssr: false },
+)
 
 interface MapComponentProps {
   onLocationSelect: (locationName: string, coords: [number, number]) => void
-  showMapTiler: boolean
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({
-  onLocationSelect,
-  showMapTiler,
-}) => {
+const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
   const [position, setPosition] = useState<LatLng | null>(null)
+  const [mapCenter, setMapCenter] = useState<LatLngExpression>([
+    13.4417, 121.9473,
+  ])
   const [L, setL] = useState<typeof import('leaflet') | null>(null)
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const mapRef = useRef<LeafletMap | null>(null)
 
   useEffect(() => {
     import('leaflet').then((leaflet) => {
       delete (leaflet.Icon.Default.prototype as any)._getIconUrl
       leaflet.Icon.Default.mergeOptions({
+        iconUrl:
+          'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
         iconRetinaUrl:
-          'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+          'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
         shadowUrl:
-          'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+          'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
       })
       setL(leaflet)
       setLoading(false)
     })
   }, [])
 
-  const fetchLocationName = async (
-    lat: number,
-    lng: number,
-  ): Promise<string> => {
+  const fetchLocationName = useCallback(
+    async (lat: number, lng: number): Promise<string> => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+        )
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        const data = await response.json()
+        const { village, town, county, state } = data.address
+        const locationParts = [village, town, county, state].filter(Boolean)
+        return locationParts.join(', ')
+      } catch (error) {
+        console.error('Failed to fetch location name:', error)
+        return 'Unknown location'
+      }
+    },
+    [],
+  )
+
+  const handleSearch = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
       )
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
       const data = await response.json()
-      const { village, town, county, state } = data.address
-      const locationParts = [village, town, county, state].filter(Boolean)
-      return locationParts.join(', ')
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0]
+        const newPosition = { lat: parseFloat(lat), lng: parseFloat(lon) }
+        setPosition(newPosition)
+        setMapCenter(newPosition)
+        mapRef.current?.flyTo(newPosition, 13)
+        const locationName = await fetchLocationName(
+          parseFloat(lat),
+          parseFloat(lon),
+        )
+        onLocationSelect(locationName, [parseFloat(lat), parseFloat(lon)])
+      }
     } catch (error) {
-      console.error('Failed to fetch location name:', error)
-      return 'Unknown location'
+      console.error('Failed to search location:', error)
     }
-  }
+  }, [searchQuery, fetchLocationName, onLocationSelect])
 
   const LocationMarker: React.FC = () => {
-    useMapEvents({
+    const map = useMapEvents({
       async click(e) {
-        setPosition(e.latlng)
-        const locationName = await fetchLocationName(e.latlng.lat, e.latlng.lng)
-        onLocationSelect(locationName, [e.latlng.lat, e.latlng.lng])
+        const newPosition = e.latlng
+        setPosition(newPosition)
+        map.flyTo(newPosition, map.getZoom())
+        const locationName = await fetchLocationName(
+          newPosition.lat,
+          newPosition.lng,
+        )
+        onLocationSelect(locationName, [newPosition.lat, newPosition.lng])
       },
     })
+
+    useEffect(() => {
+      mapRef.current = map
+    }, [map])
 
     return position === null ? null : <Marker position={position} />
   }
@@ -87,25 +137,36 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }
 
   return (
-    <div className='h-[300px] sm:h-[400px] w-full'>
-      <MapContainer
-        center={[13.4417, 121.9473]}
-        zoom={12}
-        style={{ height: '100%', width: '100%' }}
-      >
-        <TileLayer
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    <div className='space-y-4'>
+      <div className='flex space-x-2 pt-4'>
+        <Input
+          type='text'
+          placeholder='Search for a location'
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          className='flex-grow'
         />
-        {showMapTiler && (
+        <Button onClick={handleSearch}>
+          <Search className='h-4 w-4 mr-2' />
+          Search
+        </Button>
+      </div>
+      <div className='h-[400px] w-full'>
+        <MapContainer
+          center={mapCenter}
+          zoom={13}
+          style={{ height: '100%', width: '100%' }}
+        >
           <TileLayer
-            url={`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`}
-            attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
-            errorTileUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-        )}
-        <LocationMarker />
-      </MapContainer>
+          <LocationMarker />
+          <ScaleControl position='bottomleft' />
+          <FullscreenControl position='topright' />
+        </MapContainer>
+      </div>
     </div>
   )
 }

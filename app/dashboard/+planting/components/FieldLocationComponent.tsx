@@ -12,7 +12,6 @@ import {
 import { MapPin, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import {
   Tooltip,
@@ -29,7 +28,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import MapComponent from '@/app/dashboard/(components)/MapComponent'
+import MapComponent from '../../(components)/MapComponent'
 
 interface FieldLocationProps {
   selectedLocation: string
@@ -44,7 +43,6 @@ export default function FieldLocation({
   onLocationSelect,
   errorMessage,
 }: FieldLocationProps) {
-  const [showMapTiler, setShowMapTiler] = useState(false)
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [tempLocation, setTempLocation] = useState('')
   const [tempCoordinates, setTempCoordinates] = useState<
@@ -72,36 +70,26 @@ export default function FieldLocation({
       <Card className='w-full'>
         <CardHeader className='space-y-1 flex flex-row items-center justify-between'>
           <CardTitle className='text-xl font-bold'>Field Location</CardTitle>
-          <div className='flex items-center space-x-2'>
-            <Switch
-              id='map-tiler-toggle'
-              checked={showMapTiler}
-              onCheckedChange={setShowMapTiler}
-            />
-            <Label htmlFor='map-tiler-toggle' className='text-sm font-normal'>
-              {showMapTiler ? 'High-Res' : 'Standard'} Map
-            </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant='ghost' size='icon' className='h-8 w-8 ml-2'>
-                    <Info className='h-4 w-4' />
-                    <span className='sr-only'>Location selection info</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Click on the map to select the field location</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant='ghost' size='icon' className='h-8 w-8 ml-2'>
+                  <Info className='h-4 w-4' />
+                  <span className='sr-only'>Location selection info</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Search for a location, use your current location, or click on
+                  the map to select the field location
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='rounded-md overflow-hidden border border-border'>
-            <MapComponent
-              onLocationSelect={handleLocationSelect}
-              showMapTiler={showMapTiler}
-            />
+            <MapComponent onLocationSelect={handleLocationSelect} />
           </div>
           {selectedLocation && coordinates && (
             <div className='flex items-center space-x-2'>
@@ -128,8 +116,8 @@ export default function FieldLocation({
         </CardContent>
         <CardFooter className='bg-muted/50 text-sm text-muted-foreground'>
           <p>
-            Drag the map or use the zoom controls to find your exact field
-            location.
+            Search for a location, use your current location, or click on the
+            map to select your exact field location.
           </p>
         </CardFooter>
       </Card>

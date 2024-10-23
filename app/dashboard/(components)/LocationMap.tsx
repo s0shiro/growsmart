@@ -35,14 +35,9 @@ const defaultIcon = new Icon({
 interface LocationMapProps {
   latitude: number | null
   longitude: number | null
-  showHighRes: boolean
 }
 
-export default function LocationMap({
-  latitude,
-  longitude,
-  showHighRes,
-}: LocationMapProps) {
+export default function LocationMap({ latitude, longitude }: LocationMapProps) {
   const [position, setPosition] = useState<LatLng | null>(null)
   const [zoom, setZoom] = useState<number>(12)
 
@@ -77,13 +72,6 @@ export default function LocationMap({
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {showHighRes && (
-          <TileLayer
-            url={`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`}
-            attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
-            errorTileUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          />
-        )}
         <Marker position={position} icon={defaultIcon} />
       </MapContainer>
     </div>
