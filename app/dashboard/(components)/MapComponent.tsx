@@ -5,9 +5,10 @@ import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import type { LatLng, LatLngExpression, Map as LeafletMap } from 'leaflet'
 import { useMapEvents } from 'react-leaflet'
-import { Search } from 'lucide-react'
+import { Search, AlertCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
@@ -42,7 +43,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
   const [L, setL] = useState<typeof import('leaflet') | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchError, setSearchError] = useState<string | null>(null)
   const mapRef = useRef<LeafletMap | null>(null)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     import('leaflet').then((leaflet) => {
@@ -82,6 +85,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
   )
 
   const handleSearch = useCallback(async () => {
+    setSearchError(null)
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
@@ -101,11 +105,34 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
           parseFloat(lon),
         )
         onLocationSelect(locationName, [parseFloat(lat), parseFloat(lon)])
+      } else {
+        setSearchError('No results found. Please try a different search term.')
       }
     } catch (error) {
       console.error('Failed to search location:', error)
+      setSearchError('An error occurred while searching. Please try again.')
     }
   }, [searchQuery, fetchLocationName, onLocationSelect])
+
+  const debouncedSearch = useCallback(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      handleSearch()
+    }, 300) // Debounce for 300ms
+  }, [handleSearch])
+
+  useEffect(() => {
+    if (searchQuery) {
+      debouncedSearch()
+    }
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [searchQuery, debouncedSearch])
 
   const LocationMarker: React.FC = () => {
     const map = useMapEvents({
@@ -144,14 +171,20 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
           placeholder='Search for a location'
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           className='flex-grow'
+          aria-label='Search for a location'
         />
         <Button onClick={handleSearch}>
           <Search className='h-4 w-4 mr-2' />
           Search
         </Button>
       </div>
+      {searchError && (
+        <Alert variant='destructive'>
+          <AlertCircle className='h-4 w-4' />
+          <AlertDescription>{searchError}</AlertDescription>
+        </Alert>
+      )}
       <div className='h-[400px] w-full'>
         <MapContainer
           center={mapCenter}

@@ -38,6 +38,7 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  Plus,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -53,6 +54,9 @@ import {
   Tooltip as RechartsTooltip,
 } from 'recharts'
 import { getOneFarmer } from '@/lib/farmer'
+import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
+import AddAssistanceForm from './AssistanceForm'
+import useFetchAssitanceOfFarmerById from '@/hooks/farmer/useFetchAssitanceOfFarmerById'
 
 interface FarmerProfileProps {
   id: string
@@ -67,6 +71,9 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
     queryKey: ['farmer', id],
     queryFn: () => getOneFarmer(id),
   })
+
+  const { data: assistances, isLoading: isLoadingAssistance } =
+    useFetchAssitanceOfFarmerById(id)
 
   const [expandedRecord, setExpandedRecord] = useState<string | null>(null)
 
@@ -84,6 +91,10 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
 
   if (!farmer) {
     return <div className='text-center'>No farmer data found</div>
+  }
+
+  const getQuantityUnit = (assistanceType: string): string => {
+    return assistanceType.toLowerCase() === 'farm inputs' ? 'kg' : 'pcs'
   }
 
   const totalAreaPlanted = farmer.planting_records.reduce(
@@ -158,7 +169,7 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
         <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value='profile'>Profile</TabsTrigger>
           <TabsTrigger value='planting-records'>Planting Records</TabsTrigger>
-          <TabsTrigger value='interventions'>Interventions</TabsTrigger>
+          <TabsTrigger value='assistance'>Assistance</TabsTrigger>
         </TabsList>
         <TabsContent value='profile'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -327,7 +338,7 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
             </CardHeader>
             <CardContent>
               <div className='space-y-4'>
-                {farmer.planting_records.map((record) => (
+                {farmer.planting_records.map((record: any) => (
                   <Card key={record.id} className='overflow-hidden'>
                     <CardHeader
                       className='bg-muted cursor-pointer'
@@ -392,7 +403,7 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                                 <Badge
                                   variant={
                                     record.status === 'harvested'
-                                      ? 'success'
+                                      ? 'default'
                                       : 'default'
                                   }
                                 >
@@ -410,37 +421,77 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value='interventions'>
+        <TabsContent value='assistance'>
           <Card>
-            <CardHeader>
-              <CardTitle className='text-xl font-semibold flex items-center gap-2'>
-                <Sprout className='h-6 w-6 text-primary' />
-                Interventions
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-base font-medium'>
+                Assistance
               </CardTitle>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DialogForm
+                      id='add-assistance'
+                      title='Add Assistance'
+                      description='Record a new assistance for this farmer'
+                      Trigger={
+                        <Button variant='outline' size='sm'>
+                          <Plus className='h-4 w-4 mr-2' />
+                          Add Assistance
+                        </Button>
+                      }
+                      form={<AddAssistanceForm farmerID={id} />}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add new assistance</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </CardHeader>
             <CardContent>
-              <div className='text-center py-12'>
-                <Leaf className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
-                <p className='text-xl font-semibold text-muted-foreground mb-2'>
-                  No interventions data available yet
-                </p>
-                <p className='text-muted-foreground mb-6'>
-                  Interventions will be displayed here once they are recorded.
-                </p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button>
-                        <BarChart2 className='mr-2 h-4 w-4' />
-                        Add Intervention
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Record a new intervention for this farmer</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              {isLoadingAssistance ? (
+                <div className='text-center py-2 text-sm'>
+                  Loading assistance data...
+                </div>
+              ) : assistances && assistances.length > 0 ? (
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                  {assistances.map((assistance: any) => (
+                    <Card key={assistance.id} className='bg-muted'>
+                      <CardHeader className='p-4 pb-2'>
+                        <div className='flex justify-between items-start'>
+                          <Badge variant='default' className='mb-2'>
+                            {assistance.assistance_type}
+                          </Badge>
+                          <span className='text-xs text-muted-foreground'>
+                            {formatDate(assistance.date_received)}
+                          </span>
+                        </div>
+                        <CardTitle className='text-sm font-medium'>
+                          {assistance.description}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className='p-4 pt-0'>
+                        <div className='text-sm'>
+                          <span className='font-medium'>Quantity:</span>{' '}
+                          {assistance.quantity}{' '}
+                          {getQuantityUnit(assistance.assistance_type)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className='text-center py-6'>
+                  <Sprout className='h-8 w-8 text-muted-foreground mx-auto mb-2' />
+                  <p className='text-sm font-medium text-muted-foreground mb-1'>
+                    No assistance data available
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    Assistance will be displayed here once recorded.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
