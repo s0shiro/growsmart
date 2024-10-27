@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import {
   Card,
@@ -50,20 +50,30 @@ export default function FieldLocation({
   >(null)
   const [editedLocation, setEditedLocation] = useState('')
 
-  const handleLocationSelect = (
-    locationName: string,
-    coords: [number, number],
-  ) => {
-    setTempLocation(locationName)
-    setTempCoordinates(coords)
-    setEditedLocation(locationName)
-    setIsConfirmDialogOpen(true)
-  }
+  const handleLocationSelect = useCallback(
+    (locationName: string, coords: [number, number]) => {
+      setTempLocation(locationName)
+      setTempCoordinates(coords)
+      setEditedLocation(locationName)
+      setIsConfirmDialogOpen(true)
+    },
+    [],
+  )
 
-  const handleConfirm = () => {
-    onLocationSelect(editedLocation, tempCoordinates!)
+  const handleConfirm = useCallback(() => {
+    if (tempCoordinates) {
+      onLocationSelect(editedLocation, tempCoordinates)
+    }
     setIsConfirmDialogOpen(false)
-  }
+  }, [editedLocation, tempCoordinates, onLocationSelect])
+
+  const handleDialogClose = useCallback(() => {
+    setIsConfirmDialogOpen(false)
+  }, [])
+
+  const handleClearLocation = useCallback(() => {
+    onLocationSelect('', [0, 0])
+  }, [onLocationSelect])
 
   return (
     <div className='space-y-4 relative z-0'>
@@ -100,7 +110,7 @@ export default function FieldLocation({
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => onLocationSelect('', [0, 0])}
+                onClick={handleClearLocation}
                 className='text-muted-foreground hover:text-foreground'
               >
                 Clear
@@ -122,7 +132,7 @@ export default function FieldLocation({
         </CardFooter>
       </Card>
 
-      <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+      <Dialog open={isConfirmDialogOpen} onOpenChange={handleDialogClose}>
         <DialogContent className={cn('z-50')}>
           <DialogHeader>
             <DialogTitle>Confirm Field Location</DialogTitle>
@@ -154,10 +164,7 @@ export default function FieldLocation({
             )}
           </div>
           <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setIsConfirmDialogOpen(false)}
-            >
+            <Button variant='outline' onClick={handleDialogClose}>
               Cancel
             </Button>
             <Button onClick={handleConfirm}>Confirm Location</Button>

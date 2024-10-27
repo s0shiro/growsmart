@@ -235,7 +235,7 @@ export default function Sidebar({
                   !isOpen && 'sr-only',
                 )}
               >
-                Generate Reports
+                Reports
               </div>
               <TooltipProvider>
                 <Tooltip>
