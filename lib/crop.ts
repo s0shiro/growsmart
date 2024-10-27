@@ -144,3 +144,21 @@ export const getAllCategoriesWithCropsAndVarieties = async () => {
 
   return data
 }
+
+export const getAllHarvestedCrops = async () => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select(
+      `*, farmer_id (id, firstname, lastname), crop_type(id, name), variety(id, name), crop_categoryId(id, name), harvest_records(harvest_date)`,
+    )
+    .eq('status', 'harvested')
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return []
+  }
+
+  return data
+}
