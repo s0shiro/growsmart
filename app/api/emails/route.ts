@@ -9,7 +9,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export async function POST(request: Request) {
   try {
     const { name, role, status, email, password } = await request.json()
-    const origin = headers().get('origin')
+    const origin =
+      headers().get('origin') || `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
     const supabase = createSupabaseAdmin()
 
     // Create user with Supabase Auth
