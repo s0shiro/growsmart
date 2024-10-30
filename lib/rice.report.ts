@@ -40,3 +40,45 @@ export const getPlantingRiceCropForTheCurrentMonth = async () => {
 
   return sortedData
 }
+
+export const getHarvestedRiceCropsData = async (
+  selectedMunicipality: string,
+  selectedType: string,
+) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select(
+      `
+      *,
+      crop_categoryId (
+        name
+      ),
+      location_id (
+        barangay,
+        municipality,
+        province
+      )
+    `,
+    )
+    .eq('status', 'harvested')
+    .not('crop_categoryId', 'is', null)
+    .eq('crop_categoryId.name', 'rice')
+    .eq('location_id.municipality', selectedMunicipality)
+    .not('location_id', 'is', null)
+    .eq('category_specific->>waterSupply', selectedType)
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return null
+  }
+
+  // Rename location_id to location in the returned data
+  const renamedData = data.map((record) => {
+    const { location_id, ...rest } = record
+    return { ...rest, location: location_id }
+  })
+
+  return renamedData
+}

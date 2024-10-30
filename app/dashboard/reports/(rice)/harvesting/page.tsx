@@ -1,9 +1,10 @@
-import { getHarvestedRiceCropsData } from '@/lib/rice.reports'
+'use client'
+
+import useFetchHarvestedRice from '@/hooks/reports/useFetchHarvestedRice'
 import HarvestingReportTable from './HarvestingReportTable'
 
-const page = async () => {
-  const data = await getHarvestedRiceCropsData()
-  console.log(data)
+const page = () => {
+  const { data, error } = useFetchHarvestedRice()
   return (
     <div>
       <HarvestingReportTable />
