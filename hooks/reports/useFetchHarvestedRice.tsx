@@ -1,13 +1,14 @@
 import { getHarvestedRiceCropsData } from '@/lib/rice.report'
 import { useQuery } from '@tanstack/react-query'
 
-const useFetchHarvestedRice = () => {
+const useFetchHarvestedRice = (municipality: string, waterSupply: string) => {
   return useQuery({
-    queryKey: ['harveted-rice-crops'],
+    queryKey: ['harvested-rice-crops', municipality, waterSupply],
     queryFn: async () => {
-      const data = await getHarvestedRiceCropsData('Buenavista', 'rainfed')
+      const data = await getHarvestedRiceCropsData(municipality, waterSupply)
       return data
     },
+    enabled: !!municipality && !!waterSupply,
   })
 }
 
