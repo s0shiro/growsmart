@@ -12,6 +12,9 @@ import {
 } from '@/components/ui/select'
 import useFetchHarvestedRice from '@/hooks/reports/useFetchHarvestedRice'
 import useFetchTotalHarvestedRice from '@/hooks/reports/useFetchTotalHarvestRiceData'
+import { DateRangePicker } from './DatePicker'
+import { DateRange } from 'react-day-picker'
+import useHarvestStore from '@/stores/useRiceHarvestStore'
 
 type SeedData = {
   area: number
@@ -58,19 +61,27 @@ const municipalities = [
 const waterSupplyTypes = ['irrigated', 'rainfed', 'upland', 'total']
 
 export default function HarvestingReportTable() {
-  const [selectedMunicipality, setSelectedMunicipality] = useState<string>('')
-  const [selectedWaterSupply, setSelectedWaterSupply] = useState<string>('')
+  const printableRef = useRef<HTMLDivElement>(null)
+  const {
+    selectedMunicipality,
+    selectedWaterSupply,
+    dateRange,
+    setSelectedMunicipality,
+    setSelectedWaterSupply,
+    setDateRange,
+  } = useHarvestStore()
+
   const {
     data: specificData,
-    isFetching: isFetchingSpecific,
-    error: specificError,
-  } = useFetchHarvestedRice(selectedMunicipality, selectedWaterSupply)
+    isLoading: isLoadingSpecific,
+    error: errorSpecific,
+  } = useFetchHarvestedRice()
+
   const {
     data: totalData,
-    isFetching: isFetchingTotal,
-    error: totalError,
-  } = useFetchTotalHarvestedRice(selectedMunicipality)
-  const printableRef = useRef<HTMLDivElement>(null)
+    isLoading: isLoadingTotal,
+    error: errorTotal,
+  } = useFetchTotalHarvestedRice()
 
   const processedData: ProcessedData = useMemo(() => {
     const dataToProcess =
@@ -242,10 +253,10 @@ export default function HarvestingReportTable() {
     }
   }
 
-  const isFetching = isFetchingSpecific || isFetchingTotal
-  const error = specificError || totalError
+  const isLoading = isLoadingSpecific || isLoadingTotal
+  const error = errorSpecific || errorTotal
 
-  if (isFetching) return <div>Loading...</div>
+  if (isLoading) return <div>Loading...</div>
   if (error)
     return (
       <div>
@@ -256,7 +267,7 @@ export default function HarvestingReportTable() {
   return (
     <div className='p-4'>
       <div className='flex gap-4 mb-4'>
-        <Select onValueChange={(value) => setSelectedMunicipality(value)}>
+        <Select onValueChange={setSelectedMunicipality}>
           <SelectTrigger className='w-[180px]'>
             <SelectValue placeholder='Select Municipality' />
           </SelectTrigger>
@@ -268,7 +279,7 @@ export default function HarvestingReportTable() {
             ))}
           </SelectContent>
         </Select>
-        <Select onValueChange={(value) => setSelectedWaterSupply(value)}>
+        <Select onValueChange={setSelectedWaterSupply}>
           <SelectTrigger className='w-[180px]'>
             <SelectValue placeholder='Select Water Supply' />
           </SelectTrigger>
@@ -280,6 +291,10 @@ export default function HarvestingReportTable() {
             ))}
           </SelectContent>
         </Select>
+        <DateRangePicker
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+        />
       </div>
       <ScrollArea className='w-full rounded-md border'>
         <div ref={printableRef}>

@@ -44,6 +44,8 @@ export const getPlantingRiceCropForTheCurrentMonth = async () => {
 export const getHarvestedRiceCropsData = async (
   selectedMunicipality: string,
   selectedType: string,
+  startDate: Date,
+  endDate: Date,
 ) => {
   const supabase = createClient()
 
@@ -51,34 +53,36 @@ export const getHarvestedRiceCropsData = async (
     .from('planting_records')
     .select(
       `
-        crop_categoryId (
-          name
-        ),
-        crop_type(
-          name
-       ),
-       variety(
-          name
-       ),
-       farmer_id(
-            id,
-          firstname,
-          lastname),
-       category_specific,
-        location_id (
-          barangay,
-          municipality,
-          province
-        ), harvest_records(
-          area_harvested,
-          yield_quantity,
-          harvest_date)
-      `,
+          crop_categoryId (
+            name
+          ),
+          crop_type(
+            name
+         ),
+         variety(
+            name
+         ),
+         farmer_id(
+              id,
+            firstname,
+            lastname),
+         category_specific,
+          location_id (
+            barangay,
+            municipality,
+            province
+          ), harvest_records(
+            area_harvested,
+            yield_quantity,
+            harvest_date)
+        `,
     )
     .eq('status', 'harvested')
     .not('crop_categoryId', 'is', null)
     .eq('crop_categoryId.name', 'rice')
     .not('location_id', 'is', null)
+    .gte('harvest_records.harvest_date', startDate.toISOString())
+    .lte('harvest_records.harvest_date', endDate.toISOString())
 
   if (selectedMunicipality) {
     query = query.eq('location_id.municipality', selectedMunicipality)
@@ -108,6 +112,8 @@ export const getHarvestedRiceCropsData = async (
 
 export const getTotalHarvestedRiceCropsData = async (
   selectedMunicipality: string,
+  startDate: Date,
+  endDate: Date,
 ) => {
   const supabase = createClient()
 
@@ -115,34 +121,36 @@ export const getTotalHarvestedRiceCropsData = async (
     .from('planting_records')
     .select(
       `
-        crop_categoryId (
-          name
-        ),
-        crop_type(
-          name
-       ),
-       variety(
-          name
-       ),
-       farmer_id(
-            id,
-          firstname,
-          lastname),
-       category_specific,
-        location_id (
-          barangay,
-          municipality,
-          province
-        ), harvest_records(
-          area_harvested,
-          yield_quantity,
-          harvest_date)
-      `,
+          crop_categoryId (
+            name
+          ),
+          crop_type(
+            name
+         ),
+         variety(
+            name
+         ),
+         farmer_id(
+              id,
+            firstname,
+            lastname),
+         category_specific,
+          location_id (
+            barangay,
+            municipality,
+            province
+          ), harvest_records(
+            area_harvested,
+            yield_quantity,
+            harvest_date)
+        `,
     )
     .eq('status', 'harvested')
     .not('crop_categoryId', 'is', null)
     .eq('crop_categoryId.name', 'rice')
     .not('location_id', 'is', null)
+    .gte('harvest_records.harvest_date', startDate.toISOString())
+    .lte('harvest_records.harvest_date', endDate.toISOString())
 
   if (selectedMunicipality) {
     query = query.eq('location_id.municipality', selectedMunicipality)
@@ -155,8 +163,13 @@ export const getTotalHarvestedRiceCropsData = async (
     return null
   }
 
+  // Filter out records with empty harvest_records array
+  const filteredData = data.filter(
+    (record) => record.harvest_records.length > 0,
+  )
+
   // Rename location_id to location in the returned data
-  const renamedData = data.map((record) => {
+  const renamedData = filteredData.map((record) => {
     const { location_id, ...rest } = record
     return { ...rest, location: location_id }
   })
