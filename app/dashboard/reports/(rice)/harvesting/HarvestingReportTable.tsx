@@ -222,6 +222,11 @@ export default function HarvestingReportTable() {
             <head>
               <title>${selectedWaterSupply.toUpperCase()} Harvesting Report - ${selectedMunicipality}</title>
               <style>
+                *, *::before, *::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                }
                 @page { size: landscape; }
                 body { font-family: Arial, sans-serif; }
                 table { width: 100%; border-collapse: collapse; }

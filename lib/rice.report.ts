@@ -49,6 +49,12 @@ export const getHarvestedRiceCropsData = async (
 ) => {
   const supabase = createClient()
 
+  // Ensure start date is at the beginning of the day and end date is at the end of the day
+  const adjustedStartDate = new Date(startDate)
+  adjustedStartDate.setHours(0, 0, 0, 0)
+  const adjustedEndDate = new Date(endDate)
+  adjustedEndDate.setHours(23, 59, 59, 999)
+
   let query = supabase
     .from('planting_records')
     .select(
@@ -81,8 +87,8 @@ export const getHarvestedRiceCropsData = async (
     .not('crop_categoryId', 'is', null)
     .eq('crop_categoryId.name', 'rice')
     .not('location_id', 'is', null)
-    .gte('harvest_records.harvest_date', startDate.toISOString())
-    .lte('harvest_records.harvest_date', endDate.toISOString())
+    .gte('harvest_records.harvest_date', adjustedStartDate.toISOString())
+    .lte('harvest_records.harvest_date', adjustedEndDate.toISOString())
 
   if (selectedMunicipality) {
     query = query.eq('location_id.municipality', selectedMunicipality)
@@ -101,8 +107,15 @@ export const getHarvestedRiceCropsData = async (
     return null
   }
 
+  // Filter out records with empty harvest_records array and ensure strict date adherence
+  const filteredData = data.filter((record) => {
+    if (record.harvest_records.length === 0) return false
+    const harvestDate = new Date(record.harvest_records[0].harvest_date)
+    return harvestDate >= adjustedStartDate && harvestDate <= adjustedEndDate
+  })
+
   // Rename location_id to location in the returned data
-  const renamedData = data.map((record) => {
+  const renamedData = filteredData.map((record) => {
     const { location_id, ...rest } = record
     return { ...rest, location: location_id }
   })
@@ -116,6 +129,12 @@ export const getTotalHarvestedRiceCropsData = async (
   endDate: Date,
 ) => {
   const supabase = createClient()
+
+  // Ensure start date is at the beginning of the day and end date is at the end of the day
+  const adjustedStartDate = new Date(startDate)
+  adjustedStartDate.setHours(0, 0, 0, 0)
+  const adjustedEndDate = new Date(endDate)
+  adjustedEndDate.setHours(23, 59, 59, 999)
 
   let query = supabase
     .from('planting_records')
@@ -149,8 +168,8 @@ export const getTotalHarvestedRiceCropsData = async (
     .not('crop_categoryId', 'is', null)
     .eq('crop_categoryId.name', 'rice')
     .not('location_id', 'is', null)
-    .gte('harvest_records.harvest_date', startDate.toISOString())
-    .lte('harvest_records.harvest_date', endDate.toISOString())
+    .gte('harvest_records.harvest_date', adjustedStartDate.toISOString())
+    .lte('harvest_records.harvest_date', adjustedEndDate.toISOString())
 
   if (selectedMunicipality) {
     query = query.eq('location_id.municipality', selectedMunicipality)
@@ -163,10 +182,12 @@ export const getTotalHarvestedRiceCropsData = async (
     return null
   }
 
-  // Filter out records with empty harvest_records array
-  const filteredData = data.filter(
-    (record) => record.harvest_records.length > 0,
-  )
+  // Filter out records with empty harvest_records array and ensure strict date adherence
+  const filteredData = data.filter((record) => {
+    if (record.harvest_records.length === 0) return false
+    const harvestDate = new Date(record.harvest_records[0].harvest_date)
+    return harvestDate >= adjustedStartDate && harvestDate <= adjustedEndDate
+  })
 
   // Rename location_id to location in the returned data
   const renamedData = filteredData.map((record) => {
