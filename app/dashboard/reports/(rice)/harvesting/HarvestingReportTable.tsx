@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useMemo, useState } from 'react'
+import React, { useRef, useMemo } from 'react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,8 +13,14 @@ import {
 import useFetchHarvestedRice from '@/hooks/reports/useFetchHarvestedRice'
 import useFetchTotalHarvestedRice from '@/hooks/reports/useFetchTotalHarvestRiceData'
 import { DateRangePicker } from './DatePicker'
-import { DateRange } from 'react-day-picker'
 import useHarvestStore from '@/stores/useRiceHarvestStore'
+import { format } from 'date-fns'
+import {
+  determineSeason,
+  formatDateRange,
+  getBgColor,
+  getSeasonAndYear,
+} from '@/lib/utils'
 
 type SeedData = {
   area: number
@@ -60,6 +66,53 @@ const municipalities = [
 ]
 const waterSupplyTypes = ['irrigated', 'rainfed', 'upland', 'total']
 
+const calculateTotal = (data: BarangayData): SeedData => {
+  return Object.values(data).reduce(
+    (acc, seedData) => {
+      if (
+        typeof seedData === 'object' &&
+        seedData !== null &&
+        'area' in seedData
+      ) {
+        acc.area += seedData.area
+        acc.production += seedData.production
+      }
+      return acc
+    },
+    { area: 0, averageYield: 0, production: 0 },
+  )
+}
+
+const calculateMunicipalityTotal = (
+  barangayData: Record<string, BarangayData>,
+): BarangayData => {
+  const initialTotal: BarangayData = {
+    noOfFarmerHarvested: 0,
+    hybridSeeds: { area: 0, averageYield: 0, production: 0 },
+    registeredSeeds: { area: 0, averageYield: 0, production: 0 },
+    certifiedSeeds: { area: 0, averageYield: 0, production: 0 },
+    goodQualitySeeds: { area: 0, averageYield: 0, production: 0 },
+    farmerSavedSeeds: { area: 0, averageYield: 0, production: 0 },
+    farmerIds: new Set(),
+  }
+
+  return Object.values(barangayData).reduce((acc, barangay) => {
+    acc.noOfFarmerHarvested += barangay.noOfFarmerHarvested
+    barangay.farmerIds?.forEach((id) => acc.farmerIds!.add(id))
+    Object.keys(acc).forEach((key) => {
+      if (key !== 'noOfFarmerHarvested' && key !== 'farmerIds') {
+        acc[key].area += barangay[key].area
+        acc[key].production += barangay[key].production
+        acc[key].averageYield = calculateAverageYield(
+          acc[key].production,
+          acc[key].area,
+        )
+      }
+    })
+    return acc
+  }, initialTotal)
+}
+
 export default function HarvestingReportTable() {
   const printableRef = useRef<HTMLDivElement>(null)
   const {
@@ -82,6 +135,10 @@ export default function HarvestingReportTable() {
     isLoading: isLoadingTotal,
     error: errorTotal,
   } = useFetchTotalHarvestedRice()
+
+  const seasonAndYear = dateRange.from
+    ? getSeasonAndYear(new Date(dateRange.from))
+    : ''
 
   const processedData: ProcessedData = useMemo(() => {
     const dataToProcess =
@@ -150,6 +207,7 @@ export default function HarvestingReportTable() {
       const production = calculateProduction(
         harvest_records[0]?.yield_quantity || 0,
       )
+
       const averageYield = calculateAverageYield(production, area)
 
       const seedData = barangays[municipality][barangay][seedType]
@@ -164,53 +222,6 @@ export default function HarvestingReportTable() {
     return barangays
   }, [specificData, totalData, selectedWaterSupply])
 
-  const calculateTotal = (data: BarangayData): SeedData => {
-    return Object.values(data).reduce(
-      (acc, seedData) => {
-        if (
-          typeof seedData === 'object' &&
-          seedData !== null &&
-          'area' in seedData
-        ) {
-          acc.area += seedData.area
-          acc.production += seedData.production
-        }
-        return acc
-      },
-      { area: 0, averageYield: 0, production: 0 },
-    )
-  }
-
-  const calculateMunicipalityTotal = (
-    barangayData: Record<string, BarangayData>,
-  ): BarangayData => {
-    const initialTotal: BarangayData = {
-      noOfFarmerHarvested: 0,
-      hybridSeeds: { area: 0, averageYield: 0, production: 0 },
-      registeredSeeds: { area: 0, averageYield: 0, production: 0 },
-      certifiedSeeds: { area: 0, averageYield: 0, production: 0 },
-      goodQualitySeeds: { area: 0, averageYield: 0, production: 0 },
-      farmerSavedSeeds: { area: 0, averageYield: 0, production: 0 },
-      farmerIds: new Set(),
-    }
-
-    return Object.values(barangayData).reduce((acc, barangay) => {
-      acc.noOfFarmerHarvested += barangay.noOfFarmerHarvested
-      barangay.farmerIds?.forEach((id) => acc.farmerIds!.add(id))
-      Object.keys(acc).forEach((key) => {
-        if (key !== 'noOfFarmerHarvested' && key !== 'farmerIds') {
-          acc[key].area += barangay[key].area
-          acc[key].production += barangay[key].production
-          acc[key].averageYield = calculateAverageYield(
-            acc[key].production,
-            acc[key].area,
-          )
-        }
-      })
-      return acc
-    }, initialTotal)
-  }
-
   const handlePrint = () => {
     if (printableRef.current) {
       const printContent = printableRef.current.innerHTML
@@ -223,25 +234,86 @@ export default function HarvestingReportTable() {
               <title>${selectedWaterSupply.toUpperCase()} Harvesting Report - ${selectedMunicipality}</title>
               <style>
                 *, *::before, *::after {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
                 }
                 @page { size: landscape; }
-                body { font-family: Arial, sans-serif; }
-                table { width: 100%; border-collapse: collapse; }
-                th, td { border: 1px solid black; padding: 4px; text-align: center; font-size: 12px; }
-                .irrigated-header { background-color: #FFFF00; }
+                body { font-family: Arial, sans-serif; font-size: 9px; }
+                table { width: 100%; border-collapse: collapse; border: 2px solid black; }
+                th, td { border: 1px solid black; padding: 4px; font-size: 10px; }
+                .irrigated-header { background-color: #FFFF99; }
+                .rainfed-header { background-color: #99FF99; }
+                .upland-header { background-color: #FFCC99; }
+                .total-header { background-color: #99CCFF; }
                 .municipality { background-color: #FFA500; text-align: left; }
                 .seed-type { background-color: #FFFFFF; }
                 .municipality-total { background-color: #90EE90; font-weight: bold; }
+                .date-text {
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 8px;
+                }
+                .month {
+                  color: #c7bbc90;
+                }
+                .header-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 3px;
+                }
+                .region {
+                margin-bottom: 2px;
+                }
+                .signature-section {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-top: 30px;
+                }
+                .signature-block {
+                  text-align: center;
+                }
+                .signature-line {
+                  width: 200px;
+                  border-top: 1px solid black;
+                  margin-top: 30px;
+                }
                 @media print {
                   body { -webkit-print-color-adjust: exact; }
                 }
               </style>
             </head>
             <body>
+             <div class="date-text">
+              <p>RICE HARVESTING REPORT</p>
+              <p>HARVESTING ACCOMPLISHMENT REPORT</p>
+              <p>${seasonAndYear}</p>
+              <p className="month">
+                For the Month of: ${formatDateRange(dateRange.from, dateRange.to)}
+              </p>
+            </div>
+            <div class="header-info">
+              <div>
+                <p class="region"><strong>REGION: IV - MIMAROPA</strong></p>
+                <p><strong>PROVINCE: MARINDUQUE</strong></p>
+                <p><strong>MUNICIPALITY: ${selectedMunicipality.toUpperCase()}</strong></p>
+              </div>
+            </div>
               ${printContent}
+            <div class="signature-section">
+                <div class="signature-block">
+                  <p>Prepared by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>JERALD B. MABUTI</strong></p>
+                  <p>Corn AEW</p>
+                </div>
+                <div class="signature-block">
+                  <p>Noted by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>VANESSA TAYABA</strong></p>
+                  <p>Municipal Agricultural Officer</p>
+                </div>
+            </div>
             </body>
           </html>
         `)
@@ -272,7 +344,10 @@ export default function HarvestingReportTable() {
   return (
     <div className='p-4'>
       <div className='flex gap-4 mb-4'>
-        <Select onValueChange={setSelectedMunicipality}>
+        <Select
+          onValueChange={setSelectedMunicipality}
+          value={selectedMunicipality || undefined}
+        >
           <SelectTrigger className='w-[180px]'>
             <SelectValue placeholder='Select Municipality' />
           </SelectTrigger>
@@ -284,7 +359,10 @@ export default function HarvestingReportTable() {
             ))}
           </SelectContent>
         </Select>
-        <Select onValueChange={setSelectedWaterSupply}>
+        <Select
+          onValueChange={setSelectedWaterSupply}
+          value={selectedWaterSupply || undefined}
+        >
           <SelectTrigger className='w-[180px]'>
             <SelectValue placeholder='Select Water Supply' />
           </SelectTrigger>
@@ -320,7 +398,7 @@ export default function HarvestingReportTable() {
                 </th>
                 <th
                   colSpan={18}
-                  className='border border-black p-2 bg-yellow-300 text-black text-center font-bold irrigated-header'
+                  className={`border border-black p-2 text-black text-center font-bold ${selectedWaterSupply}-header ${getBgColor(selectedWaterSupply)}`}
                 >
                   {selectedWaterSupply.toUpperCase()}
                 </th>
@@ -374,140 +452,48 @@ export default function HarvestingReportTable() {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(processedData).map(
-                ([municipality, barangayData]) => (
-                  <React.Fragment key={municipality}>
-                    <tr>
-                      <td
-                        colSpan={20}
-                        className='border border-black p-2 bg-orange-300 text-black font-bold municipality'
-                      >
-                        {municipality.toUpperCase()}
-                      </td>
-                    </tr>
-                    {Object.entries(barangayData).map(([barangay, data]) => {
-                      const total = calculateTotal(data)
-                      total.averageYield = calculateAverageYield(
-                        total.production,
-                        total.area,
-                      )
-                      return (
-                        <tr key={barangay}>
-                          <td className='border border-black p-2 bg-white text-black'>
-                            {barangay}
-                          </td>
-                          <td className='border border-black p-2 bg-white text-black text-center'>
-                            {data.noOfFarmerHarvested}
-                          </td>
-                          {[
-                            'hybridSeeds',
-                            'registeredSeeds',
-                            'certifiedSeeds',
-                            'goodQualitySeeds',
-                            'farmerSavedSeeds',
-                          ].map((seedType) => (
-                            <React.Fragment key={seedType}>
-                              <td className='border border-black p-2 bg-white text-black text-center'>
-                                {data[seedType].area !== 0
-                                  ? data[seedType].area.toFixed(4)
-                                  : ''}
-                              </td>
-                              <td className='border border-black p-2 bg-white text-black text-center'>
-                                {data[seedType].averageYield !== 0
-                                  ? data[seedType].averageYield.toFixed(4)
-                                  : ''}
-                              </td>
-                              <td className='border border-black p-2 bg-white text-black text-center'>
-                                {data[seedType].production !== 0
-                                  ? data[seedType].production.toFixed(4)
-                                  : ''}
-                              </td>
-                            </React.Fragment>
-                          ))}
-                          <td className='border border-black p-2 bg-white text-black text-center'>
-                            {total.area !== 0 ? total.area.toFixed(4) : ''}
-                          </td>
-                          <td className='border border-black p-2 bg-white text-black text-center'>
-                            {total.averageYield !== 0
-                              ? total.averageYield.toFixed(4)
-                              : ''}
-                          </td>
-                          <td className='border border-black p-2 bg-white text-black text-center'>
-                            {total.production !== 0
-                              ? total.production.toFixed(4)
-                              : ''}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                    <tr className='municipality-total bg-green-600'>
-                      <td className='border border-black p-2 text-black bg-green-600'>
-                        TOTAL
-                      </td>
-                      {(() => {
-                        const municipalityTotal =
-                          calculateMunicipalityTotal(barangayData)
-                        const total = calculateTotal(municipalityTotal)
-                        total.averageYield = calculateAverageYield(
-                          total.production,
-                          total.area,
-                        )
-                        return (
-                          <>
-                            <td className='border border-black p-2 text-black text-center'>
-                              {municipalityTotal.farmerIds!.size}
-                            </td>
-                            {[
-                              'hybridSeeds',
-                              'registeredSeeds',
-                              'certifiedSeeds',
-                              'goodQualitySeeds',
-                              'farmerSavedSeeds',
-                            ].map((seedType) => (
-                              <React.Fragment key={seedType}>
-                                <td className='border border-black p-2 text-black text-center'>
-                                  {municipalityTotal[seedType].area !== 0
-                                    ? municipalityTotal[seedType].area.toFixed(
-                                        4,
-                                      )
-                                    : ''}
-                                </td>
-                                <td className='border border-black p-2 text-black text-center'>
-                                  {municipalityTotal[seedType].averageYield !==
-                                  0
-                                    ? municipalityTotal[
-                                        seedType
-                                      ].averageYield.toFixed(4)
-                                    : ''}
-                                </td>
-                                <td className='border border-black p-2 text-black text-center'>
-                                  {municipalityTotal[seedType].production !== 0
-                                    ? municipalityTotal[
-                                        seedType
-                                      ].production.toFixed(4)
-                                    : ''}
-                                </td>
-                              </React.Fragment>
-                            ))}
-                            <td className='border border-black p-2 text-black text-center'>
-                              {total.area !== 0 ? total.area.toFixed(4) : ''}
-                            </td>
-                            <td className='border border-black p-2 text-black text-center'>
-                              {total.area !== 0
-                                ? (total.production / total.area).toFixed(4)
-                                : ''}
-                            </td>
-                            <td className='border border-black p-2 text-black text-center'>
-                              {total.production !== 0
-                                ? total.production.toFixed(4)
-                                : ''}
-                            </td>
-                          </>
-                        )
-                      })()}
-                    </tr>
-                  </React.Fragment>
-                ),
+              {Object.entries(processedData).length > 0 ? (
+                Object.entries(processedData).map(
+                  ([municipality, barangayData]) => (
+                    <React.Fragment key={municipality}>
+                      <tr>
+                        <td
+                          colSpan={20}
+                          className='border border-black p-2 bg-orange-300 text-black font-bold municipality'
+                        >
+                          {municipality.toUpperCase()}
+                        </td>
+                      </tr>
+                      {Object.entries(barangayData).map(([barangay, data]) => (
+                        <BarangayRow
+                          key={barangay}
+                          barangay={barangay}
+                          data={data}
+                        />
+                      ))}
+                      <MunicipalityTotalRow barangayData={barangayData} />
+                    </React.Fragment>
+                  ),
+                )
+              ) : (
+                <>
+                  <tr>
+                    <td
+                      colSpan={20}
+                      className='border border-black p-2 bg-orange-300 text-black font-bold municipality'
+                    >
+                      {selectedMunicipality.toUpperCase()}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      colSpan={20}
+                      className='border border-black p-2 text-center'
+                    >
+                      No harvesting data available for {selectedMunicipality}
+                    </td>
+                  </tr>
+                </>
               )}
             </tbody>
           </table>
@@ -522,5 +508,112 @@ export default function HarvestingReportTable() {
         Print
       </Button>
     </div>
+  )
+}
+
+function BarangayRow({
+  barangay,
+  data,
+}: {
+  barangay: string
+  data: BarangayData
+}) {
+  const total = calculateTotal(data)
+  total.averageYield = calculateAverageYield(total.production, total.area)
+
+  return (
+    <tr>
+      <td className='border border-black p-2 bg-white text-black'>
+        {barangay}
+      </td>
+      <td className='border border-black p-2 bg-white text-black text-center'>
+        {data.noOfFarmerHarvested}
+      </td>
+      {[
+        'hybridSeeds',
+        'registeredSeeds',
+        'certifiedSeeds',
+        'goodQualitySeeds',
+        'farmerSavedSeeds',
+      ].map((seedType) => (
+        <React.Fragment key={seedType}>
+          <td className='border border-black p-2 bg-white text-black text-center'>
+            {data[seedType].area !== 0 ? data[seedType].area.toFixed(4) : ''}
+          </td>
+          <td className='border border-black p-2 bg-white text-black text-center'>
+            {data[seedType].averageYield !== 0
+              ? data[seedType].averageYield.toFixed(4)
+              : ''}
+          </td>
+          <td className='border border-black p-2 bg-white text-black text-center'>
+            {data[seedType].production !== 0
+              ? data[seedType].production.toFixed(4)
+              : ''}
+          </td>
+        </React.Fragment>
+      ))}
+      <td className='border border-black p-2 bg-white text-black text-center'>
+        {total.area !== 0 ? total.area.toFixed(4) : ''}
+      </td>
+      <td className='border border-black p-2 bg-white text-black text-center'>
+        {total.averageYield !== 0 ? total.averageYield.toFixed(4) : ''}
+      </td>
+      <td className='border border-black p-2 bg-white text-black text-center'>
+        {total.production !== 0 ? total.production.toFixed(4) : ''}
+      </td>
+    </tr>
+  )
+}
+
+function MunicipalityTotalRow({
+  barangayData,
+}: {
+  barangayData: Record<string, BarangayData>
+}) {
+  const municipalityTotal = calculateMunicipalityTotal(barangayData)
+  const total = calculateTotal(municipalityTotal)
+  total.averageYield = calculateAverageYield(total.production, total.area)
+
+  return (
+    <tr className='municipality-total bg-green-600'>
+      <td className='border border-black p-2 text-black bg-green-600'>TOTAL</td>
+      <td className='border border-black p-2 text-black text-center'>
+        {municipalityTotal.farmerIds!.size}
+      </td>
+      {[
+        'hybridSeeds',
+        'registeredSeeds',
+        'certifiedSeeds',
+        'goodQualitySeeds',
+        'farmerSavedSeeds',
+      ].map((seedType) => (
+        <React.Fragment key={seedType}>
+          <td className='border border-black p-2 text-black text-center'>
+            {municipalityTotal[seedType].area !== 0
+              ? municipalityTotal[seedType].area.toFixed(4)
+              : ''}
+          </td>
+          <td className='border border-black p-2 text-black text-center'>
+            {municipalityTotal[seedType].averageYield !== 0
+              ? municipalityTotal[seedType].averageYield.toFixed(4)
+              : ''}
+          </td>
+          <td className='border border-black p-2 text-black text-center'>
+            {municipalityTotal[seedType].production !== 0
+              ? municipalityTotal[seedType].production.toFixed(4)
+              : ''}
+          </td>
+        </React.Fragment>
+      ))}
+      <td className='border border-black p-2 text-black text-center'>
+        {total.area !== 0 ? total.area.toFixed(4) : ''}
+      </td>
+      <td className='border border-black p-2 text-black text-center'>
+        {total.area !== 0 ? (total.production / total.area).toFixed(4) : ''}
+      </td>
+      <td className='border border-black p-2 text-black text-center'>
+        {total.production !== 0 ? total.production.toFixed(4) : ''}
+      </td>
+    </tr>
   )
 }
