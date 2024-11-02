@@ -45,11 +45,11 @@ export const getBgColor = (selectedWaterSupply: string) => {
     case 'irrigated':
       return 'bg-yellow-300'
     case 'rainfed':
-      return 'bg-green-300'
+      return 'bg-green-500'
     case 'upland':
       return 'bg-orange-300'
     case 'total':
-      return 'bg-sky-300'
+      return 'bg-blue-500'
     default:
       return ''
   }
