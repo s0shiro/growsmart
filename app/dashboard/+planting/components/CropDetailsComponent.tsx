@@ -118,14 +118,32 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
       label: 'Classification',
       type: 'select',
       icon: Shapes,
-      options: [
-        'Hybrid',
-        'Registered',
-        'Certified',
-        'Good Quality',
-        'Farmer Saved Seeds',
-      ],
-      showIf: (category: string) => getCategoryNameById(category) === 'rice',
+      options: (category: string) => {
+        const categoryName = getCategoryNameById(category)
+        if (categoryName === 'rice') {
+          return [
+            'Hybrid',
+            'Registered',
+            'Certified',
+            'Good Quality',
+            'Farmer Saved Seeds',
+          ]
+        } else if (categoryName === 'high-value') {
+          return [
+            'lowland vegetable',
+            'upland vegetable',
+            'legumes',
+            'spice',
+            'rootcrop',
+            'fruit',
+          ]
+        }
+        return []
+      },
+      showIf: (category: string) => {
+        const categoryName = getCategoryNameById(category)
+        return categoryName === 'rice' || categoryName === 'high-value'
+      },
     },
     {
       name: 'remarks',
@@ -197,7 +215,6 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
               field.onChange(value)
               onChange?.(value)
 
-              // Set landType to "none" and disable it when waterSupply is "irrigated"
               if (
                 name === 'categorySpecific.waterSupply' &&
                 value === 'irrigated'
@@ -352,11 +369,15 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
                     name === 'categorySpecific.classification' ||
                     name === 'remarks'
                   ) {
+                    const optionsArray =
+                      typeof options === 'function'
+                        ? options(formValues.cropCategory)
+                        : options || []
                     return renderSelect(
                       name,
                       label,
                       placeholder,
-                      options || [],
+                      optionsArray,
                       false,
                     )
                   }
