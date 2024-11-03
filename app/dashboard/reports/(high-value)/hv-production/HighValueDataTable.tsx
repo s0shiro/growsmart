@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import useHighValueInspection from '@/hooks/reports/useFetchHighValueInspectionData'
+import { format } from 'date-fns'
 
 type CropData = {
   area_planted: number
@@ -67,18 +68,85 @@ export default function Component() {
             <head>
               <title>Agricultural Report</title>
               <style>
+                *, *::before, *::after {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+                }
                 @page { size: landscape; }
-                body { font-family: Arial, sans-serif; }
-                table { width: 100%; border-collapse: collapse; }
+                body { font-family: Arial, sans-serif; font-size: 9px; }
+                table { width: 100%; border-collapse: collapse; border: 2px solid black; }
                 th, td { border: 1px solid black; padding: 4px; font-size: 10px; }
                 .commodity { font-weight: bold; }
+                 .header-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 3px;
+                }
+                .region {
+                margin-bottom: 2px;
+                }
+                .total { font-weight: bold; }
+                .crop { padding-left: 15px; }
+                .signature-section {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-top: 10px;
+                  flex-wrap: wrap;
+                }
+
+                .signature-block {
+                  text-align: center;
+                  flex: 0 0 auto;
+                }
+
+                .signature-block:last-child {
+                  flex-basis: 100%;
+                  margin-top: 1rem;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center; /* Centers the content horizontally */
+                }
+
+                .signature-line {
+                  width: 200px;
+                  border-top: 1px solid black;
+                  margin-top: 30px;
+                }
                 @media print {
                   body { -webkit-print-color-adjust: exact; }
                 }
               </style>
             </head>
             <body>
+              <div class="header-info">
+              <div>
+                <p class="region"><strong>REGION: IV - MIMAROPA</strong></p>
+                <p><strong>PROVINCE: MARINDUQUE</strong></p>\
+               <p><strong>For the Month of: ${format(new Date(), 'MMMM yyyy').toUpperCase()}</strong></p>
+              </div>
+            </div>
               ${printContent}
+              <div class="signature-section">
+                <div class="signature-block">
+                  <p>Prepared by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>JERALD B. MABUTI</strong></p>
+                  <p>Corn AEW</p>
+                </div>
+                <div class="signature-block">
+                  <p>Submitted by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>VANESSA TAYABA</strong></p>
+                  <p>Municipal Agricultural Officer</p>
+                </div>
+                <div class="signature-block">
+                  <p>Noted by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>EDILBERTO M. DE LUNA</strong></p>
+                  <p>Provincial Agricuturist</p>
+                </div>
+            </div>
             </body>
           </html>
         `)
@@ -229,7 +297,7 @@ export default function Component() {
                 </tr>
                 {Object.entries(crops).map(([crop, data]) => (
                   <tr key={crop}>
-                    <td className='border p-2 pl-4'>{crop}</td>
+                    <td className='border p-2 pl-4 crop'>{crop}</td>
                     <td className='border p-2 text-right'>
                       {data.existing > 0 ? data.existing.toFixed(4) : ''}
                     </td>
@@ -249,28 +317,28 @@ export default function Component() {
                   </tr>
                 ))}
                 <tr>
-                  <td className='border p-2 pl-4 font-medium'>TOTAL</td>
-                  <td className='border p-2 text-right font-medium'>
+                  <td className='border p-2 pl-4 font-medium total'>TOTAL</td>
+                  <td className='border p-2 text-right font-medium total'>
                     {totals[category].existing > 0
                       ? totals[category].existing.toFixed(4)
                       : ''}
                   </td>
-                  <td className='border p-2 text-right font-medium'>
+                  <td className='border p-2 text-right font-medium total'>
                     {totals[category].thisMonth > 0
                       ? totals[category].thisMonth.toFixed(4)
                       : ''}
                   </td>
-                  <td className='border p-2 text-right font-medium'>
+                  <td className='border p-2 text-right font-medium total'>
                     {totals[category].toDate > 0
                       ? totals[category].toDate.toFixed(4)
                       : ''}
                   </td>
-                  <td className='border p-2 text-right font-medium'>
+                  <td className='border p-2 text-right font-medium total'>
                     {totals[category].production > 0
                       ? totals[category].production.toFixed(2)
                       : ''}
                   </td>
-                  <td className='border p-2 text-right font-medium'>
+                  <td className='border p-2 text-right font-medium total'>
                     {totals[category].production > 0
                       ? totals[category].production.toFixed(2)
                       : ''}

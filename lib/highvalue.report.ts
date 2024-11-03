@@ -44,24 +44,20 @@ export const getHighValueInspectionData = async () => {
     return plantingDate < monthStart
   })
 
+  // Get production data
   let productionData = null
 
   const highValueCrops = await getHighValueCropsId()
   if (highValueCrops) {
     for (const crop of highValueCrops) {
-      console.log('Checking crop:', crop.name)
       const harvestedData = await getHarvestedDataOfHighValueCropCurrentMonth(
         crop.id,
       )
-      console.log('Harvested data:', harvestedData)
 
       if (harvestedData?.length) {
         const totalYieldQuantityKg = harvestedData.reduce((sum, record) => {
-          console.log('Record harvest:', record.harvest_records)
           return sum + (record.harvest_records[0].yield_quantity || 0)
         }, 0)
-
-        console.log('Total yield in kg:', totalYieldQuantityKg)
         const totalYieldQuantityMT = totalYieldQuantityKg / 1000
 
         productionData = {
@@ -69,7 +65,6 @@ export const getHighValueInspectionData = async () => {
           name: crop.name,
           yield_quantity: totalYieldQuantityMT,
         }
-        console.log('Production data set (in metric tons):', productionData)
         break
       }
     }
