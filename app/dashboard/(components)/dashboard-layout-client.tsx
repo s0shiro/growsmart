@@ -78,9 +78,8 @@ const DashboardLayoutClient = ({
 
         {/* Scrollable content area */}
         <div className='flex-1 overflow-auto p-2 md:p-8 lg:p-6'>
-          <main className='bg-background rounded-lg max-w-5xl mx-auto'>
-            {children}
-          </main>
+          {/* max-w-7xl  */}
+          <main className='bg-background rounded-lg mx-auto'>{children}</main>
         </div>
       </div>
     </div>
