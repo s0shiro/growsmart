@@ -29,7 +29,7 @@ const reportCategories = [
       {
         label: 'Standing Rice Crops',
         Icon: Clock4,
-        href: '/dashboard/reports/rice/standing',
+        href: '/dashboard/reports/rice-standing',
       },
       {
         label: 'Monthly Rice Plantings',
@@ -39,7 +39,7 @@ const reportCategories = [
       {
         label: 'Monthly Rice Harvest',
         Icon: CalendarCheck,
-        href: '/dashboard/reports/rice/monthly',
+        href: '/dashboard/reports/harvesting',
       },
     ],
   },
@@ -69,14 +69,9 @@ const reportCategories = [
     Icon: Sprout,
     reports: [
       {
-        label: 'Standing Crops',
+        label: 'High Value Crops Report',
         Icon: Clock4,
-        href: '/dashboard/reports/high-value/standing',
-      },
-      {
-        label: 'Monthly Harvest',
-        Icon: CalendarCheck,
-        href: '/dashboard/reports/high-value/monthly',
+        href: '/dashboard/reports/hv-production',
       },
     ],
   },
