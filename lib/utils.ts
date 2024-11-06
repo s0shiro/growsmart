@@ -82,3 +82,17 @@ export const getSeasonAndYear = (date: any) => {
 
   return `${season} ${year}`
 }
+
+export const getInitials = (name?: string) => {
+  if (!name) return 'UN'
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+}
+
+export const capitalizeFirst = (text?: string) => {
+  if (!text) return ''
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
