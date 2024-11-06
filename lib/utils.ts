@@ -96,3 +96,13 @@ export const capitalizeFirst = (text?: string) => {
   if (!text) return ''
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
+
+export const getURL = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ??
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ??
+    'http://localhost:3000/'
+  url = url.startsWith('http') ? url : `https://${url}`
+  url = url.endsWith('/') ? url : `${url}/`
+  return url
+}
