@@ -65,13 +65,39 @@ export async function updateMemberBasicById(
   id: string,
   data: {
     full_name: string
+    jobTitle?: string
   },
 ) {
-  const supabase = await createClient()
+  const supabase = await createSupabaseAdmin()
 
-  const res = await supabase.from('users').update(data).eq('id', id)
-  revalidatePath('/dashboard/create-user')
-  return JSON.stringify(res)
+  try {
+    const [userUpdate, metadataUpdate] = await Promise.all([
+      // Update users table with full_name only
+      supabase
+        .from('users')
+        .update({ full_name: data.full_name, job_title: data.jobTitle })
+        .eq('id', id),
+
+      // Update auth metadata with both fields
+      supabase.auth.admin.updateUserById(id, {
+        user_metadata: {
+          full_name: data.full_name,
+          jobTitle: data.jobTitle,
+        },
+      }),
+    ])
+
+    if (userUpdate.error) throw userUpdate.error
+    if (metadataUpdate.error) throw metadataUpdate.error
+
+    revalidatePath('/dashboard/users')
+    return JSON.stringify({ success: true })
+  } catch (error) {
+    return JSON.stringify({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user',
+    })
+  }
 }
 
 export async function updateMemberAdvanceAndMetadataById(
