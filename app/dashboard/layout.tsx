@@ -13,6 +13,8 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
+  console.log(data)
+
   // Extract only the necessary, serializable data
   const serializableUserData = {
     id: data.user.id,
@@ -21,6 +23,8 @@ export default async function DashboardLayout({
     role: data.user.user_metadata.role,
     status: data.user.user_metadata.status,
     lastSignInAt: data.user.last_sign_in_at,
+    avatarUrl: data.user.user_metadata.avatarUrl,
+    jobTitle: data.user.user_metadata.jobTitle,
   }
 
   return (

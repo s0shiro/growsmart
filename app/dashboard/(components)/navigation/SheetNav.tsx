@@ -22,6 +22,8 @@ import BreadcrumbSeparator from './BreadcrumbSeparator'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabaseBrowser } from '@/utils/supabase/browser'
 import NotificationIcon from '../ui/NotificationIcon'
+import { useSession } from '@/stores/useSession'
+import { getInitials } from '@/lib/utils'
 
 // Helper function to format breadcrumb segments
 const formatPathname = (pathname: string): JSX.Element[] => {
@@ -46,6 +48,7 @@ const SheetNav = () => {
   const pathname = usePathname()
   const router = useRouter()
   const formattedPathname = formatPathname(pathname)
+  const { user } = useSession()
 
   const handleLogout = async () => {
     const supabase = supabaseBrowser()
@@ -77,12 +80,15 @@ const SheetNav = () => {
               size='icon'
               className='overflow-hidden rounded-full'
             >
-              <Avatar>
+              <Avatar className='h-9 w-9'>
                 <AvatarImage
-                  src='https://i.pinimg.com/originals/7c/af/16/7caf16ffec532599adf6c6a9ee863754.jpg'
-                  alt='@shadcn'
+                  src={user?.avatarUrl ?? '/images/default-avatar.png'}
+                  alt={user?.fullName || 'User'}
+                  className='object-cover'
                 />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback className='bg-muted'>
+                  {getInitials(user?.fullName)}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>

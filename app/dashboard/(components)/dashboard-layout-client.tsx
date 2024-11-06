@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Menu, ChevronLeft, ChevronRight } from 'lucide-react'
 import Side from './navigation/Side'
 import SheetNav from './navigation/SheetNav'
+import { useSession } from '@/stores/useSession'
 
 interface UserData {
   id: string
@@ -25,8 +26,13 @@ const DashboardLayoutClient = ({
   children,
   userData,
 }: DashboardLayoutClientProps) => {
+  const { setUser } = useSession()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setUser(userData)
+  }, [userData, setUser])
 
   useEffect(() => {
     const handleResize = () => {

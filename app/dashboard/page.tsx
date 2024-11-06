@@ -14,6 +14,8 @@ export default async function DashboardPage() {
     id: data.user.id,
     email: data.user.email,
     fullName: data.user.user_metadata.full_name,
+    jobTitle: data.user.user_metadata.jobTitle,
+    avatarUrl: data.user.user_metadata.avatarUrl,
     role: data.user.user_metadata.role,
     status: data.user.user_metadata.status,
     lastSignInAt: data.user.last_sign_in_at,

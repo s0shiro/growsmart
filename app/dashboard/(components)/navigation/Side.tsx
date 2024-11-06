@@ -38,6 +38,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { capitalizeFirst, getInitials } from '@/lib/utils'
 
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
@@ -293,20 +295,24 @@ export default function Sidebar({
         </TooltipProvider>
         {isOpen && (
           <div className='flex items-center'>
-            <Image
-              src='https://i.pinimg.com/originals/7c/af/16/7caf16ffec532599adf6c6a9ee863754.jpg'
-              alt='User Avatar'
-              width={40}
-              height={40}
-              className='rounded-full'
-            />
+            <div className='relative w-10 h-10'>
+              <Avatar className='w-full h-full'>
+                <AvatarImage
+                  src={userSession?.avatarUrl ?? '/images/default-avatar.png'}
+                  alt={userSession?.fullName || 'User'}
+                  className='object-cover'
+                />
+                <AvatarFallback className='bg-muted'>
+                  {getInitials(userSession?.fullName)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
             <div className='ml-3'>
-              <p className='text-sm font-semibold text-primary-foreground'>
+              <p className='text-sm font-semibold'>
                 {userSession.fullName || 'User Name'}
               </p>
               <p className='text-xs text-muted-foreground'>
-                {userSession.role.charAt(0).toUpperCase() +
-                  userSession.role.slice(1)}
+                {capitalizeFirst(userSession?.jobTitle)}
               </p>
             </div>
           </div>
