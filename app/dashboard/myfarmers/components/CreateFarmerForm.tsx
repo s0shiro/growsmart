@@ -31,8 +31,8 @@ import { Separator } from '@/components/ui/separator'
 
 const FormSchema = z.object({
   rsbsaNumber: z.coerce.number(),
-  firstname: z.string().min(1, "First name is required"),
-  lastname: z.string().min(1, "Last name is required"),
+  firstname: z.string().min(1, 'First name is required'),
+  lastname: z.string().min(1, 'Last name is required'),
   gender: z.string(),
   municipality: z.string(),
   barangay: z.string(),
@@ -205,113 +205,125 @@ function CreateFarmerForm() {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">Create New Farmer</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-            <div className="flex flex-col items-center mb-6">
-              <SingleImageDropzone
-                width={200}
-                height={200}
-                value={file}
-                dropzoneOptions={{
-                  maxSize: 1024 * 1024,
-                }}
-                onChange={(file) => {
-                  setFile(file);
-                }}
-              />
-              <p className="text-sm text-muted-foreground mt-2">Upload farmer's avatar (optional)</p>
-            </div>
-            <Separator />
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-              {fieldConfigs.map(({ name, placeholder, label, type, icon: Icon }) => {
-                if (type === 'select') {
-                  let options: { id: string; name: string }[] = [];
-                  let disabled = false;
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+        <div className='flex flex-col items-center mb-6'>
+          <SingleImageDropzone
+            width={200}
+            height={200}
+            value={file}
+            dropzoneOptions={{
+              maxSize: 1024 * 1024,
+            }}
+            onChange={(file) => {
+              setFile(file)
+            }}
+          />
+          <p className='text-sm text-muted-foreground mt-2'>
+            Upload farmer's avatar (optional)
+          </p>
+        </div>
+        <Separator />
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+          {fieldConfigs.map(
+            ({ name, placeholder, label, type, icon: Icon }) => {
+              if (type === 'select') {
+                let options: { id: string; name: string }[] = []
+                let disabled = false
 
-                  switch (name) {
-                    case 'association':
-                      options = associations?.map((assoc) => ({ id: assoc.id, name: assoc.name })) || [];
-                      break;
-                    case 'municipality':
-                      options = municipalities?.map((mun: any) => ({ id: mun.code, name: mun.name })) || [];
-                      break;
-                    case 'barangay':
-                      options = barangays?.map((brgy: any) => ({ id: brgy.code, name: brgy.name })) || [];
-                      disabled = !selectedMunicipality;
-                      break;
-                    case 'gender':
-                      options = [{ id: 'male', name: 'Male' }, { id: 'female', name: 'Female' }];
-                      break;
-                    case 'position':
-                      options = positions;
-                      break;
-                  }
-
-                  return (
-                    <SelectField
-                      control={form.control}
-                      key={name}
-                      name={name as any}
-                      label={label}
-                      placeholder={placeholder}
-                      options={options}
-                      disabled={disabled}
-                      icon={<Icon className="h-4 w-4 text-muted-foreground" />}
-                    />
-                  )
-                } else {
-                  return (
-                    <FormField
-                      key={name}
-                      control={form.control}
-                      name={name}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{label}</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                placeholder={placeholder}
-                                type={type}
-                                {...field}
-                                className='pl-10 mt-1 block w-full'
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )
+                switch (name) {
+                  case 'association':
+                    options =
+                      associations?.map((assoc) => ({
+                        id: assoc.id,
+                        name: assoc.name,
+                      })) || []
+                    break
+                  case 'municipality':
+                    options =
+                      municipalities?.map((mun: any) => ({
+                        id: mun.code,
+                        name: mun.name,
+                      })) || []
+                    break
+                  case 'barangay':
+                    options =
+                      barangays?.map((brgy: any) => ({
+                        id: brgy.code,
+                        name: brgy.name,
+                      })) || []
+                    disabled = !selectedMunicipality
+                    break
+                  case 'gender':
+                    options = [
+                      { id: 'male', name: 'Male' },
+                      { id: 'female', name: 'Female' },
+                    ]
+                    break
+                  case 'position':
+                    options = positions
+                    break
                 }
-              })}
-            </div>
 
-            <Button
-              type='submit'
-              className='w-full flex gap-2 items-center justify-center'
-              variant='default'
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? (
-                <>
-                  <Loader2 className="animate-spin mr-2" />
-                  Submitting...
-                </>
-              ) : (
-                'Create Farmer'
-              )}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                return (
+                  <SelectField
+                    control={form.control}
+                    key={name}
+                    name={name as any}
+                    label={label}
+                    placeholder={placeholder}
+                    options={options}
+                    disabled={disabled}
+                    icon={<Icon className='h-4 w-4 text-muted-foreground' />}
+                  />
+                )
+              } else {
+                return (
+                  <FormField
+                    key={name}
+                    control={form.control}
+                    name={name}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{label}</FormLabel>
+                        <FormControl>
+                          <div className='relative'>
+                            <Icon className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                            <Input
+                              placeholder={placeholder}
+                              type={type}
+                              {...field}
+                              className='pl-10 mt-1 block w-full'
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )
+              }
+            },
+          )}
+        </div>
+
+        <Button
+          type='submit'
+          className='w-full flex gap-2 items-center justify-center'
+          variant='default'
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className='animate-spin mr-2' />
+              Submitting...
+            </>
+          ) : (
+            'Create Farmer'
+          )}
+        </Button>
+      </form>
+    </Form>
   )
 }
 
