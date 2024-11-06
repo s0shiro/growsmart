@@ -25,10 +25,15 @@ import {
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/hooks/use-toast'
+import { useEdgeStore } from '@/lib/edgestore'
+import { SingleImageDropzone } from '@/app/dashboard/(components)/forms/single-image-dropzone'
 
 const FormSchema = z.object({
   name: z.string().min(2, {
     message: 'Username must be at least 2 characters.',
+  }),
+  jobTitle: z.string().min(2, {
+    message: 'Job title must be at least 2 characters.',
   }),
   role: z.enum(['technician', 'admin', 'program coordinator']),
   status: z.enum(['active', 'resigned']),
@@ -36,6 +41,7 @@ const FormSchema = z.object({
   password: z
     .string()
     .min(6, { message: 'Password must be at least 6 characters.' }),
+  avatarUrl: z.string().optional(),
 })
 
 async function createMember(data: z.infer<typeof FormSchema>) {
@@ -60,22 +66,45 @@ export default function MemberForm() {
   const roles = ['admin', 'technician', 'program coordinator']
   const status = ['active', 'resigned']
   const { toast } = useToast()
+  const [file, setFile] = useState<File>()
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const { edgestore } = useEdgeStore()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
+      jobTitle: '',
       role: 'technician',
       status: 'active',
       email: '',
       password: '',
+      avatarUrl: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
       try {
-        const result = await createMember(data)
+        let avatarUrl = ''
+
+        if (file) {
+          const result = await edgestore.myPublicImages.upload({
+            file,
+            input: { type: 'avatar' },
+            onProgressChange: (progress) => {
+              setUploadProgress(progress)
+            },
+          })
+          avatarUrl = result.url
+        }
+
+        const submitData = {
+          ...data,
+          avatarUrl,
+        }
+
+        const result = await createMember(submitData)
         document.getElementById('create-trigger')?.click()
 
         toast({
@@ -99,6 +128,57 @@ export default function MemberForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <FormField
+          control={form.control}
+          name='avatarUrl'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Picture</FormLabel>
+              <FormControl>
+                <div className='flex flex-col items-center gap-2'>
+                  <SingleImageDropzone
+                    width={200}
+                    height={200}
+                    value={file}
+                    dropzoneOptions={{
+                      maxSize: 1024 * 1024 * 2, // 2MB
+                    }}
+                    onChange={setFile}
+                  />
+                  {uploadProgress > 0 && (
+                    <div className='w-full h-2 bg-gray-200 rounded-full'>
+                      <div
+                        className='h-full bg-green-500 rounded-full transition-all'
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </FormControl>
+              <FormDescription>
+                Upload a profile picture (max 2MB)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='jobTitle'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Title</FormLabel>
+              <FormControl>
+                <Input placeholder='e.g. Senior Technician' {...field} />
+              </FormControl>
+              <FormDescription>
+                The official job title of the user.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name='email'

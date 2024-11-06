@@ -8,7 +8,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
-    const { name, role, status, email, password } = await request.json()
+    const { name, jobTitle, role, status, email, password, avatarUrl } =
+      await request.json()
     const origin =
       headers().get('origin') || `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
     const supabase = createSupabaseAdmin()
@@ -21,8 +22,10 @@ export async function POST(request: Request) {
         email_confirm: false,
         user_metadata: {
           full_name: name,
+          jobTitle,
           role,
           status,
+          avatarUrl,
         },
       })
 
