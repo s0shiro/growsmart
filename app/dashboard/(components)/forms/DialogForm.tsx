@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-
+import { ScrollArea } from '@/components/ui/scroll-area'
 import React, { ReactNode } from 'react'
 
 export default function DialogForm({
@@ -27,12 +27,16 @@ export default function DialogForm({
       <DialogTrigger asChild id={id}>
         {Trigger}
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[700px] w-full sm:w-auto max-h-[90vh] max-w-[65vh] overflow-y-auto rounded-md p-6 sm:max-h-[650px] sm:min-w-[450px]'>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        {form}
+      <DialogContent className='sm:max-w-[700px] w-full sm:w-auto max-h-[90vh] rounded-md sm:max-h-[650px] sm:min-w-[450px]'>
+        <ScrollArea className='h-full max-h-[calc(90vh-4rem)]'>
+          <div className='p-6 pr-10'>
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>{description}</DialogDescription>
+            </DialogHeader>
+            {form}
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   )
