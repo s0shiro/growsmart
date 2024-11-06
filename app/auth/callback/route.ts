@@ -1,3 +1,4 @@
+import { getURL } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
@@ -16,10 +17,10 @@ export async function GET(request: Request) {
       // You can add additional logic here if needed
     } catch (error) {
       console.error('Auth error:', error)
-      return NextResponse.redirect(`${requestUrl.origin}/auth-error`)
+      return NextResponse.redirect(`${getURL()}auth-error`)
     }
   }
 
   // Redirect to the dashboard after successful signup and email confirmation
-  return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
+  return NextResponse.redirect(`${getURL()}dashboard`)
 }

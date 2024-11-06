@@ -1,8 +1,8 @@
 import { createSupabaseAdmin } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { headers } from 'next/headers'
 import GrowsmartWelcomeEmail from '@/emails/signup-email'
+import { getURL } from '@/lib/utils'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -10,8 +10,7 @@ export async function POST(request: Request) {
   try {
     const { name, jobTitle, role, status, email, password, avatarUrl } =
       await request.json()
-    const origin =
-      headers().get('origin') || `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    const origin = getURL()
     const supabase = createSupabaseAdmin()
 
     // Create user with Supabase Auth

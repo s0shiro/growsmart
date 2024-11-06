@@ -1,3 +1,4 @@
+import { getURL } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/server'
 import { headers } from 'next/headers'
 import Link from 'next/link'
@@ -11,7 +12,7 @@ export default async function ForgotPassword({
   const confirmReset = async (formData: FormData) => {
     'use server'
 
-    const origin = headers().get('origin')
+    const origin = getURL()
     const email = formData.get('email') as string
     const supabase = createClient()
 
