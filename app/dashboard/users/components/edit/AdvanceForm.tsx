@@ -29,20 +29,15 @@ import { Member } from '@/lib/types'
 import { updateMemberAdvanceAndMetadataById } from '../../actions'
 import { useTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEditMemberStore } from '@/stores/useEditUsersStore'
 
 const FormSchema = z.object({
   role: z.enum(['admin', 'technician']),
   status: z.enum(['active', 'resigned']),
 })
 
-export default function AdvanceForm({
-  permission,
-  onUpdate,
-}: {
-  permission: Member
-  onUpdate: (updatedMember: Member) => void
-}) {
-  const [isPending, startTransition] = useTransition()
+export default function AdvanceForm() {
+  const { member, updateAdvance, isLoading } = useEditMemberStore()
   const queryClient = useQueryClient()
 
   const roles = ['admin', 'technician']
@@ -51,47 +46,21 @@ export default function AdvanceForm({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      role: permission.role,
-      status: permission.status,
+      role: member?.role ?? 'technician',
+      status: member?.status ?? 'active',
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    startTransition(async () => {
-      const response = JSON.parse(
-        await updateMemberAdvanceAndMetadataById(
-          permission.id,
-          permission.user_id,
-          {
-            role: data.role,
-            status: data.status,
-          },
-        ),
-      )
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const result = await updateAdvance(data)
 
-      if (
-        response.permissionsRes.error?.message ||
-        response.metadataRes.error?.message
-      ) {
-        const errorMessage =
-          response.permissionsRes.error?.message ||
-          response.metadataRes.error?.message
-        toast({
-          title: 'You submitted the following values:',
-          description: (
-            <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-              <code className='text-white'>{errorMessage}</code>
-            </pre>
-          ),
-        })
-      } else {
-        toast('Successfully updated.')
-        // Call the onUpdate function with the updated member data
-        onUpdate({ ...permission, role: data.role, status: data.status })
-        document.getElementById('edit-member')?.click()
-        queryClient.invalidateQueries({ queryKey: ['members'] })
-      }
-    })
+    if (result.success) {
+      toast.success('Successfully updated')
+      queryClient.invalidateQueries({ queryKey: ['members'] })
+      document.getElementById('edit-member')?.click()
+    } else {
+      toast.error(result.error)
+    }
   }
 
   return (
@@ -158,10 +127,10 @@ export default function AdvanceForm({
           type='submit'
           className='flex gap-2 items-center w-full'
           variant='outline'
-          disabled={isPending}
+          disabled={isLoading}
         >
-          Update{' '}
-          <Loader className={cn('animate-spin', { hidden: !isPending })} />
+          Update
+          <Loader className={cn('animate-spin', { hidden: !isLoading })} />
         </Button>
       </form>
     </Form>

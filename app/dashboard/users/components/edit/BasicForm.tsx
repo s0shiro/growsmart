@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,61 +19,51 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
 import { toast } from 'sonner'
-import { Member } from '@/lib/types'
-import { updateMemberBasicById } from '../../actions'
-import { useTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEditMemberStore } from '@/stores/useEditUsersStore'
+import { useEffect } from 'react'
 
 const FormSchema = z.object({
   full_name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
+  jobTitle: z.string().min(2, {
+    message: 'Job title must be at least 2 characters.',
+  }),
 })
 
-export default function BasicForm({
-  permission,
-  onUpdate,
-}: {
-  permission: Member
-  onUpdate: (updatedMember: Member) => void
-}) {
-  const [isPending, startTransition] = useTransition()
+export default function BasicForm() {
+  const { member, updateBasic, isLoading } = useEditMemberStore()
   const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      full_name: permission.users.full_name,
+    values: {
+      // Use values instead of defaultValues
+      full_name: member?.users.full_name ?? '',
+      jobTitle: member?.users.job_title ?? '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    startTransition(async () => {
-      const { error } = JSON.parse(
-        await updateMemberBasicById(permission.user_id, data),
-      )
+  // Ensure form resets when component mounts or member changes
+  useEffect(() => {
+    if (member) {
+      form.reset({
+        full_name: member.users.full_name,
+        jobTitle: member.users.job_title,
+      })
+    }
+  }, [member, form])
 
-      if (error?.message) {
-        toast({
-          title: 'You submitted the following values:',
-          description: (
-            <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-              <code className='text-white'>{error.message}</code>
-            </pre>
-          ),
-        })
-      } else {
-        toast('Successfully updated.')
-        // Call the onUpdate function with the updated member data
-        onUpdate({
-          ...permission,
-          users: { ...permission.users, full_name: data.full_name },
-        })
-        document.getElementById('edit-member')?.click()
-        // Invalidate the relevant query
-        queryClient.invalidateQueries({ queryKey: ['members'] })
-      }
-    })
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const result = await updateBasic(data)
+    if (result.success) {
+      toast.success('Successfully updated')
+      queryClient.invalidateQueries({ queryKey: ['members'] })
+      document.getElementById('edit-member')?.click()
+    } else {
+      toast.error(result.error)
+    }
   }
 
   return (
@@ -85,7 +76,23 @@ export default function BasicForm({
             <FormItem>
               <FormLabel>Display Name</FormLabel>
               <FormControl>
-                <Input placeholder='shadcn' {...field} />
+                <Input
+                  placeholder='Full name'
+                  {...field} // This already includes value and onChange
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='jobTitle'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Title</FormLabel>
+              <FormControl>
+                <Input placeholder='e.g. Senior Technician' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,10 +102,10 @@ export default function BasicForm({
           type='submit'
           className='flex gap-2 items-center w-full'
           variant='outline'
-          disabled={isPending}
+          disabled={isLoading}
         >
-          Update{' '}
-          <Loader className={cn('animate-spin', { hidden: !isPending })} />
+          Update
+          <Loader className={cn('animate-spin', { hidden: !isLoading })} />
         </Button>
       </form>
     </Form>

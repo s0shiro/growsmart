@@ -105,7 +105,7 @@ export default function MemberForm() {
         }
 
         const result = await createMember(submitData)
-        document.getElementById('create-trigger')?.click()
+        document.getElementById('create-member')?.click()
 
         toast({
           title: 'User created successfully!🎉',

@@ -18,10 +18,8 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
 import { toast } from 'sonner'
-import { Member } from '@/lib/types'
-import { useTransition } from 'react'
-import { updateAccountById } from '../../actions'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEditMemberStore } from '@/stores/useEditUsersStore'
 
 const FormSchema = z
   .object({
@@ -34,42 +32,32 @@ const FormSchema = z
     path: ['confirm'],
   })
 
-export default function AccountForm({ permission }: { permission: Member }) {
-  const [isPending, startTransition] = useTransition()
+export default function AccountForm() {
+  const { member, updateAccount, isLoading } = useEditMemberStore()
   const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: permission.users.email,
+      email: member?.users.email ?? '',
       password: '',
       confirm: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    startTransition(async () => {
-      const response = JSON.parse(
-        await updateAccountById(permission.user_id, {
-          password: data.password,
-          confirm: data.confirm,
-        }),
-      )
-
-      if (response.error?.message) {
-        toast('Error', {
-          description: (
-            <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-              <code className='text-white'>{response.error.message}</code>
-            </pre>
-          ),
-        })
-      } else {
-        toast('Success', { description: 'Successfully updated.' })
-        document.getElementById('edit-member')?.click()
-        queryClient.invalidateQueries({ queryKey: ['members'] })
-      }
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const result = await updateAccount({
+      password: data.password,
+      confirm: data.confirm,
     })
+
+    if (result.success) {
+      toast.success('Successfully updated')
+      queryClient.invalidateQueries({ queryKey: ['members'] })
+      document.getElementById('edit-member')?.click()
+    } else {
+      toast.error(result.error)
+    }
   }
 
   return (
@@ -132,10 +120,10 @@ export default function AccountForm({ permission }: { permission: Member }) {
           type='submit'
           className='flex gap-2 items-center w-full'
           variant='outline'
-          disabled={isPending}
+          disabled={isLoading}
         >
-          Update{' '}
-          <Loader className={cn('animate-spin', { hidden: !isPending })} />
+          Update
+          <Loader className={cn('animate-spin', { hidden: !isLoading })} />
         </Button>
       </form>
     </Form>
