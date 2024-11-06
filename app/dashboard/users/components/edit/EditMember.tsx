@@ -16,11 +16,11 @@ export default function EditMember({ permission }: EditMemberProps) {
     <DialogForm
       id='edit-member'
       description='Make changes to member information. Click save when you are done.'
-      title={`Edit Member - ${permission.users.full_name}`}
+      title={`User: ${permission.users.full_name}`}
       Trigger={
-        <Button variant='outline' size='icon' className='h-8 w-8'>
+        <button className='relative flex cursor-pointer select-none items-center justify-start rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground'>
           <Pencil1Icon className='h-4 w-4' />
-        </Button>
+        </button>
       }
       form={<EditForm permission={permission} />}
     />

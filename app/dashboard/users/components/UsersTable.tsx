@@ -1,16 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  Edit,
-  Trash,
-  UserPlus,
-  Search,
-  MoreHorizontal,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -40,33 +31,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import DialogForm from '../../(components)/forms/DialogForm'
-import CreateForm from './create/CreateForm'
-import { formatDate } from '@/lib/utils'
-import EditForm from './edit/EditorForm'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import DeleteUser from './DeleteUser'
-
-interface User {
-  id: string
-  email: string
-  full_name: string
-  created_at: string
-}
-
-interface Member {
-  id: string
-  created_at: string
-  user_id: string
-  role: string
-  status: string
-  users: User
-}
+import { formatDate, getInitials } from '@/lib/utils'
+import EditMember from './edit/EditMember'
+import CreateMember from './create/CreateMember'
+import { Member } from '@/lib/types'
 
 export default function UsersTable() {
   const [members, setMembers] = useState<Member[]>([])
@@ -165,19 +133,6 @@ export default function UsersTable() {
     }
   }
 
-  const updateMember = (updatedMember: Member) => {
-    setMembers((prevMembers) =>
-      prevMembers.map((member) =>
-        member.id === updatedMember.id ? updatedMember : member,
-      ),
-    )
-    setFilteredMembers((prevFilteredMembers) =>
-      prevFilteredMembers.map((member) =>
-        member.id === updatedMember.id ? updatedMember : member,
-      ),
-    )
-  }
-
   if (error) return <ErrorDisplay error={error} />
 
   return (
@@ -189,18 +144,7 @@ export default function UsersTable() {
             A comprehensive list of all registered users
           </p>
         </div>
-        <DialogForm
-          id='create-trigger'
-          description='Add a new user to the system'
-          title='Create User'
-          Trigger={
-            <Button>
-              <UserPlus className='mr-2 h-4 w-4' />
-              Add User
-            </Button>
-          }
-          form={<CreateForm />}
-        />
+        <CreateMember />
       </div>
 
       <div className='flex flex-col sm:flex-row gap-4'>
@@ -284,11 +228,15 @@ export default function UsersTable() {
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src='https://i.pinimg.com/564x/0e/9c/c6/0e9cc65bde115ecfa5ba8056d877690a.jpg'
-                            alt={member.users.full_name}
+                            src={
+                              member.users.avatar_url ??
+                              '/images/default-avatar.png'
+                            }
+                            alt={member.users.full_name || 'User'}
+                            className='object-cover'
                           />
-                          <AvatarFallback>
-                            {member.users.full_name?.charAt(0)}
+                          <AvatarFallback className='bg-muted'>
+                            {getInitials(member.users.full_name)}
                           </AvatarFallback>
                         </Avatar>
                       </TableCell>
@@ -330,8 +278,12 @@ export default function UsersTable() {
                                   <div className='flex items-center space-x-4'>
                                     <Avatar className='w-20 h-20'>
                                       <AvatarImage
-                                        src={`/placeholder.svg?text=${selectedUser.users.full_name?.charAt(0)}`}
-                                        alt={selectedUser.users.full_name}
+                                        src={
+                                          member.users.avatar_url ??
+                                          '/images/default-avatar.png'
+                                        }
+                                        alt={member.users.full_name || 'User'}
+                                        className='object-cover'
                                       />
                                       <AvatarFallback>
                                         {selectedUser.users.full_name?.charAt(
@@ -381,48 +333,8 @@ export default function UsersTable() {
                             </DialogContent>
                           </Dialog>
 
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant='ghost' className='h-8 w-8 p-0'>
-                                <MoreHorizontal className='h-4 w-4' />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align='end'>
-                              <DropdownMenuItem
-                                onClick={() => setSelectedUser(member)}
-                              >
-                                <Eye className='mr-2 h-4 w-4' />
-                                View
-                              </DropdownMenuItem>
-                              <DialogForm
-                                id='edit-member'
-                                title='Record Planting'
-                                description={`Edit member`}
-                                Trigger={
-                                  <DropdownMenuItem
-                                    onSelect={(e) => e.preventDefault()}
-                                  >
-                                    <Edit className='mr-2 h-4 w-4' />
-                                    Edit
-                                  </DropdownMenuItem>
-                                }
-                                form={
-                                  <EditForm
-                                    permission={member}
-                                    updateMember={updateMember}
-                                  />
-                                }
-                              />
-                              {/* <DropdownMenuItem>
-                                <DeleteUser
-                                  userId={member.user_id}
-                                  onDelete={deleteMember}
-                                />
-                                <Trash className='mr-2 h-4 w-4' />
-                                Delete
-                              </DropdownMenuItem> */}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <EditMember permission={member} />
+
                           {/* <Button
                             variant='ghost'
                             size='icon'
