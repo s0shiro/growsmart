@@ -101,7 +101,7 @@ export default function Sidebar({
   return (
     <aside
       className={clsx(
-        'bg-card flex flex-col h-screen transition-all duration-300 ease-in-out',
+        'bg-card flex flex-col h-screen transition-all duration-300 ease-in-out border-r border-border',
         isOpen ? 'w-64' : 'w-16',
         isMobile && 'fixed left-0 top-0 z-40',
         isMobile && !isOpen && '-translate-x-full',
