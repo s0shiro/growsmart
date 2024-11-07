@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Eye, MoreHorizontal } from 'lucide-react'
+import React, { useEffect } from 'react'
+import { ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { useQuery } from '@tanstack/react-query'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -34,104 +33,50 @@ import {
 import { formatDate, getInitials } from '@/lib/utils'
 import EditMember from './edit/EditMember'
 import CreateMember from './create/CreateMember'
-import { Member } from '@/lib/types'
+import { useUsersStore } from '@/stores/usersStore'
+import UserDetails from './UserDetails'
+import TableSkeleton from './TableSkeleton'
+import { useReadUsers } from '@/hooks/users/useReadUsers'
 
 export default function UsersTable() {
-  const [members, setMembers] = useState<Member[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
-  const [selectedUser, setSelectedUser] = useState<Member | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [roleFilter, setRoleFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const itemsPerPage = 5
+  const {
+    members,
+    filteredMembers,
+    searchTerm,
+    roleFilter,
+    statusFilter,
+    currentPage,
+    itemsPerPage,
+    totalPages,
+    setMembers,
+    setSearchTerm,
+    setRoleFilter,
+    setStatusFilter,
+    setCurrentPage,
+  } = useUsersStore()
 
-  const fetchMembers = async () => {
-    const response = await fetch('/api/members')
-    if (!response.ok) {
-      throw new Error('Network response was not ok')
-    }
-    return response.json()
-  }
-
-  const { data, error, isLoading } = useQuery<Member[], Error>({
-    queryKey: ['members'],
-    queryFn: fetchMembers,
-  })
+  const { data, error, isLoading } = useReadUsers()
 
   useEffect(() => {
     if (data) {
       setMembers(data)
-      setFilteredMembers(data)
     }
-  }, [data])
+  }, [data, setMembers])
 
-  const handleSearch = useCallback(
-    (term: string) => {
-      const filtered = members.filter(
-        (member) =>
-          member.users.full_name?.toLowerCase().includes(term.toLowerCase()) ||
-          member.role.toLowerCase().includes(term.toLowerCase()) ||
-          member.status?.toLowerCase().includes(term.toLowerCase()),
-      )
-      setFilteredMembers(filtered)
-      setCurrentPage(1)
-    },
-    [members],
-  )
-
-  const filteredAndSortedMembers = useMemo(() => {
-    return filteredMembers.filter(
-      (member) =>
-        (roleFilter === 'all' || member.role === roleFilter) &&
-        (statusFilter === 'all' || member.status === statusFilter),
-    )
-  }, [filteredMembers, roleFilter, statusFilter])
-
-  const paginatedMembers = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return filteredAndSortedMembers.slice(startIndex, startIndex + itemsPerPage)
-  }, [filteredAndSortedMembers, currentPage])
-
-  const totalPages = Math.ceil(filteredAndSortedMembers.length / itemsPerPage)
-
-  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value
-    setSearchTerm(term)
-    handleSearch(term)
-  }
-
-  const roles = useMemo(
+  const roles = React.useMemo(
     () => ['all', ...new Set(members.map((member) => member.role))],
     [members],
   )
 
-  const statuses = useMemo(
+  const statuses = React.useMemo(
     () => ['all', ...new Set(members.map((member) => member.status))],
     [members],
   )
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-500'
-      case 'resigned':
-        return 'bg-red-500'
-      default:
-        return 'bg-gray-500'
-    }
-  }
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'border-green-500 text-green-500'
-      case 'technician':
-        return 'border-yellow-500 text-yellow-500'
-      default:
-        return 'border-gray-500 text-gray-500'
-    }
-  }
+  const paginatedMembers = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return filteredMembers.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredMembers, currentPage, itemsPerPage])
 
   if (error) return <ErrorDisplay error={error} />
 
@@ -151,7 +96,7 @@ export default function UsersTable() {
         <Input
           placeholder='Search by name'
           value={searchTerm}
-          onChange={onSearchChange}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className='sm:w-1/3'
         />
         <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -200,159 +145,68 @@ export default function UsersTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading
-                ? Array.from({ length: itemsPerPage }).map((_, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Skeleton className='h-10 w-10 rounded-full' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-4 w-[200px]' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-4 w-[100px]' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-4 w-[100px]' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-4 w-[120px]' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-8 w-[100px]' />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                : paginatedMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell>
-                        <Avatar>
-                          <AvatarImage
-                            src={
-                              member.users.avatar_url ??
-                              '/images/default-avatar.png'
-                            }
-                            alt={member.users.full_name || 'User'}
-                            className='object-cover'
-                          />
-                          <AvatarFallback className='bg-muted'>
-                            {getInitials(member.users.full_name)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </TableCell>
-                      <TableCell>{member.users.full_name}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant='outline'
-                          className={`${getRoleColor(member.role)}`}
-                        >
-                          {member.role}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={`${getStatusColor(member.status)} text-white`}
-                        >
-                          {member.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatDate(member.created_at)}</TableCell>
-                      <TableCell>
-                        <div className='flex space-x-2'>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                onClick={() => setSelectedUser(member)}
-                              >
-                                <Eye className='h-4 w-4' />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className='sm:max-w-[425px]'>
-                              <DialogHeader>
-                                <DialogTitle>User Details</DialogTitle>
-                              </DialogHeader>
-                              {selectedUser && (
-                                <div className='grid gap-4 py-4'>
-                                  <div className='flex items-center space-x-4'>
-                                    <Avatar className='w-20 h-20'>
-                                      <AvatarImage
-                                        src={
-                                          member.users.avatar_url ??
-                                          '/images/default-avatar.png'
-                                        }
-                                        alt={member.users.full_name || 'User'}
-                                        className='object-cover'
-                                      />
-                                      <AvatarFallback>
-                                        {selectedUser.users.full_name?.charAt(
-                                          0,
-                                        )}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                      <h3 className='font-semibold text-lg'>
-                                        {selectedUser.users.full_name}
-                                      </h3>
-                                      <p className='text-sm text-muted-foreground'>
-                                        {selectedUser.users.email}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className='grid grid-cols-2 gap-4'>
-                                    <div>
-                                      <p className='text-sm font-medium'>
-                                        Role
-                                      </p>
-                                      <p className='text-sm text-muted-foreground'>
-                                        {selectedUser.role}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <p className='text-sm font-medium'>
-                                        Status
-                                      </p>
-                                      <p className='text-sm text-muted-foreground'>
-                                        {selectedUser.status}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <p className='text-sm font-medium'>
-                                        Joined
-                                      </p>
-                                      <p className='text-sm text-muted-foreground'>
-                                        {new Date(
-                                          selectedUser.created_at,
-                                        ).toDateString()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </DialogContent>
-                          </Dialog>
-
-                          <EditMember permission={member} />
-
-                          {/* <Button
-                            variant='ghost'
-                            size='icon'
-                            onClick={() => handleDeleteUser(member)}
-                          >
-                            <Trash className='h-4 w-4' />
-                          </Button> */}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+              {isLoading ? (
+                <TableSkeleton itemsPerPage={itemsPerPage} />
+              ) : (
+                paginatedMembers.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>
+                      <Avatar>
+                        <AvatarImage
+                          src={member.users.avatar_url}
+                          alt={member.users.full_name || 'User'}
+                          className='object-cover'
+                        />
+                        <AvatarFallback className='bg-muted'>
+                          {getInitials(member.users.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>{member.users.full_name}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant='outline'
+                        className={getRoleColor(member.role)}
+                      >
+                        {member.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`${getStatusColor(member.status)} text-white`}
+                      >
+                        {member.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatDate(member.created_at)}</TableCell>
+                    <TableCell>
+                      <div className='flex space-x-2'>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant='ghost' size='icon'>
+                              <Eye className='h-4 w-4' />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className='sm:max-w-[425px]'>
+                            <DialogHeader>
+                              <DialogTitle>User Details</DialogTitle>
+                            </DialogHeader>
+                            <UserDetails user={member} />
+                          </DialogContent>
+                        </Dialog>
+                        <EditMember permission={member} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
           <ScrollBar orientation='horizontal' />
         </ScrollArea>
       </div>
 
-      {!isLoading && filteredAndSortedMembers.length === 0 && (
+      {!isLoading && paginatedMembers.length === 0 && (
         <div className='text-center py-4 text-muted-foreground'>
           No users found matching the current filters.
         </div>
@@ -372,7 +226,7 @@ export default function UsersTable() {
           <Button
             variant='outline'
             size='sm'
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
             disabled={isLoading || currentPage === 1}
           >
             <ChevronLeft className='h-4 w-4 mr-2' />
@@ -382,12 +236,12 @@ export default function UsersTable() {
             variant='outline'
             size='sm'
             onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              setCurrentPage(Math.min(currentPage + 1, totalPages))
             }
             disabled={
               isLoading ||
               currentPage === totalPages ||
-              filteredAndSortedMembers.length === 0
+              filteredMembers.length === 0
             }
           >
             Next
@@ -406,4 +260,26 @@ function ErrorDisplay({ error }: { error: Error }) {
       <p>An error occurred while fetching user data: {error.message}</p>
     </div>
   )
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'active':
+      return 'bg-green-500'
+    case 'resigned':
+      return 'bg-red-500'
+    default:
+      return 'bg-gray-500'
+  }
+}
+
+function getRoleColor(role: string) {
+  switch (role) {
+    case 'admin':
+      return 'border-green-500 text-green-500'
+    case 'technician':
+      return 'border-yellow-500 text-yellow-500'
+    default:
+      return 'border-gray-500 text-gray-500'
+  }
 }

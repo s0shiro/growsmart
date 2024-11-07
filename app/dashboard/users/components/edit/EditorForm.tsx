@@ -7,7 +7,12 @@ import { Member } from '@/lib/types'
 import { useEffect } from 'react'
 import { useEditMemberStore } from '@/stores/useEditUsersStore'
 
-export default function EditForm({ permission }: { permission: Member }) {
+interface EditFormProps {
+  permission: Member
+  onSuccess?: () => void
+}
+
+export default function EditForm({ permission, onSuccess }: EditFormProps) {
   const { setMember, reset } = useEditMemberStore()
 
   useEffect(() => {
@@ -23,13 +28,13 @@ export default function EditForm({ permission }: { permission: Member }) {
         <TabsTrigger value='advance'>Advance</TabsTrigger>
       </TabsList>
       <TabsContent value='basic'>
-        <BasicForm />
+        <BasicForm onSuccess={onSuccess} />
       </TabsContent>
       <TabsContent value='account'>
-        <AccountForm />
+        <AccountForm onSuccess={onSuccess} />
       </TabsContent>
       <TabsContent value='advance'>
-        <AdvanceForm />
+        <AdvanceForm onSuccess={onSuccess} />
       </TabsContent>
     </Tabs>
   )

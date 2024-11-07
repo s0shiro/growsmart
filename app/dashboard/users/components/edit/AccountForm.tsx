@@ -20,6 +20,7 @@ import { Loader } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEditMemberStore } from '@/stores/useEditUsersStore'
+import { useToast } from '@/components/hooks/use-toast'
 
 const FormSchema = z
   .object({
@@ -32,9 +33,14 @@ const FormSchema = z
     path: ['confirm'],
   })
 
-export default function AccountForm() {
+interface AccountFormProps {
+  onSuccess?: () => void
+}
+
+export default function AccountForm({ onSuccess }: AccountFormProps) {
   const { member, updateAccount, isLoading } = useEditMemberStore()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -52,11 +58,18 @@ export default function AccountForm() {
     })
 
     if (result.success) {
-      toast.success('Successfully updated')
+      toast({ description: 'Password updated successfully.✅' })
       queryClient.invalidateQueries({ queryKey: ['members'] })
-      document.getElementById('edit-member')?.click()
+      // Explicitly set password fields to empty
+      form.setValue('password', '')
+      form.setValue('confirm', '')
+      onSuccess?.()
     } else {
-      toast.error(result.error)
+      toast({
+        title: 'Error',
+        description: result.error,
+        variant: 'destructive',
+      })
     }
   }
 
@@ -92,6 +105,7 @@ export default function AccountForm() {
                 <Input
                   placeholder='******'
                   type='password'
+                  {...field}
                   onChange={field.onChange}
                 />
               </FormControl>
@@ -109,6 +123,7 @@ export default function AccountForm() {
                 <Input
                   placeholder='******'
                   type='password'
+                  {...field}
                   onChange={field.onChange}
                 />
               </FormControl>

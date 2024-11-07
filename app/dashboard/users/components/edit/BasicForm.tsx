@@ -18,10 +18,10 @@ import { Input } from '@/components/ui/input'
 
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
-import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEditMemberStore } from '@/stores/useEditUsersStore'
 import { useEffect } from 'react'
+import { useToast } from '@/components/hooks/use-toast'
 
 const FormSchema = z.object({
   full_name: z.string().min(2, {
@@ -32,9 +32,14 @@ const FormSchema = z.object({
   }),
 })
 
-export default function BasicForm() {
+interface BasicFormProps {
+  onSuccess?: () => void
+}
+
+export default function BasicForm({ onSuccess }: BasicFormProps) {
   const { member, updateBasic, isLoading } = useEditMemberStore()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -58,11 +63,25 @@ export default function BasicForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const result = await updateBasic(data)
     if (result.success) {
-      toast.success('Successfully updated')
+      const updatedFields = []
+      if (data.full_name !== member?.users.full_name) updatedFields.push('name')
+      if (data.jobTitle !== member?.users.job_title)
+        updatedFields.push('job title')
+
+      const message = `Successfully updated ${member?.users.full_name}'s ${updatedFields.join(' and ').toUpperCase()}.`
+
+      toast({
+        description: message,
+        variant: 'default',
+      })
       queryClient.invalidateQueries({ queryKey: ['members'] })
-      document.getElementById('edit-member')?.click()
+      onSuccess?.()
     } else {
-      toast.error(result.error)
+      toast({
+        title: 'Error',
+        description: result.error || 'Failed to update user information',
+        variant: 'destructive',
+      })
     }
   }
 

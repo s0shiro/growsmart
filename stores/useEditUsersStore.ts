@@ -10,7 +10,9 @@ interface EditMemberStore {
   member: Member | null
   isLoading: boolean
   error: string | null
+  isDialogOpen: boolean
   setMember: (member: Member) => void
+  setDialogOpen: (open: boolean) => void
   updateBasic: (data: { full_name: string; jobTitle: string }) => Promise<{
     success: boolean
     error?: string
@@ -33,6 +35,8 @@ export const useEditMemberStore = create<EditMemberStore>((set, get) => ({
   member: null,
   isLoading: false,
   error: null,
+  isDialogOpen: false,
+  setDialogOpen: (open) => set({ isDialogOpen: open }),
 
   setMember: (member) => set({ member }),
 
@@ -66,11 +70,15 @@ export const useEditMemberStore = create<EditMemberStore>((set, get) => ({
       const response = JSON.parse(
         await updateAccountById(get().member?.user_id!, data),
       )
-      if (response.error) throw response.error
+      if (response.error) {
+        throw new Error(response.error)
+      }
       return { success: true }
     } catch (error) {
-      set({ error: (error as Error).message })
-      return { success: false, error: (error as Error).message }
+      return {
+        success: false,
+        error: (error as Error).message,
+      }
     } finally {
       set({ isLoading: false })
     }
@@ -99,5 +107,10 @@ export const useEditMemberStore = create<EditMemberStore>((set, get) => ({
     }
   },
 
-  reset: () => set({ member: null, error: null }),
+  reset: () =>
+    set({
+      member: null,
+      error: null,
+      isDialogOpen: false,
+    }),
 }))

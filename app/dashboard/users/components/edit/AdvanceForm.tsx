@@ -25,20 +25,23 @@ import {
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
 import { toast } from 'sonner'
-import { Member } from '@/lib/types'
-import { updateMemberAdvanceAndMetadataById } from '../../actions'
-import { useTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEditMemberStore } from '@/stores/useEditUsersStore'
+import { useToast } from '@/components/hooks/use-toast'
 
 const FormSchema = z.object({
   role: z.enum(['admin', 'technician']),
   status: z.enum(['active', 'resigned']),
 })
 
-export default function AdvanceForm() {
+interface AdvanceFormProps {
+  onSuccess?: () => void
+}
+
+export default function AdvanceForm({ onSuccess }: AdvanceFormProps) {
   const { member, updateAdvance, isLoading } = useEditMemberStore()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   const roles = ['admin', 'technician']
   const status = ['active', 'resigned']
@@ -55,11 +58,24 @@ export default function AdvanceForm() {
     const result = await updateAdvance(data)
 
     if (result.success) {
-      toast.success('Successfully updated')
+      const message = `Successfully updated ${member?.users.full_name}'s ${
+        data.role !== member?.role
+          ? `role to ${data.role}`
+          : `status to ${data.status}`
+      }`
+
+      toast({
+        description: message,
+        variant: 'default',
+      })
       queryClient.invalidateQueries({ queryKey: ['members'] })
-      document.getElementById('edit-member')?.click()
+      onSuccess?.()
     } else {
-      toast.error(result.error)
+      toast({
+        title: 'Error',
+        description: result.error,
+        variant: 'destructive',
+      })
     }
   }
 

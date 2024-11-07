@@ -146,13 +146,13 @@ export async function updateAccountById(
 
   if (userSession.user?.user_metadata.role !== 'admin') {
     return JSON.stringify({
-      error: { message: 'You are not allowed to do this!' },
+      error: 'You are not allowed to do this!',
     })
   }
 
   if (!data.password) {
     return JSON.stringify({
-      error: { message: 'Password is required!' },
+      error: 'Password is required!',
     })
   }
 
@@ -163,12 +163,13 @@ export async function updateAccountById(
     updateObject,
   )
 
-  if (updateResult.error?.message) {
-    return JSON.stringify(updateResult)
-  } else {
-    revalidatePath('/dashboard/member')
-    return JSON.stringify({ message: 'Password updated successfully.' })
+  if (updateResult.error) {
+    return JSON.stringify({
+      error: updateResult.error.message,
+    })
   }
+
+  return JSON.stringify({ message: 'Password updated successfully.' })
 }
 
 //Deleting user by admin
