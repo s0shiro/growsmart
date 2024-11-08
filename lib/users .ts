@@ -32,3 +32,30 @@ export const getUserRole = async (userId: string) => {
 
   return data
 }
+
+export async function getCurrentUserProfile() {
+  const supabase = createClient()
+
+  // Get authenticated user
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    throw new Error('User not authenticated')
+  }
+
+  // Query profile for the authenticated user
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  if (profileError) {
+    throw profileError
+  }
+
+  return profile
+}
