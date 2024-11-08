@@ -24,6 +24,7 @@ import { supabaseBrowser } from '@/utils/supabase/browser'
 import NotificationIcon from '../ui/NotificationIcon'
 import { useSession } from '@/stores/useSession'
 import { getInitials } from '@/lib/utils'
+import { LogOut, User } from 'lucide-react'
 
 // Helper function to format breadcrumb segments
 const formatPathname = (pathname: string): JSX.Element[] => {
@@ -95,7 +96,19 @@ const SheetNav = () => {
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={'/dashboard/profile'} className='flex items-center'>
+                <User className='mr-2 h-4 w-4' />
+                Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className='flex items-center'
+            >
+              <LogOut className='mr-2 h-4 w-4' />
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

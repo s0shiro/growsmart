@@ -135,7 +135,7 @@ export default function Sidebar({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={isActive(path, href) ? 'secondary' : 'ghost'}
+                    variant={isActive(path, href) ? 'default' : 'ghost'}
                     className={clsx(
                       'w-full justify-start mb-2',
                       !isOpen && 'justify-center p-0',
@@ -170,7 +170,7 @@ export default function Sidebar({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        variant={isActive(path, href) ? 'secondary' : 'ghost'}
+                        variant={isActive(path, href) ? 'default' : 'ghost'}
                         className={clsx(
                           'w-full justify-start mb-2',
                           !isOpen && 'justify-center p-0',
@@ -207,7 +207,7 @@ export default function Sidebar({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        variant={isActive(path, href) ? 'secondary' : 'ghost'}
+                        variant={isActive(path, href) ? 'default' : 'ghost'}
                         className={clsx(
                           'w-full justify-start mb-2',
                           !isOpen && 'justify-center p-0',
@@ -245,7 +245,7 @@ export default function Sidebar({
                     <Button
                       variant={
                         isActive(path, '/dashboard/reports')
-                          ? 'secondary'
+                          ? 'default'
                           : 'ghost'
                       }
                       className={clsx(
@@ -276,23 +276,6 @@ export default function Sidebar({
       <div
         className={clsx('px-4 py-4 border-t border-border', !isOpen && 'px-2')}
       >
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant='ghost'
-                className={clsx(
-                  'w-full justify-start mb-4',
-                  !isOpen && 'justify-center p-0',
-                )}
-              >
-                <Settings className={clsx('h-4 w-4', isOpen && 'mr-2')} />
-                {isOpen && <span>Settings</span>}
-              </Button>
-            </TooltipTrigger>
-            {!isOpen && <TooltipContent side='right'>Settings</TooltipContent>}
-          </Tooltip>
-        </TooltipProvider>
         {isOpen && (
           <div className='flex items-center'>
             <div className='relative w-10 h-10'>
