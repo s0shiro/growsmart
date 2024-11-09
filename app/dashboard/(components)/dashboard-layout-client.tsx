@@ -11,10 +11,11 @@ import { useSession } from '@/stores/useSession'
 interface UserData {
   id: string
   email: string | undefined
-  fullName: string
-  role: string
-  status: string
-  lastSignInAt: string | undefined
+  fullName: string | null // Allow null
+  avatarUrl: string | null // Allow null
+  jobTitle: string | null // Allow null
+  role: string | null // Allow null
+  status: string | null // Allow null
 }
 
 interface DashboardLayoutClientProps {

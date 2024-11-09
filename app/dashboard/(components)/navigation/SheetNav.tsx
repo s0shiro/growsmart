@@ -25,6 +25,7 @@ import NotificationIcon from '../ui/NotificationIcon'
 import { useSession } from '@/stores/useSession'
 import { getInitials } from '@/lib/utils'
 import { LogOut, User } from 'lucide-react'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
 // Helper function to format breadcrumb segments
 const formatPathname = (pathname: string): JSX.Element[] => {
@@ -50,6 +51,8 @@ const SheetNav = () => {
   const router = useRouter()
   const formattedPathname = formatPathname(pathname)
   const { user } = useSession()
+  //TODO: Replace with useCurrentUserProfile hook
+  const { data, error } = useCurrentUserProfile()
 
   const handleLogout = async () => {
     const supabase = supabaseBrowser()
@@ -83,7 +86,7 @@ const SheetNav = () => {
             >
               <Avatar className='h-9 w-9'>
                 <AvatarImage
-                  src={user?.avatarUrl ?? '/images/default-avatar.png'}
+                  src={data?.avatar_url}
                   alt={user?.fullName || 'User'}
                   className='object-cover'
                 />

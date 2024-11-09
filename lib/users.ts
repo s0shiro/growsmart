@@ -3,6 +3,9 @@
 import { createClient, createSupabaseAdmin } from '../utils/supabase/server'
 import { cache } from 'react'
 import { QueryData } from '@supabase/supabase-js'
+import { createClient as createClientVerify } from '@supabase/supabase-js'
+import { z } from 'zod'
+import { revalidatePath } from 'next/cache'
 
 export const getCurrentUser = cache(async () => {
   const supabase = createClient()
@@ -94,14 +97,27 @@ export const updateUserAvatar = async (userId: string, avatarUrl: string) => {
   return true
 }
 
-// lib/users.ts
+// verifyPassword function
 export async function verifyPassword(email: string, password: string) {
   // Create a new Supabase client specifically for verification
-  const verifyClient = createClient()
+  const supabaseAuthClient = createClientVerify(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SERVICE_ROLE!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    },
+  )
+
+  if (typeof window !== 'undefined') {
+    throw new Error('This function must be executed server-side')
+  }
 
   try {
     // Attempt sign in without persisting session
-    const { data, error } = await verifyClient.auth.signInWithPassword({
+    const { data, error } = await supabaseAuthClient.auth.signInWithPassword({
       email,
       password,
     })
@@ -115,5 +131,31 @@ export async function verifyPassword(email: string, password: string) {
   } catch (error) {
     console.error('Password verification error:', error)
     return { valid: false }
+  }
+}
+
+const profileSchema = z.object({
+  full_name: z.string().min(2),
+  job_title: z.string().min(2),
+})
+
+export async function updateProfile(
+  formData: z.infer<typeof profileSchema>,
+  userId: string,
+) {
+  const supabase = createClient()
+
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update(formData)
+      .eq('id', userId)
+
+    if (error) throw error
+
+    revalidatePath('/dashboard/profile')
+    return { success: true }
+  } catch (error) {
+    return { error: 'Failed to update profile' }
   }
 }

@@ -3,19 +3,14 @@
 import Link from 'next/link'
 import {
   Home,
-  Package,
-  Settings,
   Users2,
   UserPlus,
   Megaphone,
-  Building2,
   Sprout,
-  ChevronRight,
   ClipboardList,
   CheckSquare,
   CheckCircle,
   User,
-  UserCheck,
   Plus,
   FileText,
   X,
@@ -26,11 +21,6 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
@@ -40,6 +30,7 @@ import {
 } from '@/components/ui/tooltip'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { capitalizeFirst, getInitials } from '@/lib/utils'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
@@ -97,6 +88,7 @@ export default function Sidebar({
         : defaultLinks
 
   const path = usePathname()
+  const { data, error } = useCurrentUserProfile()
 
   return (
     <aside
@@ -281,7 +273,7 @@ export default function Sidebar({
             <div className='relative w-10 h-10'>
               <Avatar className='w-full h-full'>
                 <AvatarImage
-                  src={userSession?.avatarUrl ?? '/images/default-avatar.png'}
+                  src={data?.avatar_url}
                   alt={userSession?.fullName || 'User'}
                   className='object-cover'
                 />
