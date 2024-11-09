@@ -1,5 +1,5 @@
 import { getCountOfFarmers } from '@/lib/farmer'
-import { getCurrentUser } from '@/lib/users '
+import { getCurrentUser } from '@/lib/users'
 import { useQuery } from '@tanstack/react-query'
 
 const useFarmersCount = () => {

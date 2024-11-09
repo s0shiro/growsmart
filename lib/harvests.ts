@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { getCurrentUser } from './users '
+import { getCurrentUser } from './users'
 import { QueryData } from '@supabase/supabase-js'
 import { parse } from 'path'
 

@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { getCurrentUser } from './users '
+import { getCurrentUser } from './users'
 
 export const createNewFarmer = async (data: {
   firstname: string

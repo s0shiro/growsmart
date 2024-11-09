@@ -1,4 +1,4 @@
-import { getUserRole } from '@/lib/users '
+import { getUserRole } from '@/lib/users'
 import { createClient } from '@/utils/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 

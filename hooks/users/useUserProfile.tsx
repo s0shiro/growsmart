@@ -1,4 +1,4 @@
-import { getCurrentUserProfile } from '@/lib/users '
+import { getCurrentUserProfile } from '@/lib/users'
 import { useQuery } from '@tanstack/react-query'
 
 // Keep existing getCurrentUserProfile function
