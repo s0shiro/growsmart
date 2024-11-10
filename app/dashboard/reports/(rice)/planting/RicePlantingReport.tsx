@@ -4,6 +4,9 @@ import { useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
 import useFetchMonthlyPlantingRice from '@/hooks/reports/useFetchMonthlyPlantingRice'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { formatDate, getSeasonAndYear } from '@/lib/utils'
+import { format } from 'date-fns'
 
 type PlantingData = {
   location_id: {
@@ -27,6 +30,7 @@ type PlantingData = {
 export default function RicePlantingReport() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, error, isLoading } = useFetchMonthlyPlantingRice()
+  const { data: user } = useCurrentUserProfile()
 
   const processedData = useMemo(() => {
     if (!data || !Array.isArray(data)) return null
@@ -172,23 +176,9 @@ export default function RicePlantingReport() {
                   size: landscape;
                   margin: 10mm;
                 }
-                body {
-                  font-family: 'Times New Roman', Times, serif;
-                  width: 100%;
-                  height: 100%;
-                  margin: 0;
-                  padding: 0;
-                }
-                table {
-                  border-collapse: collapse;
-                  width: 100%;
-                  font-size: 10px;
-                }
-                th, td {
-                  border: 1px solid black;
-                  padding: 2px;
-                  text-align: center;
-                }
+                body { font-family: Arial, sans-serif; font-size: 9px; }
+                table { width: 100%; border-collapse: collapse; border: 2px solid black; }
+                th, td { border: 1px solid black; padding: 4px; font-size: 10px; }
                 th {
                   background-color: #f2f2f2;
                 }
@@ -223,6 +213,29 @@ export default function RicePlantingReport() {
                 .rainfed-lowland { background-color: #FFD700; }
                 .rainfed-upland { background-color: #F0E68C; }
                 .total-row { background-color: #FFD700; }
+                .date-text {
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 8px;
+                }
+                .header-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 3px;
+                }
+                 .signature-section {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-top: 30px;
+                }
+                .signature-block {
+                  text-align: center;
+                }
+                .signature-line {
+                  width: 200px;
+                  border-top: 1px solid black;
+                  margin-top: 30px;
+                }
                 @media print {
                   body {
                     print-color-adjust: exact;
@@ -235,14 +248,32 @@ export default function RicePlantingReport() {
               </style>
             </head>
             <body>
-             <div class="header">
-                <img src="/no-bg.png" alt="Logo" class="logo"/>
-                <div class="org-info">
-                  <h2>Marinduque Provincial Agriculture Office</h2>
-                  <p>Capitol Compound, Boac, Philippines</p>
+                <div class="date-text">
+                    <p>Department Of Agriculture</p>
+                    <p><strong>REGIONAL FIELD OFFICE MIMAROPA</strong></p>
+                    <p><strong>Rice Program</strong></p>
                 </div>
-              </div>
+                <div class="header-info">
+                    <div>
+                    <p class="region"><strong>${getSeasonAndYear(new Date()).toUpperCase()} Planting Reportt</strong></p>
+                    <p><strong>as of ${format(new Date(), 'MMMM dd, yyyy')}</strong></p>
+                </div>
+            </div>
               ${printContent}
+              <div class="signature-section">
+                <div class="signature-block">
+                  <p>Prepared by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>${user?.full_name?.toUpperCase()}</strong></p>
+                  <p>${user?.job_title}</p>
+                </div>
+                <div class="signature-block">
+                  <p>Noted by:</p>
+                  <div class="signature-line"></div>
+                  <p><strong>VANESSA TAYABA</strong></p>
+                  <p>Municipal Agricultural Officer</p>
+                </div>
+            </div>
             </body>
           </html>
         `)
@@ -288,7 +319,7 @@ export default function RicePlantingReport() {
               <th className='irrigated' colSpan={6}>
                 IRRIGATED
               </th>
-              <th className='rainfed' colSpan={12}>
+              <th className='rainfed' colSpan={11}>
                 RAINFED
               </th>
             </tr>
@@ -311,7 +342,7 @@ export default function RicePlantingReport() {
               <th className='irrigated' rowSpan={2}>
                 TOTAL
               </th>
-              <th className='rainfed-lowland' colSpan={6}>
+              <th className='rainfed-lowland' colSpan={5}>
                 LOWLAND
               </th>
               <th className='rainfed-upland' colSpan={6}>
@@ -332,7 +363,6 @@ export default function RicePlantingReport() {
                 GOOD QUALITY
               </th>
               <th className='rainfed-lowland'>FARMER SAVED SEEDS</th>
-              <th className='rainfed-lowland'>TOTAL</th>
               <th className='rainfed-upland'>HYBRID</th>
               <th className='rainfed-upland'>REGISTERED</th>
               <th className='rainfed-upland'>CERTIFIED</th>
@@ -346,19 +376,37 @@ export default function RicePlantingReport() {
               <td>MARINDUQUE</td>
               <td>{processedData.totals.farmers.size}</td>
               {['irrigated', 'rainfedLowland', 'rainfedUpland']
-                .flatMap((category) => [
-                  formatNumber(processedData.totals[category].hybrid),
-                  formatNumber(processedData.totals[category].registered),
-                  formatNumber(processedData.totals[category].certified),
-                  formatNumber(processedData.totals[category].goodQuality),
-                  formatNumber(processedData.totals[category].farmersSaved),
-                  formatNumber(
-                    Object.values(processedData.totals[category]).reduce(
-                      (a, b) => a + b,
-                      0,
-                    ),
-                  ),
-                ])
+                .flatMap((category, index) => {
+                  const values = [
+                    formatNumber(processedData.totals[category].hybrid),
+                    formatNumber(processedData.totals[category].registered),
+                    formatNumber(processedData.totals[category].certified),
+                    formatNumber(processedData.totals[category].goodQuality),
+                    formatNumber(processedData.totals[category].farmersSaved),
+                  ]
+                  if (index === 0) {
+                    values.push(
+                      formatNumber(
+                        Object.values(processedData.totals[category]).reduce(
+                          (a, b) => a + b,
+                          0,
+                        ),
+                      ),
+                    )
+                  } else if (index === 2) {
+                    const rainfedTotal =
+                      Object.values(processedData.totals.rainfedLowland).reduce(
+                        (a, b) => a + b,
+                        0,
+                      ) +
+                      Object.values(processedData.totals.rainfedUpland).reduce(
+                        (a, b) => a + b,
+                        0,
+                      )
+                    values.push(formatNumber(rainfedTotal))
+                  }
+                  return values
+                })
                 .map((value, index) => (
                   <td key={index}>{value}</td>
                 ))}
@@ -369,19 +417,37 @@ export default function RicePlantingReport() {
                   <td>{municipality}</td>
                   <td>{data.farmers.size}</td>
                   {['irrigated', 'rainfedLowland', 'rainfedUpland']
-                    .flatMap((category) => [
-                      formatNumber(data[category].hybrid),
-                      formatNumber(data[category].registered),
-                      formatNumber(data[category].certified),
-                      formatNumber(data[category].goodQuality),
-                      formatNumber(data[category].farmersSaved),
-                      formatNumber(
-                        Object.values(data[category]).reduce(
-                          (a, b) => a + b,
-                          0,
-                        ),
-                      ),
-                    ])
+                    .flatMap((category, index) => {
+                      const values = [
+                        formatNumber(data[category].hybrid),
+                        formatNumber(data[category].registered),
+                        formatNumber(data[category].certified),
+                        formatNumber(data[category].goodQuality),
+                        formatNumber(data[category].farmersSaved),
+                      ]
+                      if (index === 0) {
+                        values.push(
+                          formatNumber(
+                            Object.values(data[category]).reduce(
+                              (a, b) => a + b,
+                              0,
+                            ),
+                          ),
+                        )
+                      } else if (index === 2) {
+                        const rainfedTotal =
+                          Object.values(data.rainfedLowland).reduce(
+                            (a, b) => a + b,
+                            0,
+                          ) +
+                          Object.values(data.rainfedUpland).reduce(
+                            (a, b) => a + b,
+                            0,
+                          )
+                        values.push(formatNumber(rainfedTotal))
+                      }
+                      return values
+                    })
                     .map((value, index) => (
                       <td key={index}>{value}</td>
                     ))}
