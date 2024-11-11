@@ -222,7 +222,7 @@ export default function DamageReport() {
             <TableHead className='bg-muted text-xs'>Crop</TableHead>
             <TableHead className='bg-muted text-xs'>Variety</TableHead>
             <TableHead className='bg-muted text-xs'>
-              Damage Quantity (kg)
+              Damage Quantity (ha)
             </TableHead>
             <TableHead className='bg-muted text-xs'>Date</TableHead>
           </TableRow>
@@ -237,7 +237,7 @@ export default function DamageReport() {
               <TableCell className='text-xs'>
                 {item.planting_records.variety.name}
               </TableCell>
-              <TableCell className='text-xs'>{`${item.damaged} kg`}</TableCell>
+              <TableCell className='text-xs'>{`${item.damaged} ha`}</TableCell>
               <TableCell className='text-xs'>{formatDate(item.date)}</TableCell>
             </TableRow>
           ))}

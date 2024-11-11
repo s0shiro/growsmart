@@ -98,7 +98,7 @@ function InspectionForm({
             name='damagedQuantity'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Damaged Quantity (kg)</FormLabel>
+                <FormLabel>Damaged Quantity (ha)</FormLabel>
                 <FormControl>
                   <Input
                     placeholder='Damaged Quantity'
