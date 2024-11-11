@@ -15,6 +15,7 @@ import {
   FileText,
   X,
   TriangleAlert,
+  History,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -42,6 +43,11 @@ const productionLinks = [
   { href: '/dashboard/standing', Icon: ClipboardList, label: 'Standing Crops' },
   { href: '/dashboard/harvest', Icon: CheckSquare, label: 'Harvest Crops' },
   { href: '/dashboard/harvested', Icon: CheckCircle, label: 'Harvested Crops' },
+  {
+    href: '/dashboard/harvested-history',
+    Icon: History,
+    label: 'All Harvested Crops',
+  },
   { href: '/dashboard/damages', Icon: TriangleAlert, label: 'Damages Report' },
 ]
 
