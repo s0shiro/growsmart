@@ -119,7 +119,7 @@ const CustomTooltip = ({
               entry.dataKey === 'damaged' ? 'text-destructive' : 'text-primary'
             }
           >
-            {`${entry.name}: ${entry.value} kg`}
+            {`${entry.name}: ${entry.value} ha`}
           </p>
         ))}
       </div>
@@ -308,7 +308,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                           type='monotone'
                           dataKey='damaged'
                           stroke='hsl(var(--destructive))'
-                          name='Damaged (kg)'
+                          name='Damaged (ha)'
                         />
                       </LineChart>
                     </ResponsiveContainer>
@@ -523,7 +523,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                         Total Damage
                       </p>
                       <p className='text-2xl font-bold text-destructive'>
-                        {totalDamaged} kg
+                        {totalDamaged} ha
                       </p>
                     </div>
                     <div className='bg-muted p-4 rounded-[var(--radius)]'>
@@ -558,7 +558,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                               }
                             >
                               {visit.damaged > 0
-                                ? `${visit.damaged} kg damaged`
+                                ? `${visit.damaged} ha damaged`
                                 : 'No damage'}
                             </Badge>
                           </div>

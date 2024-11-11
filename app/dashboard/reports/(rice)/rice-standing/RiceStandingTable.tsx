@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
 import useRiceStandingData from '@/hooks/reports/useFetchStandingRiceData'
 import { formatDate } from '@/lib/utils'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
 type RiceData = {
   area_planted: number
@@ -25,6 +26,7 @@ type RiceData = {
 export default function RiceStandingTable() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, error } = useRiceStandingData()
+  const { data: user } = useCurrentUserProfile()
 
   const processedData = useMemo(() => {
     if (!data) return null
@@ -191,8 +193,8 @@ export default function RiceStandingTable() {
                 <div class="signature-block">
                   <p>Prepared by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>JERALD B. MABUTI</strong></p>
-                  <p>Corn AEW</p>
+                  <p><strong>${user?.full_name?.toUpperCase()}</strong></p>
+                  <p>${user?.job_title}</p>
                 </div>
                 <div class="signature-block">
                   <p>Noted by:</p>

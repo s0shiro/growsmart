@@ -21,6 +21,7 @@ import {
   getBgColor,
   getSeasonAndYear,
 } from '@/lib/utils'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
 type SeedData = {
   area: number
@@ -115,6 +116,7 @@ const calculateMunicipalityTotal = (
 
 export default function HarvestingReportTable() {
   const printableRef = useRef<HTMLDivElement>(null)
+  const { data: user } = useCurrentUserProfile()
   const {
     selectedMunicipality,
     selectedWaterSupply,
@@ -304,8 +306,8 @@ export default function HarvestingReportTable() {
                 <div class="signature-block">
                   <p>Prepared by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>JERALD B. MABUTI</strong></p>
-                  <p>Corn AEW</p>
+                  <p><strong>${user?.full_name}</strong></p>
+                  <p>${user?.job_title}</p>
                 </div>
                 <div class="signature-block">
                   <p>Noted by:</p>
