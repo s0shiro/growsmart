@@ -26,6 +26,7 @@ import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import HarvestForm from '@/app/dashboard/(components)/forms/HarvestForm'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Link from 'next/link'
 
 interface Crop {
   id: string
@@ -173,23 +174,13 @@ export default function HarvestCropTable() {
                     <TableCell>{formatDate(planting.harvest_date)}</TableCell>
                     <TableCell>{planting.quantity.toLocaleString()}</TableCell>
                     <TableCell>
-                      <DialogForm
-                        id={`create-harvest`}
-                        title='Record Harvest'
-                        description={`Record harvest for ${planting.crops.name}`}
-                        Trigger={
-                          <Button variant='ghost' size='sm'>
-                            <Wheat className='mr-2 h-4 w-4' />
-                            Harvest
-                          </Button>
-                        }
-                        form={
-                          <HarvestForm
-                            plantingID={planting.id}
-                            farmerID={planting.farmer_id}
-                          />
-                        }
-                      />
+                      <Button asChild variant='outline'>
+                        <Link
+                          href={`/dashboard/harvest/${planting.id}?farmerId=${planting.farmer_id}`}
+                        >
+                          View
+                        </Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

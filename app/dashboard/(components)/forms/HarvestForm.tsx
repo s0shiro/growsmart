@@ -25,14 +25,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
 const FormSchema = z.object({
   harvestDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format for plantingDate',
   }),
-  yieldQuantity: z.coerce.number(),
+  yieldQuantity: z.coerce.number().positive('Yield quantity must be positive'),
   profit: z.coerce.number(),
-  areaHarvested: z.coerce.number(),
+  areaHarvested: z.coerce.number().positive('Area harvested must be positive'),
   damagedQuantity: z.coerce.number().optional(),
   damagedReason: z.string().optional(),
 })
@@ -92,9 +93,11 @@ const fieldConfigs: {
 export default function HarvestForm({
   plantingID,
   farmerID,
+  remainingArea,
 }: {
   plantingID: string
   farmerID: string | undefined
+  remainingArea: number | null
 }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -105,6 +108,7 @@ export default function HarvestForm({
   const [urls, setUrls] = useState<string[]>([])
   const queryClient = useQueryClient()
   const { edgestore } = useEdgeStore()
+  const router = useRouter()
 
   function updateFileProgress(key: string, progress: FileState['progress']) {
     setFileStates((fileStates) => {
@@ -118,6 +122,14 @@ export default function HarvestForm({
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    if (remainingArea !== null && data.areaHarvested > remainingArea) {
+      form.setError('areaHarvested', {
+        type: 'manual',
+        message: `Area harvested cannot exceed the remaining area of ${remainingArea.toFixed(4)} ha`,
+      })
+      return
+    }
+
     try {
       await addHarvest({
         plantingId: plantingID,
@@ -130,6 +142,12 @@ export default function HarvestForm({
         damagedReason: data.damagedReason,
         harvestImages: urls,
       })
+
+      // If harvest added successfully, confirm uploads
+      for (const url of urls) {
+        await edgestore.myPublicImages.confirmUpload({ url })
+      }
+
       await updateStatusWhenAddHarvest(plantingID)
       document.getElementById('create-harvest')?.click()
       toast.success('Crop harvested successfully!')
@@ -138,19 +156,26 @@ export default function HarvestForm({
         queryKey: ['plantings', 'harvests'],
       })
       form.reset()
+      router.push(`/dashboard/harvested/${plantingID}`)
     } catch (error) {
       console.error('Failed to submit form:', error)
+      toast.error('Failed to submit harvest information')
     }
   }
 
+  const remainingAreaWarning =
+    remainingArea === null ? (
+      <p className='text-yellow-600 mb-4'>
+        Warning: Remaining area information is not available. Please ensure
+        you're not over-harvesting.
+      </p>
+    ) : null
+
   return (
-    <Card className='w-full max-w-4xl mx-auto'>
-      <CardHeader>
-        <CardTitle className='text-2xl font-bold text-center'>
-          Harvest Information
-        </CardTitle>
-      </CardHeader>
+    <Card className='w-full mx-auto'>
+      <CardHeader></CardHeader>
       <CardContent>
+        {remainingAreaWarning}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <div className='space-y-6'>
@@ -228,11 +253,6 @@ export default function HarvestForm({
               disabled={form.formState.isSubmitting}
               type='submit'
               className='w-full'
-              onClick={async () => {
-                for (const url of urls) {
-                  await edgestore.myProtectedFiles.confirmUpload({ url })
-                }
-              }}
             >
               {form.formState.isSubmitting
                 ? 'Submitting...'
