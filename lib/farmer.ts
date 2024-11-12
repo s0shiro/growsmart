@@ -3,61 +3,98 @@
 import { createClient } from '@/utils/supabase/server'
 import { getCurrentUser } from './users'
 
-export const createNewFarmer = async (data: {
+// Types for the new structure
+type AssociationPosition = {
+  associationId: string
+  position: string
+}
+
+type FarmerCreateData = {
   firstname: string
   lastname: string
   gender: string
   municipality: string
   barangay: string
   phoneNumber: string
-  association_id: string
-  position: string
-  avatar: string | undefined
+  associationPositions: AssociationPosition[]
+  avatar?: string
   rsbsaNumber: number
-}) => {
+}
+
+export const createNewFarmer = async (data: FarmerCreateData) => {
   const supabase = createClient()
   const user = await getCurrentUser()
 
-  const { error } = await supabase.from('technician_farmers').insert({
-    user_id: user?.id || '',
-    firstname: data.firstname,
-    lastname: data.lastname,
-    gender: data.gender,
-    municipality: data.municipality,
-    barangay: data.barangay,
-    phone: data.phoneNumber,
-    association_id: data.association_id,
-    position: data.position,
-    avatar: data.avatar,
-    rsbsa_number: data.rsbsaNumber,
-  })
+  // Start transaction
+  const { data: farmer, error: farmerError } = await supabase
+    .from('technician_farmers')
+    .insert({
+      user_id: user?.id || '',
+      firstname: data.firstname,
+      lastname: data.lastname,
+      gender: data.gender,
+      municipality: data.municipality,
+      barangay: data.barangay,
+      phone: data.phoneNumber,
+      avatar: data.avatar,
+      rsbsa_number: data.rsbsaNumber,
+    })
+    .select()
+    .single()
 
-  if (error) {
-    console.error('Supabase error:', error.message)
+  if (farmerError) {
+    console.error('Error creating farmer:', farmerError.message)
+    throw farmerError
   }
+
+  // Insert association positions
+  if (data.associationPositions.length > 0) {
+    const { error: associationsError } = await supabase
+      .from('farmer_associations')
+      .insert(
+        data.associationPositions.map((ap) => ({
+          farmer_id: farmer.id,
+          association_id: ap.associationId,
+          position: ap.position,
+        })),
+      )
+
+    if (associationsError) {
+      console.error('Error creating associations:', associationsError.message)
+      throw associationsError
+    }
+  }
+
+  return farmer
 }
 
 export const getListOfFarmers = async (userId: string) => {
   const supabase = createClient()
+
   const { data, error } = await supabase
     .from('technician_farmers')
     .select(
       `
-      *,
-      association(
-        id,
-        name
-      )
-    `,
+        *,
+        farmer_associations (
+          id,
+          position,
+          association: association (
+            id,
+            name
+          )
+        )
+      `,
     )
     .eq('user_id', userId)
-    .order('firstname', { ascending: true }) // Orders by lastname in ascending order
+    .order('firstname', { ascending: true })
 
   if (error) {
     console.error('Supabase error:', error.message)
+    throw error
   }
 
-  return data
+  return data || []
 }
 
 export const getOneFarmer = async (farmerId: string) => {
@@ -66,13 +103,29 @@ export const getOneFarmer = async (farmerId: string) => {
   const { data, error } = await supabase
     .from('technician_farmers')
     .select(
-      `*, planting_records(*, crop_categories(name), crops(name), crop_varieties(name)), association(name)`,
+      `
+        *,
+        planting_records (
+          *,
+          crop_categories (name),
+          crops (name),
+          crop_varieties (name)
+        ),
+        farmer_associations (
+          position,
+          association (
+            id,
+            name
+          )
+        )
+      `,
     )
     .eq('id', farmerId)
     .single()
 
   if (error) {
     console.error('Supabase error:', error.message)
+    throw error
   }
 
   return data
@@ -98,7 +151,19 @@ export const getAllFarmers = async () => {
 
   const { data, error } = await supabase
     .from('technician_farmers')
-    .select(`*, association(name)`)
+    .select(
+      `
+      *,
+      farmer_associations (
+        id,
+        position,
+        association: association (
+          id,
+          name
+        )
+      )
+    `,
+    )
     .order('created_at', { ascending: false }) // Orders by created_at in descending order
 
   if (error) {
