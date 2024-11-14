@@ -104,21 +104,25 @@ export const getOneFarmer = async (farmerId: string) => {
     .from('technician_farmers')
     .select(
       `
-        *,
-        planting_records (
           *,
-          crop_categories (name),
-          crops (name),
-          crop_varieties (name)
-        ),
-        farmer_associations (
-          position,
-          association (
-            id,
-            name
+          planting_records (
+            *,
+            crop_categories (name),
+            crops (name),
+            crop_varieties (name),
+            harvest_records (
+              profit,
+              created_at
+            )
+          ),
+          farmer_associations (
+            position,
+            association (
+              id,
+              name
+            )
           )
-        )
-      `,
+        `,
     )
     .eq('id', farmerId)
     .single()
@@ -128,7 +132,22 @@ export const getOneFarmer = async (farmerId: string) => {
     throw error
   }
 
-  return data
+  // Calculate total profits
+  const totalProfits =
+    data.planting_records?.reduce((sum, record) => {
+      const harvestProfits =
+        record.harvest_records?.reduce(
+          (harvestSum, harvest) => harvestSum + (harvest.profit || 0),
+          0,
+        ) || 0
+      return sum + harvestProfits
+    }, 0) || 0
+
+  // Return data with total profits
+  return {
+    ...data,
+    totalProfits,
+  }
 }
 
 export const getCountOfFarmers = async (userId: string): Promise<number> => {

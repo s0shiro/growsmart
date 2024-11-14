@@ -70,3 +70,47 @@ export const getCalculatedDamagesOfPlantingRecord = async (
     remaining_area: areaPlanted - totalDamaged,
   }
 }
+
+//getting the damages per month
+export const getDamagesPerMonth = async () => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('inspections')
+    .select('damaged, date, planting_records(location_id(municipality))')
+    .gt('damaged', 0)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return null
+  }
+
+  // Initialize damages per municipality
+  const municipalityDamages = {
+    Boac: 0,
+    Buenavista: 0,
+    Gasan: 0,
+    Mogpog: 0,
+    'Santa Cruz': 0,
+    Torrijos: 0,
+  }
+
+  // Aggregate damages
+  data?.forEach((inspection) => {
+    const municipality = inspection.planting_records?.location_id?.municipality
+    if (municipality && municipality in municipalityDamages) {
+      municipalityDamages[municipality] += inspection.damaged
+    }
+  })
+
+  // Convert to array format if needed
+  const result = Object.entries(municipalityDamages).map(
+    ([municipality, total]) => ({
+      municipality,
+      total,
+    }),
+  )
+
+  return result
+}

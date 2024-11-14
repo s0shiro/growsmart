@@ -116,8 +116,6 @@ export const addPlantingRecord = async (data: PlantingRecordData) => {
   if (error) {
     console.error('Supabase error:', error.message)
   }
-
-  revalidatePath('/dashboard/farmers')
 }
 
 export const getAllPlantingRecords = async (farmerID: string) => {
