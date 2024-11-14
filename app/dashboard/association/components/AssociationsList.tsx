@@ -4,10 +4,10 @@ import { useState, useMemo } from 'react'
 import {
   PlusCircle,
   Users,
-  ChevronLeft,
-  ChevronRight,
   Search,
   Eye,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -19,17 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import useReadAssociation from '@/hooks/association/useReadAssociations'
@@ -41,24 +31,19 @@ interface Association {
   id: string
   created_at: string
   name: string
-  memberCount: number
+  memberCount: { count: number }[]
 }
 
 export default function AssociationsList() {
   const { data, error, isLoading } = useReadAssociation()
-  const [newAssociationName, setNewAssociationName] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedAssociation, setSelectedAssociation] =
-    useState<Association | null>(null)
-
+  const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
   const filteredAssociations = useMemo(() => {
-    return (
-      data?.filter((association: any) =>
-        association.name.toLowerCase().includes(searchTerm.toLowerCase()),
-      ) || []
+    if (!data) return []
+    return data.filter((association: any) =>
+      association.name.toLowerCase().includes(searchTerm.toLowerCase()),
     )
   }, [data, searchTerm])
 
@@ -68,13 +53,6 @@ export default function AssociationsList() {
   }, [filteredAssociations, currentPage])
 
   const totalPages = Math.ceil(filteredAssociations.length / itemsPerPage)
-
-  const handleCreateAssociation = (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: Implement association creation logic
-    console.log('Creating new association:', newAssociationName)
-    setNewAssociationName('')
-  }
 
   if (error) {
     return <ErrorState error={error} />
@@ -137,7 +115,7 @@ export default function AssociationsList() {
                       </TableCell>
                     </TableRow>
                   ))
-                : paginatedAssociations.map((association: Association) => (
+                : paginatedAssociations.map((association: any) => (
                     <TableRow key={association.id}>
                       <TableCell className='font-medium'>
                         {association.name}
@@ -145,7 +123,7 @@ export default function AssociationsList() {
                       <TableCell>
                         <div className='flex items-center'>
                           <Users className='mr-2 h-4 w-4 text-muted-foreground' />
-                          {association.memberCount}
+                          {association.memberCount[0]?.count || 0}
                         </div>
                       </TableCell>
                       <TableCell>

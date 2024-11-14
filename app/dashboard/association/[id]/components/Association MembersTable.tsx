@@ -29,7 +29,11 @@ export default function AssociationMembers({
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   const associationName =
-    data && data.length > 0 ? data[0].association?.name : 'Unknown Association'
+    data && data.length > 0
+      ? data[0].association_id.name
+      : 'Unknown Association'
+
+  console.log(data)
 
   if (error) {
     return <div className='text-red-500'>Error loading association details</div>
@@ -38,8 +42,12 @@ export default function AssociationMembers({
   const filteredData =
     data?.filter(
       (member) =>
-        member.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.lastname.toLowerCase().includes(searchTerm.toLowerCase()),
+        member.technician_farmers.firstname
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        member.technician_farmers.lastname
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()),
     ) || []
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
@@ -134,28 +142,38 @@ export default function AssociationMembers({
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src={member.avatar}
-                            alt={`${member.firstname} ${member.lastname}`}
+                            src={member.technician_farmers.avatar}
+                            alt={`${member.technician_farmers.firstname} ${member.technician_farmers.lastname}`}
                           />
                           <AvatarFallback>
-                            {member.firstname[0]}
-                            {member.lastname[0]}
+                            {member.technician_farmers.firstname[0]}
+                            {member.technician_farmers.lastname[0]}
                           </AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell>
-                        {member.firstname} {member.lastname}
+                        {member.technician_farmers.firstname}{' '}
+                        {member.technician_farmers.lastname}
                       </TableCell>
                       <TableCell className='capitalize'>
                         {member.position.replace('_', ' ')}
                       </TableCell>
-                      <TableCell>{member.municipality}</TableCell>
-                      <TableCell>{member.barangay}</TableCell>
-                      <TableCell>{member.phone}</TableCell>
-                      <TableCell>{member.rsbsa_number}</TableCell>
+                      <TableCell>
+                        {member.technician_farmers.municipality}
+                      </TableCell>
+                      <TableCell>
+                        {member.technician_farmers.barangay}
+                      </TableCell>
+                      <TableCell>{member.technician_farmers.phone}</TableCell>
+                      <TableCell>
+                        {member.technician_farmers.rsbsa_number}
+                      </TableCell>
                       <TableCell className='text-right'>
                         <Button asChild variant='outline' size='sm'>
-                          <Link href={`/dashboard/f/${member.id}`} passHref>
+                          <Link
+                            href={`/dashboard/f/${member.technician_farmers.id}`}
+                            passHref
+                          >
                             <User className='h-4 w-4 mr-2' />
                             View Profile
                           </Link>

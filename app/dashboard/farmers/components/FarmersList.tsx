@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { ChevronLeft, ChevronRight, Download, Eye } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Dialog,
@@ -35,21 +35,29 @@ import DownloadButton from '../../(components)/ui/DownloadButton'
 
 interface Farmer {
   id: string
+  created_at: string
+  user_id: string
   firstname: string
   lastname: string
   gender: string
   municipality: string
   barangay: string
   phone: string
-  position: string
-  avatar: string
+  association_id: string | null
+  position: string | null
+  avatar: string | null
   rsbsa_number: number
-  association: {
-    name: string
-  }
+  farmer_associations: {
+    id: string
+    position: string
+    association: {
+      id: string
+      name: string
+    }
+  }[]
 }
 
-export default function FarmersList() {
+export default function FarmerList() {
   const { data: farmers, error, isLoading } = useFetchAllFarmers()
   const [selectedFarmer, setSelectedFarmer] = useState<Farmer | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -69,8 +77,13 @@ export default function FarmersList() {
             farmer.lastname.toLowerCase()
           ).includes(searchTerm.toLowerCase()) &&
           (associationFilter === 'all' ||
-            farmer.association?.name === associationFilter) &&
-          (positionFilter === 'all' || farmer.position === positionFilter),
+            farmer.farmer_associations.some(
+              (assoc) => assoc.association.name === associationFilter,
+            )) &&
+          (positionFilter === 'all' ||
+            farmer.farmer_associations.some(
+              (assoc) => assoc.position === positionFilter,
+            )),
       ) || []
     )
   }, [farmers, searchTerm, associationFilter, positionFilter])
@@ -85,19 +98,26 @@ export default function FarmersList() {
   const associations = useMemo(
     () => [
       'all',
-      ...new Set(farmers?.map((farmer) => farmer.association?.name) || []),
+      ...new Set(
+        farmers?.flatMap((farmer) =>
+          farmer.farmer_associations.map((assoc) => assoc.association.name),
+        ) || [],
+      ),
     ],
     [farmers],
   )
 
   const positions = useMemo(
-    () => ['all', ...new Set(farmers?.map((farmer) => farmer.position) || [])],
+    () => [
+      'all',
+      ...new Set(
+        farmers?.flatMap((farmer) =>
+          farmer.farmer_associations.map((assoc) => assoc.position),
+        ) || [],
+      ),
+    ],
     [farmers],
   )
-
-  const handleDownload = () => {
-    console.log('Downloading masterlist...')
-  }
 
   if (error) return <ErrorDisplay error={error} />
 
@@ -163,8 +183,6 @@ export default function FarmersList() {
               <TableRow>
                 <TableHead className='w-[100px]'>Avatar</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Association</TableHead>
-                <TableHead>Position</TableHead>
                 <TableHead>Municipality</TableHead>
                 <TableHead>Barangay</TableHead>
                 <TableHead>Actions</TableHead>
@@ -179,12 +197,6 @@ export default function FarmersList() {
                       </TableCell>
                       <TableCell>
                         <Skeleton className='h-4 w-[200px]' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-4 w-[150px]' />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className='h-4 w-[100px]' />
                       </TableCell>
                       <TableCell>
                         <Skeleton className='h-4 w-[120px]' />
@@ -202,7 +214,7 @@ export default function FarmersList() {
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src={farmer?.avatar}
+                            src={farmer?.avatar || undefined}
                             alt={`${farmer.firstname} ${farmer.lastname}`}
                           />
                           <AvatarFallback>
@@ -213,10 +225,6 @@ export default function FarmersList() {
                       </TableCell>
                       <TableCell>
                         {farmer.firstname} {farmer.lastname}
-                      </TableCell>
-                      <TableCell>{farmer.association?.name}</TableCell>
-                      <TableCell>
-                        {farmer.position?.replace('_', ' ')}
                       </TableCell>
                       <TableCell>{farmer.municipality}</TableCell>
                       <TableCell>{farmer.barangay}</TableCell>
@@ -244,7 +252,7 @@ export default function FarmersList() {
                                 <div className='flex items-center space-x-4'>
                                   <Avatar className='w-20 h-20'>
                                     <AvatarImage
-                                      src={selectedFarmer.avatar}
+                                      src={selectedFarmer.avatar || undefined}
                                       alt={`${selectedFarmer.firstname} ${selectedFarmer.lastname}`}
                                     />
                                     <AvatarFallback>
@@ -265,22 +273,18 @@ export default function FarmersList() {
                                 <div className='grid grid-cols-2 gap-4'>
                                   <div>
                                     <p className='text-sm font-medium'>
-                                      Association
+                                      Associations
                                     </p>
-                                    <p className='text-sm text-muted-foreground'>
-                                      {selectedFarmer.association.name}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <p className='text-sm font-medium'>
-                                      Position
-                                    </p>
-                                    <p className='text-sm text-muted-foreground'>
-                                      {selectedFarmer.position.replace(
-                                        '_',
-                                        ' ',
+                                    <ul className='text-sm text-muted-foreground'>
+                                      {selectedFarmer.farmer_associations.map(
+                                        (assoc, index) => (
+                                          <li key={index}>
+                                            {assoc.association.name} (
+                                            {assoc.position.replace('_', ' ')})
+                                          </li>
+                                        ),
                                       )}
-                                    </p>
+                                    </ul>
                                   </div>
                                   <div>
                                     <p className='text-sm font-medium'>Phone</p>

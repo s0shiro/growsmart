@@ -157,9 +157,11 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
               <Badge variant='secondary' className='capitalize'>
                 {farmer.gender}
               </Badge>
-              <Badge variant='secondary'>
-                {farmer.position.replace('_', ' ')}
-              </Badge>
+              {farmer.farmer_associations.map((assoc, index) => (
+                <Badge key={index} variant='secondary'>
+                  {assoc.position.replace('_', ' ')} - {assoc.association.name}
+                </Badge>
+              ))}
             </div>
           </div>
         </CardHeader>
@@ -180,11 +182,18 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-4'>
-                <div className='flex items-center gap-2'>
+                {/* <div className='flex items-center gap-2'>
                   <User className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Association:</span>{' '}
-                  {farmer.association?.name}
-                </div>
+                  <span className='font-medium'>Associations:</span>
+                  <ul>
+                    {farmer.farmer_associations.map((assoc, index) => (
+                      <li key={index}>
+                        {assoc.association.name} -{' '}
+                        {assoc.position.replace('_', ' ')}
+                      </li>
+                    ))}
+                  </ul>
+                </div> */}
                 <div className='flex items-center gap-2'>
                   <Phone className='h-5 w-5 text-primary' />
                   <span className='font-medium'>Phone:</span> {farmer.phone}
@@ -193,11 +202,6 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                   <MapPin className='h-5 w-5 text-primary' />
                   <span className='font-medium'>Location:</span>{' '}
                   {farmer.barangay}, {farmer.municipality}
-                </div>
-                <div className='flex items-center gap-2'>
-                  <Briefcase className='h-5 w-5 text-primary' />
-                  <span className='font-medium'>Position:</span>{' '}
-                  {farmer.position.replace('_', ' ')}
                 </div>
                 <div className='flex items-center gap-2'>
                   <Calendar className='h-5 w-5 text-primary' />

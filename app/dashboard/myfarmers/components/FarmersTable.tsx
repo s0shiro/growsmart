@@ -4,13 +4,6 @@ import { useState, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Table,
   TableBody,
   TableCell,
@@ -27,14 +20,22 @@ import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import CreateFarmerForm from '@/app/dashboard/myfarmers/components/CreateFarmerForm'
 import { Skeleton } from '@/components/ui/skeleton'
 
-type FilterValue = string | null
+interface Farmer {
+  id: string
+  firstname: string
+  lastname: string
+  gender: string
+  municipality: string
+  barangay: string
+  phone: string
+  avatar: string
+  rsbsa_number: number
+}
 
 export default function FarmerUI() {
   const { data: farmersData, isLoading } = useFetchFarmersByUserId()
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterAssociation, setFilterAssociation] = useState<FilterValue>(null)
-  const [filterPosition, setFilterPosition] = useState<FilterValue>(null)
 
   const itemsPerPage = 5
 
@@ -42,39 +43,17 @@ export default function FarmerUI() {
     return (
       farmersData?.filter(
         (farmer: any) =>
-          (farmer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            farmer.lastname.toLowerCase().includes(searchTerm.toLowerCase())) &&
-          (filterAssociation === null ||
-            filterAssociation === 'all' ||
-            farmer.association.name === filterAssociation) &&
-          (filterPosition === null ||
-            filterPosition === 'all' ||
-            farmer.position === filterPosition),
+          farmer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          farmer.lastname.toLowerCase().includes(searchTerm.toLowerCase()),
       ) || []
     )
-  }, [farmersData, searchTerm, filterAssociation, filterPosition])
+  }, [farmersData, searchTerm])
 
   const totalPages = Math.ceil(filteredFarmers.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedFarmers = filteredFarmers.slice(
     startIndex,
     startIndex + itemsPerPage,
-  )
-
-  const associations = useMemo(
-    () => [
-      'all',
-      ...new Set(farmersData?.map((farmer: any) => farmer.association.name)),
-    ],
-    [farmersData],
-  )
-
-  const positions = useMemo(
-    () => [
-      'all',
-      ...new Set(farmersData?.map((farmer: any) => farmer.position)),
-    ],
-    [farmersData],
   )
 
   return (
@@ -103,50 +82,6 @@ export default function FarmerUI() {
           className='md:w-1/2'
           disabled={isLoading}
         />
-        <div className='flex flex-col md:flex-row gap-4 md:w-1/2'>
-          <Select
-            value={filterAssociation || undefined}
-            onValueChange={(value: string) =>
-              setFilterAssociation(value === 'all' ? null : value)
-            }
-            disabled={isLoading}
-          >
-            <SelectTrigger className='md:w-1/2'>
-              <SelectValue placeholder='Filter by Association' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Associations</SelectItem>
-              {associations
-                .filter((assoc) => assoc !== 'all')
-                .map((assoc) => (
-                  <SelectItem key={assoc} value={assoc}>
-                    {assoc}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={filterPosition || undefined}
-            onValueChange={(value: string) =>
-              setFilterPosition(value === 'all' ? null : value)
-            }
-            disabled={isLoading}
-          >
-            <SelectTrigger className='md:w-1/2'>
-              <SelectValue placeholder='Filter by Position' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Positions</SelectItem>
-              {positions
-                .filter((pos) => pos !== 'all')
-                .map((pos) => (
-                  <SelectItem key={pos} value={pos}>
-                    {pos.replace('_', ' ')}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <ScrollArea className='w-full whitespace-nowrap rounded-md border'>
@@ -155,8 +90,6 @@ export default function FarmerUI() {
             <TableRow>
               <TableHead className='w-[100px]'>Avatar</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Association</TableHead>
-              <TableHead>Position</TableHead>
               <TableHead>Municipality</TableHead>
               <TableHead>Barangay</TableHead>
               <TableHead>Actions</TableHead>
@@ -171,12 +104,6 @@ export default function FarmerUI() {
                     </TableCell>
                     <TableCell>
                       <Skeleton className='h-4 w-[200px]' />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className='h-4 w-[150px]' />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className='h-4 w-[100px]' />
                     </TableCell>
                     <TableCell>
                       <Skeleton className='h-4 w-[120px]' />
@@ -206,8 +133,6 @@ export default function FarmerUI() {
                     <TableCell>
                       {farmer.firstname} {farmer.lastname}
                     </TableCell>
-                    <TableCell>{farmer.association.name}</TableCell>
-                    <TableCell>{farmer.position.replace('_', ' ')}</TableCell>
                     <TableCell>{farmer.municipality}</TableCell>
                     <TableCell>{farmer.barangay}</TableCell>
                     <TableCell>
@@ -227,7 +152,7 @@ export default function FarmerUI() {
 
       {!isLoading && filteredFarmers.length === 0 && (
         <div className='text-center py-4'>
-          No farmers found matching the current filters.
+          No farmers found matching the current search.
         </div>
       )}
 
