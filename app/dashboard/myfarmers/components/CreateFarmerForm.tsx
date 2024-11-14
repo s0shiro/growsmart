@@ -16,18 +16,22 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { useAddFarmer } from '@/hooks/farmer/useAddFarmer'
 import SelectField from '../../(components)/forms/CustomSelectField'
-import { toast } from 'sonner'
-import { Loader2, User, Phone, MapPin, Users, Briefcase } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Loader2, User, Phone, MapPin, CirclePlus } from 'lucide-react'
 import {
   useFetchBarangays,
   useFetchMunicipalities,
 } from '@/hooks/municipalities/useFetchMunicipalities'
 import useReadAssociation from '@/hooks/association/useReadAssociations'
 import { SingleImageDropzone } from '@/app/dashboard/(components)/forms/single-image-dropzone'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEdgeStore } from '@/lib/edgestore'
 import { Separator } from '@/components/ui/separator'
+import { AssociationPositionPair } from './AssociationPair'
+import { useToast } from '@/components/hooks/use-toast'
+
+const AssociationPositionSchema = z.object({
+  associationId: z.string(),
+  position: z.string(),
+})
 
 const FormSchema = z.object({
   rsbsaNumber: z.coerce.number(),
@@ -39,9 +43,8 @@ const FormSchema = z.object({
   phoneNumber: z
     .string()
     .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
-  association: z.string(),
-  position: z.string(),
   avatar: z.string().optional(),
+  associationPositions: z.array(AssociationPositionSchema).min(1),
 })
 
 type FarmerFieldNames =
@@ -52,8 +55,6 @@ type FarmerFieldNames =
   | 'municipality'
   | 'barangay'
   | 'phoneNumber'
-  | 'association'
-  | 'position'
 
 const fieldConfigs: {
   name: FarmerFieldNames
@@ -111,29 +112,6 @@ const fieldConfigs: {
     type: 'number',
     icon: Phone,
   },
-  {
-    name: 'association',
-    placeholder: 'Select an association',
-    label: 'Association',
-    type: 'select',
-    icon: Users,
-  },
-  {
-    name: 'position',
-    placeholder: 'Select Position',
-    label: 'Position',
-    type: 'select',
-    icon: Briefcase,
-  },
-]
-
-const positions = [
-  { id: 'member', name: 'Member' },
-  { id: 'president', name: 'President' },
-  { id: 'vice_president', name: 'Vice President' },
-  { id: 'secretary', name: 'Secretary' },
-  { id: 'treasurer', name: 'Treasurer' },
-  { id: 'board_member', name: 'Board Member' },
 ]
 
 function CreateFarmerForm() {
@@ -144,8 +122,12 @@ function CreateFarmerForm() {
 
   const addFarmerMutation = useAddFarmer()
   const { data: associations, error, isLoading } = useReadAssociation()
+  const { toast } = useToast()
   const { data: municipalities } = useFetchMunicipalities()
   const [file, setFile] = useState<File>()
+  const [associationPositions, setAssociationPositions] = useState([
+    { associationId: '', position: '' },
+  ])
 
   const { edgestore } = useEdgeStore()
 
@@ -178,7 +160,6 @@ function CreateFarmerForm() {
         avatarUrl = res.url
       } catch (error) {
         console.error('Error uploading file:', error)
-        toast.error('Failed to upload avatar.')
         return
       }
     }
@@ -191,23 +172,29 @@ function CreateFarmerForm() {
         municipality: selectedMunicipality,
         barangay: selectedBarangay,
         phoneNumber: data.phoneNumber,
-        association_id: data.association,
-        position: data.position,
         avatar: avatarUrl,
         rsbsaNumber: data.rsbsaNumber,
+        associationPositions: associationPositions,
       })
-      toast.success('Farmer created successfully!')
+      toast({
+        description: `Farmer added to you list.`,
+      })
       document.getElementById('create-trigger')?.click()
     } catch (error) {
       console.error('Error creating farmer:', error)
-      toast.error('Failed to create farmer.')
+      toast({
+        variant: 'destructive',
+        title: 'Failed to add farmer!😢',
+        description:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      })
     }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-        <div className='flex flex-col items-center mb-6'>
+        <div className='flex flex-col items-center mb-6 mt-2'>
           <SingleImageDropzone
             width={200}
             height={200}
@@ -232,13 +219,6 @@ function CreateFarmerForm() {
                 let disabled = false
 
                 switch (name) {
-                  case 'association':
-                    options =
-                      associations?.map((assoc) => ({
-                        id: assoc.id,
-                        name: assoc.name,
-                      })) || []
-                    break
                   case 'municipality':
                     options =
                       municipalities?.map((mun: any) => ({
@@ -259,9 +239,6 @@ function CreateFarmerForm() {
                       { id: 'male', name: 'Male' },
                       { id: 'female', name: 'Female' },
                     ]
-                    break
-                  case 'position':
-                    options = positions
                     break
                 }
 
@@ -305,6 +282,52 @@ function CreateFarmerForm() {
               }
             },
           )}
+        </div>
+
+        <Separator />
+
+        <div className='space-y-4'>
+          <h3 className='text-lg font-medium'>Association Memberships</h3>
+
+          {associationPositions.map((ap, index) => (
+            <AssociationPositionPair
+              key={index}
+              index={index}
+              associations={
+                associations?.map((assoc) => ({
+                  id: assoc.id,
+                  name: assoc.name,
+                })) ?? []
+              }
+              value={ap}
+              control={form.control}
+              onChange={(newValue) => {
+                const newPositions = [...associationPositions]
+                newPositions[index] = newValue
+                setAssociationPositions(newPositions)
+              }}
+              onRemove={() => {
+                if (associationPositions.length > 1) {
+                  setAssociationPositions(
+                    associationPositions.filter((_, i) => i !== index),
+                  )
+                }
+              }}
+            />
+          ))}
+          <Button
+            type='button'
+            variant='outline'
+            className='w-full'
+            onClick={() => {
+              setAssociationPositions([
+                ...associationPositions,
+                { associationId: '', position: '' },
+              ])
+            }}
+          >
+            <CirclePlus className='h-4 w-4 mr-2' /> Add Association
+          </Button>
         </div>
 
         <Button
