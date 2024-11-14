@@ -1,4 +1,3 @@
-import React from 'react'
 import { Control, Controller } from 'react-hook-form'
 
 // Adjust the import path as needed
@@ -16,15 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ReactElement } from 'react'
 
 interface SelectFieldProps {
   name: string
   label: string
   placeholder: string
   options: { id: string; name: string }[] | undefined
-  control: Control<any>
   onChange?: (value: any) => void // Add onChange prop
   disabled?: boolean // Add disabled prop
+  value?: string // Add if missing
+  control?: Control<any>
+  icon: ReactElement
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -35,6 +37,8 @@ const SelectField: React.FC<SelectFieldProps> = ({
   control,
   onChange, // Destructure onChange prop
   disabled, // Destructure disabled prop
+  value,
+  icon,
 }) => {
   return (
     <FormField
