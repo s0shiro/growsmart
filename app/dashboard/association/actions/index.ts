@@ -4,6 +4,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { unstable_noStore } from 'next/cache'
 
+type Association = {
+  id: string
+  name: string
+  description: string
+  created_at: string
+  memberCount: number
+}
+
 export async function addAssociation(data: { name: string }) {
   // Create the Supabase client on the server side
   const supabase = createClient()
@@ -22,34 +30,29 @@ export async function addAssociation(data: { name: string }) {
 }
 
 export async function readAssociations() {
-  unstable_noStore()
-
   const supabase = await createClient()
 
-  const { data: associations, error: associationsError } = await supabase
+  // Single query using count and group by
+  const { data, error } = await supabase
     .from('association')
-    .select('*')
+    .select(
+      `
+        *,
+        memberCount:farmer_associations(count)
+      `,
+    )
+    .returns<Association[]>()
 
-  if (associationsError) {
-    console.error('Supabase error:', associationsError.message)
-    return { error: associationsError.message }
+  if (error) {
+    console.error('Error fetching associations:', error.message)
+    throw error
   }
 
-  const associationsWithCounts = await Promise.all(
-    associations.map(async (association) => {
-      const { count, error: countError } = await supabase
-        .from('technician_farmers')
-        .select('*', { count: 'exact' })
-        .eq('association_id', association.id)
-
-      if (countError) {
-        console.error('Supabase error:', countError.message)
-        return { ...association, memberCount: 0 }
-      }
-
-      return { ...association, memberCount: count ?? 0 }
-    }),
-  )
+  // Transform the data to include member count
+  const associationsWithCounts = data.map((association) => ({
+    ...association,
+    memberCount: association.memberCount || 0,
+  }))
 
   return associationsWithCounts
 }
@@ -92,8 +95,10 @@ export const getFarmerCountByAssociation = async (
 export const getAssociationDetails = async (associationId: string) => {
   const supabase = createClient()
   const { data, error } = await supabase
-    .from('technician_farmers')
-    .select(`*, association(name)`) // Assuming there is a relationship to fetch user details
+    .from('farmer_associations')
+    .select(
+      `id, farmer_id, association_id(name), position, technician_farmers(*)`,
+    ) // Assuming there is a relationship to fetch user details
     .eq('association_id', associationId)
 
   if (error) {
