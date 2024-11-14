@@ -35,6 +35,8 @@ import {
   Sprout,
   Tractor,
   Wheat,
+  User2,
+  EyeIcon,
 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -50,6 +52,7 @@ import {
   BarChart,
   Bar,
 } from 'recharts'
+import Link from 'next/link'
 
 interface Inspection {
   id: string
@@ -183,14 +186,16 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
           </div>
           <div className='flex space-x-2'>
             <Button
-              size='sm'
               variant='secondary'
               className='bg-secondary text-secondary-foreground hover:bg-secondary/90'
+              asChild
             >
-              <Edit3 className='mr-2 h-4 w-4' />
-              Edit
+              <Link href={`/dashboard/f/${harvest.farmer_id}`}>
+                <EyeIcon className='mr-2 h-4 w-4' />
+                View Farmer
+              </Link>
             </Button>
-            <Button
+            {/* <Button
               size='sm'
               variant='destructive'
               className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
@@ -205,7 +210,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
             >
               <ArrowLeftCircle className='mr-2 h-4 w-4' />
               Back
-            </Button>
+            </Button> */}
           </div>
         </div>
       </CardHeader>
@@ -334,30 +339,22 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                       <Card>
                         <CardContent className='p-4'>
                           <ul className='space-y-2'>
-                            <li className='flex justify-between items-center'>
+                            {/* <li className='flex justify-between items-center'>
                               <span className='text-muted-foreground'>
                                 Crop Type:
                               </span>
                               <Badge variant='secondary'>
                                 {harvest.crops.name}
                               </Badge>
-                            </li>
-                            <li className='flex justify-between items-center'>
+                            </li> */}
+                            {/* <li className='flex justify-between items-center'>
                               <span className='text-muted-foreground'>
                                 Variety:
                               </span>
                               <Badge variant='secondary'>
                                 {harvest.crop_varieties.name}
                               </Badge>
-                            </li>
-                            <li className='flex justify-between items-center'>
-                              <span className='text-muted-foreground'>
-                                Planting Date:
-                              </span>
-                              <Badge variant='secondary'>
-                                {formatDate(harvest.planting_date)}
-                              </Badge>
-                            </li>
+                            </li> */}
                             <li className='flex justify-between items-center'>
                               <span className='text-muted-foreground'>
                                 Expected Harvest Date:
@@ -380,6 +377,14 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                               </span>
                               <Badge variant='secondary'>
                                 {harvest.quantity} kg
+                              </Badge>
+                            </li>
+                            <li className='flex justify-between items-center'>
+                              <span className='text-muted-foreground'>
+                                Planting Date:
+                              </span>
+                              <Badge variant='secondary'>
+                                {formatDate(harvest.planting_date)}
                               </Badge>
                             </li>
                           </ul>
@@ -473,7 +478,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                       </Card>
                     </div>
                   </div>
-                  <div className='mt-6'>
+                  {/* <div className='mt-6'>
                     <h4 className='text-lg font-semibold mb-3 text-primary flex items-center'>
                       <BarChart2 className='mr-2 h-5 w-5' />
                       Yield vs Damage
@@ -496,7 +501,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                         </ResponsiveContainer>
                       </CardContent>
                     </Card>
-                  </div>
+                  </div> */}
                 </CardContent>
               </Card>
             </TabsContent>

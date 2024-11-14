@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 import { useToast } from '@/components/hooks/use-toast'
 import { formatDate } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 export default function ImprovedPlantingForm() {
   const { data: allCropData = [] } = useGetAllCropData()
@@ -104,6 +105,7 @@ export default function ImprovedPlantingForm() {
   const [selectedLocation, setSelectedLocation] = useState<string>('')
   const [step, setStep] = useState(1)
   const { toast } = useToast()
+  const router = useRouter()
 
   const onLocationSelect = (locationName: string, coords: [number, number]) => {
     setSelectedLocation(locationName)
@@ -145,7 +147,7 @@ export default function ImprovedPlantingForm() {
         const harvestDate = new Date(data.harvestDate)
         const status = isToday(harvestDate) ? 'harvest' : 'inspection'
 
-        await addPlantingRecord({
+        const res = await addPlantingRecord({
           farmerId: data.farmerId,
           cropCategory: data.cropCategory,
           cropType: data.cropType,
@@ -176,6 +178,7 @@ export default function ImprovedPlantingForm() {
           description: `Expected harvest ${formatDate(data.harvestDate)}📅.`,
         })
         await queryClient.invalidateQueries({ queryKey: ['inspections'] })
+        router.push(`/dashboard/standing`)
       } catch (error) {
         console.error('Failed to submit form:', error)
         toast({

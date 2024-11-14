@@ -166,6 +166,13 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
       icon: Calendar,
     },
     {
+      name: 'harvestDate',
+      placeholder: 'Select date',
+      label: 'Expected Harvest Date',
+      type: 'date',
+      icon: Clock,
+    },
+    {
       name: 'areaPlanted',
       placeholder: 'Enter area',
       label: 'Area planted (ha)',
@@ -185,13 +192,6 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
       label: 'Production cost',
       type: 'number',
       icon: Banknote,
-    },
-    {
-      name: 'harvestDate',
-      placeholder: 'Select date',
-      label: 'Expected Harvest Date',
-      type: 'date',
-      icon: Clock,
     },
   ]
 

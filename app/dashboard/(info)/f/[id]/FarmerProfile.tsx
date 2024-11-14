@@ -239,6 +239,16 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                 </div>
                 <div>
                   <div className='flex justify-between mb-2'>
+                    <span className='font-medium'>Total Revenue</span>
+                    <span>{formatCurrency(farmer.totalProfits)}</span>
+                  </div>
+                  <Progress
+                    value={(farmer.totalProfits / 200000) * 100}
+                    className='h-2'
+                  />
+                </div>
+                <div>
+                  <div className='flex justify-between mb-2'>
                     <span className='font-medium'>Total Quantity Planted</span>
                     <span>{totalQuantity} kg</span>
                   </div>
