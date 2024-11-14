@@ -23,9 +23,16 @@ import {
 import { format } from 'date-fns'
 import { cn, formatDate } from '@/lib/utils'
 import useFetchAllDamagesDuringVisitation from '@/hooks/useFetchAllDamages'
+import useFetchDamagesCurrentMonth from '@/hooks/reports/useFetchCurrentMonthDamages'
+import DamagePieChart from './DamagesGraph'
 
 export default function DamageReport() {
   const { data, isLoading, error } = useFetchAllDamagesDuringVisitation()
+  const {
+    data: damages,
+    isFetching: damagesFetching,
+    error: damagesError,
+  } = useFetchDamagesCurrentMonth()
   const printableRef = useRef<HTMLDivElement>(null)
   const [activeCategory, setActiveCategory] = useState('All')
   const [dateRange, setDateRange] = useState<{
@@ -35,6 +42,7 @@ export default function DamageReport() {
     from: undefined,
     to: undefined,
   })
+
   const handlePrint = () => {
     if (printableRef.current) {
       const printContent = printableRef.current.innerHTML
@@ -141,7 +149,6 @@ export default function DamageReport() {
 
                 p {
                   font-size: 12px;
-
                 }
 
                 @media print {
@@ -170,17 +177,12 @@ export default function DamageReport() {
             </body>
           </html>
         `)
-        // Close the document stream for rendering
         printWindow.document.close()
-
-        // Ensure the window is fully loaded before triggering the print
         printWindow.focus()
-
-        // Delay the print action to ensure everything is rendered
         setTimeout(() => {
-          printWindow.print() // Trigger the print dialog
-          printWindow.close() // Close the popup after printing
-        }, 500) // Delay to give the new window enough time to load
+          printWindow.print()
+          printWindow.close()
+        }, 500)
       } else {
         alert('Please enable popups to allow printing.')
       }
@@ -221,9 +223,7 @@ export default function DamageReport() {
             <TableHead className='bg-muted text-xs'>Farmer Name</TableHead>
             <TableHead className='bg-muted text-xs'>Crop</TableHead>
             <TableHead className='bg-muted text-xs'>Variety</TableHead>
-            <TableHead className='bg-muted text-xs'>
-              Damage Quantity (ha)
-            </TableHead>
+            <TableHead className='bg-muted text-xs'>Damage Area (ha)</TableHead>
             <TableHead className='bg-muted text-xs'>Date</TableHead>
           </TableRow>
         </TableHeader>
@@ -292,9 +292,43 @@ export default function DamageReport() {
   )
 
   return (
-    <div className=''>
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 no-print'>
-        <div className='w-full sm:w-auto'>
+    <div>
+      <div className='flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 no-print'>
+        <div className='w-full sm:w-auto order-2 sm:order-1'>
+          <Tabs
+            defaultValue='All'
+            onValueChange={setActiveCategory}
+            className='w-full sm:w-auto'
+          >
+            <TabsList className='w-full sm:w-auto flex overflow-x-auto'>
+              <TabsTrigger
+                value='All'
+                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
+              >
+                All
+              </TabsTrigger>
+              <TabsTrigger
+                value='Rice'
+                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
+              >
+                Rice
+              </TabsTrigger>
+              <TabsTrigger
+                value='Corn'
+                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
+              >
+                Corn
+              </TabsTrigger>
+              <TabsTrigger
+                value='High-Value'
+                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
+              >
+                High Value
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        <div className='flex items-center gap-2 w-full sm:w-auto order-1 sm:order-2'>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -346,57 +380,40 @@ export default function DamageReport() {
               </div>
             </PopoverContent>
           </Popover>
+          <Button onClick={handlePrint} className='whitespace-nowrap'>
+            <Printer className='mr-2 h-4 w-4' /> Print
+          </Button>
         </div>
-        <Button onClick={handlePrint} className='w-full sm:w-auto'>
-          <Printer className='mr-2 h-4 w-4' /> Print Report
-        </Button>
       </div>
 
       <div ref={printableRef}>
-        <div className='no-print header text-center mb-2'>
-          <p className='title text-xl font-bold'>DAMAGE REPORT</p>
-          <p className='text-lg font-semibold'>
+        <div className='no-print header text-center mb-6'>
+          <h1 className='text-2xl font-bold mb-2'>
             {activeCategory.toUpperCase()} PROGRAM
-          </p>
-          <p className='no-print text-sm'>
+          </h1>
+          <p className='text-sm text-muted-foreground'>
             {dateRange.from && dateRange.to
               ? `${formatDate(dateRange.from)} - ${formatDate(dateRange.to)}`
-              : ''}
+              : 'All Time'}
           </p>
-        </div>
-
-        <div className='subheader flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 text-sm'>
-          <div>
-            <p>REGION: RFO IVB</p>
-            <p>PROVINCE: MARINDUQUE</p>
-          </div>
-        </div>
-
-        <div className='no-print'>
-          <Tabs
-            defaultValue='All'
-            onValueChange={setActiveCategory}
-            className='mb-6'
-          >
-            <TabsList className='no-print w-full sm:w-auto'>
-              <TabsTrigger value='All'>All</TabsTrigger>
-              <TabsTrigger value='Rice'>Rice</TabsTrigger>
-              <TabsTrigger value='Corn'>Corn</TabsTrigger>
-              <TabsTrigger value='High-Value'>High Value</TabsTrigger>
-            </TabsList>
-          </Tabs>
         </div>
 
         <ScrollArea
-          className='w-full whitespace-nowrap rounded-md border mt-4'
+          className='w-full rounded-md border'
           style={{ height: '400px' }}
         >
-          <div className='p-2' style={{ minHeight: '100%' }}>
+          <div className='p-4'>
             {isLoading ? renderSkeletonTable() : renderTable(filteredData)}
           </div>
           <ScrollBar orientation='horizontal' className='no-print' />
           <ScrollBar orientation='vertical' className='no-print' />
         </ScrollArea>
+
+        {damages && !damagesFetching && !damagesError && (
+          <div className='mt-8 no-print'>
+            <DamagePieChart data={damages} />
+          </div>
+        )}
       </div>
     </div>
   )
