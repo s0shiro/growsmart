@@ -12,6 +12,7 @@ import {
 import useFetchCornStandingCrops from '@/hooks/crop/useFetchCornStandingCrops'
 import { formatDate } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
 const municipalities = [
   'Boac',
@@ -28,6 +29,7 @@ export default function CornStandingCrop() {
   const [selectedMunicipality, setSelectedMunicipality] = useState<
     string | null
   >(null)
+  const { data: user } = useCurrentUserProfile()
 
   const currentDate = new Date()
   const formattedDate = formatDate(currentDate)
@@ -163,8 +165,8 @@ export default function CornStandingCrop() {
                 <div class="signature-block">
                   <p>Prepared by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>JERALD B. MABUTI</strong></p>
-                  <p>Corn AEW</p>
+                 <p><strong>${user?.full_name?.toUpperCase()}</strong></p>
+                  <p>${user?.job_title}</p>
                 </div>
                 <div class="signature-block">
                   <p>Certified true and correct:</p>

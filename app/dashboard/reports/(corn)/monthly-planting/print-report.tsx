@@ -12,6 +12,7 @@ import {
 import { formatDate } from '@/lib/utils'
 import useFetchMonthlyPlantingCorn from '@/hooks/reports/useFetchMonthlyPlantingCorn'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
 const municipalities = [
   'Boac',
@@ -28,6 +29,7 @@ export default function CornMonthlyPlantingAccomplishment() {
     string | null
   >(null)
   const printableRef = useRef<HTMLDivElement>(null)
+  const { data: user } = useCurrentUserProfile()
 
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth() + 1
@@ -225,8 +227,8 @@ export default function CornMonthlyPlantingAccomplishment() {
                 <div class="signature-block">
                   <p>Prepared by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>JERALD B. MABUTI</strong></p>
-                  <p>Corn AEW</p>
+                   <p><strong>${user?.full_name?.toUpperCase()}</strong></p>
+                  <p>${user?.job_title}</p>
                 </div>
                 <div class="signature-block">
                   <p>Certified true and correct:</p>
