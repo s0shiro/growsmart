@@ -1,11 +1,12 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
 import useRiceStandingData from '@/hooks/reports/useFetchStandingRiceData'
 import { formatDate } from '@/lib/utils'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { Input } from '@/components/ui/input'
 
 type RiceData = {
   area_planted: number
@@ -27,6 +28,10 @@ export default function RiceStandingTable() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, error } = useRiceStandingData()
   const { data: user } = useCurrentUserProfile()
+  const [notedByName, setNotedByName] = useState('VANESSA TAYABA')
+  const [notedByTitle, setNotedByTitle] = useState(
+    'Municipal Agricultural Officer',
+  )
 
   const processedData = useMemo(() => {
     if (!data) return null
@@ -199,8 +204,8 @@ export default function RiceStandingTable() {
                 <div class="signature-block">
                   <p>Noted by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${notedByName.toUpperCase()}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
             </div>
             </body>
@@ -247,9 +252,9 @@ export default function RiceStandingTable() {
   }
 
   return (
-    <div className='container mx-auto p-4'>
+    <div>
       <Button onClick={handlePrint} className='mb-4 print:hidden'>
-        <Printer className='mr-2 h-4 w-4' /> Print Table (Landscape)
+        <Printer className='mr-2 h-4 w-4' /> Print Rice Standing Report
       </Button>
 
       <div ref={printableRef} className='overflow-x-auto'>
@@ -318,6 +323,42 @@ export default function RiceStandingTable() {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className='print:hidden w-full p-4 space-y-2 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t sm:border sm:rounded-lg sm:shadow-md sm:fixed sm:bottom-4 sm:right-4 sm:w-auto sm:p-4'>
+        <div className='sm:flex sm:space-x-4 sm:space-y-0 space-y-2'>
+          <div className='flex flex-col'>
+            <label
+              htmlFor='notedByName'
+              className='text-sm font-medium text-gray-700 dark:text-gray-200 mb-1'
+            >
+              Noted by Name
+            </label>
+            <input
+              id='notedByName'
+              type='text'
+              placeholder='Enter name'
+              value={notedByName}
+              onChange={(e) => setNotedByName(e.target.value)}
+              className='w-full sm:w-64 px-2 py-1 bg-transparent border-b border-gray-300 focus:border-primary focus:outline-none transition-colors'
+            />
+          </div>
+          <div className='flex flex-col'>
+            <label
+              htmlFor='notedByTitle'
+              className='text-sm font-medium text-gray-700 dark:text-gray-200 mb-1'
+            >
+              Noted by Title
+            </label>
+            <input
+              id='notedByTitle'
+              type='text'
+              placeholder='Enter title'
+              value={notedByTitle}
+              onChange={(e) => setNotedByTitle(e.target.value)}
+              className='w-full sm:w-64 px-2 py-1 bg-transparent border-b border-gray-300 focus:border-primary focus:outline-none transition-colors'
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
