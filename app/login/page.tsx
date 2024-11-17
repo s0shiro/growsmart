@@ -9,6 +9,7 @@ import { login } from '@/lib/auth'
 import React, { useState } from 'react'
 import { useTransition } from 'react'
 import { ArrowRight, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import LoadingDots from '../dashboard/(components)/ui/LoadingDots'
 
 const initState = { message: null as string | null }
 
@@ -123,7 +124,9 @@ export default function Login({
             disabled={isPending}
           >
             {isPending ? (
-              'Logging in...'
+              <p className='text-green-500 flex items-center gap-0.5 text-foreground dark:text-foreground'>
+                Logging in <LoadingDots />
+              </p>
             ) : (
               <>
                 Login <ArrowRight className='ml-2 h-4 w-4' />
