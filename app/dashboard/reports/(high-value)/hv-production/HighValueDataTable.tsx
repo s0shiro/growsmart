@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import useHighValueInspection from '@/hooks/reports/useFetchHighValueInspectionData'
 import { format } from 'date-fns'
+import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { Printer } from 'lucide-react'
 
 type CropData = {
   area_planted: number
@@ -56,6 +58,7 @@ const calculateTotals = (data: TableData) => {
 export default function Component() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, error, isFetching } = useHighValueInspection()
+  const { data: user } = useCurrentUserProfile()
 
   const handlePrint = () => {
     if (printableRef.current) {
@@ -131,8 +134,8 @@ export default function Component() {
                 <div class="signature-block">
                   <p>Prepared by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>JERALD B. MABUTI</strong></p>
-                  <p>Corn AEW</p>
+                  <p><strong>${user?.full_name}</strong></p>
+                  <p>${user?.job_title}</p>
                 </div>
                 <div class="signature-block">
                   <p>Submitted by:</p>
@@ -240,45 +243,36 @@ export default function Component() {
   const totals = calculateTotals(tableData)
 
   return (
-    <div className='p-4'>
+    <div>
       <div className='flex justify-end mb-4'>
-        <Button onClick={handlePrint}>Print</Button>
+        <Button onClick={handlePrint}>
+          {' '}
+          <Printer className='mr-2 h-4 w-4' /> Print High Value Report
+        </Button>
       </div>
       <div ref={printableRef}>
         <table className='w-full border-collapse border text-sm'>
           <thead>
             <tr>
-              <th
-                rowSpan={2}
-                className='border p-2 bg-gray-50 font-medium text-left'
-              >
+              <th rowSpan={2} className='border p-2 font-medium text-left'>
                 COMMODITY
               </th>
-              <th
-                colSpan={3}
-                className='border p-2 bg-gray-50 font-medium text-center'
-              >
+              <th colSpan={3} className='border p-2 font-medium text-center'>
                 AREA PLANTED (ha)
               </th>
-              <th
-                colSpan={2}
-                className='border p-2 bg-gray-50 font-medium text-center'
-              >
+              <th colSpan={2} className='border p-2 font-medium text-center'>
                 PRODUCTION (MT)
               </th>
-              <th
-                rowSpan={2}
-                className='border p-2 bg-gray-50 font-medium text-left'
-              >
+              <th rowSpan={2} className='border p-2 font-medium text-left'>
                 REMARKS
               </th>
             </tr>
             <tr>
-              <th className='border p-2 bg-gray-50 font-medium'>EXISTING</th>
-              <th className='border p-2 bg-gray-50 font-medium'>THIS MONTH</th>
-              <th className='border p-2 bg-gray-50 font-medium'>TO DATE</th>
-              <th className='border p-2 bg-gray-50 font-medium'>THIS MONTH</th>
-              <th className='border p-2 bg-gray-50 font-medium'>TO DATE</th>
+              <th className='border p-2  font-medium'>EXISTING</th>
+              <th className='border p-2  font-medium'>THIS MONTH</th>
+              <th className='border p-2  font-medium'>TO DATE</th>
+              <th className='border p-2  font-medium'>THIS MONTH</th>
+              <th className='border p-2  font-medium'>TO DATE</th>
             </tr>
           </thead>
           <tbody>
