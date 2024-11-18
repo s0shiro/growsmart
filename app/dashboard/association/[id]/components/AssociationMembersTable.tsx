@@ -18,6 +18,7 @@ import useAssociationDetails from '@/hooks/association/useAssociationDetails'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import Link from 'next/link'
 import DownloadButton from '@/app/dashboard/(components)/ui/DownloadButton'
+import PrintAssociation from './PrintAssociation'
 
 export default function AssociationMembers({
   associationId,
@@ -67,11 +68,8 @@ export default function AssociationMembers({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <DownloadButton
-          url={`/dashboard/association/${associationId}/pdf`}
-          fileName={`${associationName}_masterlist`}
-          buttonName='Members Masterlist'
-        />
+
+        <PrintAssociation members={data} />
       </div>
 
       <div className='border rounded-lg'>
