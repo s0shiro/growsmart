@@ -7,11 +7,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
-      {
-        hostname: 'i.pinimg.com',
-        protocol: 'https',
-      },
       {
         hostname: 'lzbjbeovjpnaktxpdfcn.supabase.co',
         protocol: 'https',

@@ -14,6 +14,7 @@ import { Search, AlertCircle, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Map as MapIcon, Satellite } from 'lucide-react'
 
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
@@ -54,7 +55,36 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchError, setSearchError] = useState<string | null>(null)
   const [isSearching, setIsSearching] = useState(false)
+  const [mapStyle, setMapStyle] = useState<'street' | 'satellite'>('street')
   const mapRef = useRef<LeafletMap | null>(null)
+  // Add new state for tracking quota
+  const [mapTilerQuotaExceeded, setMapTilerQuotaExceeded] = useState(false)
+
+  // Add tile layer URLs
+  const TILE_LAYERS = {
+    street: {
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    },
+    satellite: {
+      url: `/api/map-tiles?z={z}&x={x}&y={y}`,
+      attribution:
+        '&copy; <a href="https://www.maptiler.com/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> | <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+      maxZoom: 20,
+    },
+  }
+
+  // Add quota check function
+  const checkMapTilerQuota = (error: any) => {
+    // MapTiler returns 429 for rate limiting or 403 for quota exceeded
+    if (error?.target?.status === 429 || error?.target?.status === 403) {
+      setMapTilerQuotaExceeded(true)
+      setMapStyle('street')
+      console.warn('MapTiler quota exceeded, falling back to street view')
+    }
+  }
 
   useEffect(() => {
     import('leaflet').then((leaflet) => {
@@ -181,7 +211,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
 
   return (
     <div className='space-y-4'>
-      <div className='flex space-x-2 pt-4'>
+      <div className='flex space-x-2 pt-4 mx-2'>
         <Input
           type='text'
           placeholder='Search for a location in Marinduque'
@@ -190,6 +220,26 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
           className='flex-grow'
           aria-label='Search for a location in Marinduque'
         />
+        {/* // Update style toggle button */}
+        <Button
+          variant='outline'
+          onClick={() =>
+            setMapStyle((prev) => (prev === 'street' ? 'satellite' : 'street'))
+          }
+          className='px-3'
+          disabled={mapTilerQuotaExceeded}
+          title={
+            mapTilerQuotaExceeded
+              ? 'Satellite view unavailable - quota exceeded'
+              : ''
+          }
+        >
+          {mapStyle === 'street' ? (
+            <Satellite className='h-4 w-4' />
+          ) : (
+            <MapIcon className='h-4 w-4' />
+          )}
+        </Button>
         <Button onClick={handleSearch} disabled={isSearching}>
           {isSearching ? (
             <Loader2 className='h-4 w-4 animate-spin' />
@@ -205,7 +255,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
           <AlertDescription>{searchError}</AlertDescription>
         </Alert>
       )}
-      <div className='h-[400px] w-full'>
+      <div className='h-[500px] w-full mx-2'>
         <MapContainer
           center={mapCenter}
           zoom={11}
@@ -213,9 +263,22 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
           maxBounds={MARINDUQUE_BOUNDS}
           minZoom={10}
         >
+          // Update TileLayer with error handling
           <TileLayer
-            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url={
+              mapTilerQuotaExceeded
+                ? TILE_LAYERS.street.url
+                : TILE_LAYERS[mapStyle].url
+            }
+            attribution={TILE_LAYERS[mapStyle].attribution}
+            maxZoom={TILE_LAYERS[mapStyle].maxZoom}
+            eventHandlers={{
+              tileerror: (error) => {
+                if (mapStyle === 'satellite') {
+                  checkMapTilerQuota(error)
+                }
+              },
+            }}
           />
           <LocationMarker />
           <ScaleControl position='bottomleft' />
