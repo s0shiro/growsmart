@@ -106,7 +106,7 @@ export default function AccountForm({ profile }: { profile: any }) {
                   <Input placeholder='Software Engineer' {...field} />
                 </FormControl>
                 <FormDescription>
-                  Your current position in the company.
+                  Your current position in Provincial Agriculture Office.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

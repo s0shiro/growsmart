@@ -117,32 +117,32 @@ export default function NotificationIcon() {
     },
   })
 
-  const clearAllMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', user?.id)
-      if (error) throw error
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', user?.id] })
-    },
-  })
+  //   const clearAllMutation = useMutation({
+  //     mutationFn: async () => {
+  //       const { error } = await supabase
+  //         .from('notifications')
+  //         .delete()
+  //         .eq('user_id', user?.id)
+  //       if (error) throw error
+  //     },
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries({ queryKey: ['notifications', user?.id] })
+  //     },
+  //   })
 
-  const deleteNotificationMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id)
-      if (error) throw error
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', user?.id] })
-    },
-  })
+  //   const deleteNotificationMutation = useMutation({
+  //     mutationFn: async (id: string) => {
+  //       const { error } = await supabase
+  //         .from('notifications')
+  //         .delete()
+  //         .eq('id', id)
+  //         .eq('user_id', user?.id)
+  //       if (error) throw error
+  //     },
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries({ queryKey: ['notifications', user?.id] })
+  //     },
+  //   })
 
   useEffect(() => {
     if (!user?.id) return
@@ -245,7 +245,7 @@ export default function NotificationIcon() {
             <NotificationList
               notifications={filteredNotifications}
               markAsRead={(id) => markAsReadMutation.mutate(id)}
-              deleteNotification={(id) => deleteNotificationMutation.mutate(id)}
+              //   deleteNotification={(id) => deleteNotificationMutation.mutate(id)}
               isLoading={isLoading}
               error={error}
               hasNextPage={hasNextPage}
@@ -257,7 +257,7 @@ export default function NotificationIcon() {
             <NotificationList
               notifications={filteredNotifications}
               markAsRead={(id) => markAsReadMutation.mutate(id)}
-              deleteNotification={(id) => deleteNotificationMutation.mutate(id)}
+              //   deleteNotification={(id) => deleteNotificationMutation.mutate(id)}
               isLoading={isLoading}
               error={error}
               hasNextPage={hasNextPage}
@@ -273,11 +273,11 @@ export default function NotificationIcon() {
               Mark all as read
             </Button>
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => clearAllMutation.mutate()}>
+          {/* <DropdownMenuItem onSelect={() => clearAllMutation.mutate()}>
             <Button variant='ghost' size='sm'>
               Clear all
             </Button>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -287,7 +287,7 @@ export default function NotificationIcon() {
 function NotificationList({
   notifications,
   markAsRead,
-  deleteNotification,
+  //   deleteNotification,
   isLoading,
   error,
   hasNextPage,
@@ -296,7 +296,7 @@ function NotificationList({
 }: {
   notifications: Notification[]
   markAsRead: (id: string) => void
-  deleteNotification: (id: string) => void
+  //   deleteNotification: (id: string) => void
   isLoading: boolean
   error: Error | null
   hasNextPage: boolean | undefined
@@ -358,7 +358,7 @@ function NotificationList({
                     className={`flex flex-col space-y-1 ${notification.is_read ? 'opacity-50' : ''}`}
                   >
                     <div className='flex justify-between items-center'>
-                      <p className='text-sm font-medium leading-none'>
+                      {/* <p className='text-sm font-medium leading-none'>
                         {notification.title}
                       </p>
                       <Button
@@ -371,7 +371,7 @@ function NotificationList({
                       >
                         <Trash2 className='h-4 w-4' />
                         <span className='sr-only'>Delete notification</span>
-                      </Button>
+                      </Button> */}
                     </div>
                     <p className='text-xs leading-none text-muted-foreground'>
                       {notification.message}
