@@ -13,6 +13,7 @@ import useFetchMonthlyHarvestedCorn from '@/hooks/reports/useFetchMonthlyHarvest
 import { formatDate } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { Printer } from 'lucide-react'
 
 type CornData = {
   location_id: {
@@ -55,7 +56,7 @@ export default function MonthlyCornHarvesting() {
   const { data } = useFetchMonthlyHarvestedCorn()
   const [selectedMunicipality, setSelectedMunicipality] = useState<
     string | null
-  >(null)
+  >('Gasan')
   const printableRef = useRef<HTMLDivElement>(null)
   const { data: user } = useCurrentUserProfile()
 
@@ -559,7 +560,7 @@ export default function MonthlyCornHarvesting() {
         className='mt-4'
         disabled={!selectedMunicipality}
       >
-        Print
+        <Printer className='mr-2 h-4 w-4' /> Print Corn Harvesting Report
       </Button>
     </div>
   )

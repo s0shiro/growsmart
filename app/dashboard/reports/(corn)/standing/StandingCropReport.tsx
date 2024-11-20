@@ -13,6 +13,7 @@ import useFetchCornStandingCrops from '@/hooks/crop/useFetchCornStandingCrops'
 import { formatDate } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { Printer } from 'lucide-react'
 
 const municipalities = [
   'Boac',
@@ -28,7 +29,7 @@ export default function CornStandingCrop() {
   const { data, isLoading, error } = useFetchCornStandingCrops()
   const [selectedMunicipality, setSelectedMunicipality] = useState<
     string | null
-  >(null)
+  >('Gasan')
   const { data: user } = useCurrentUserProfile()
 
   const currentDate = new Date()
@@ -267,7 +268,7 @@ export default function CornStandingCrop() {
           </SelectContent>
         </Select>
       </div>
-      <ScrollArea className='w-full rounded-md border'>
+      <ScrollArea className='w-full'>
         <div ref={printableRef}>
           {selectedMunicipality && (
             <table className='w-full border-collapse border-2 border-[hsl(var(--border))] text-xs'>
@@ -489,7 +490,7 @@ export default function CornStandingCrop() {
         className='mt-4'
         disabled={!selectedMunicipality}
       >
-        Print
+        <Printer className='mr-2 h-4 w-4' /> Print Corn Standing Report
       </Button>
     </div>
   )

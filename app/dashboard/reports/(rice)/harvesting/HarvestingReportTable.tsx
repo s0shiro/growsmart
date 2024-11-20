@@ -14,14 +14,9 @@ import useFetchHarvestedRice from '@/hooks/reports/useFetchHarvestedRice'
 import useFetchTotalHarvestedRice from '@/hooks/reports/useFetchTotalHarvestRiceData'
 import { DateRangePicker } from './DatePicker'
 import useHarvestStore from '@/stores/useRiceHarvestStore'
-import { format } from 'date-fns'
-import {
-  determineSeason,
-  formatDateRange,
-  getBgColor,
-  getSeasonAndYear,
-} from '@/lib/utils'
+import { formatDateRange, getBgColor, getSeasonAndYear } from '@/lib/utils'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { Printer } from 'lucide-react'
 
 type SeedData = {
   area: number
@@ -504,10 +499,10 @@ export default function HarvestingReportTable() {
       </ScrollArea>
       <Button
         onClick={handlePrint}
-        className='mt-4'
+        className='mt-4 p-6'
         disabled={!selectedMunicipality || !selectedWaterSupply}
       >
-        Print
+        <Printer className='mr-2 h-4 w-4' /> Print Rice Harvesting Report
       </Button>
     </div>
   )

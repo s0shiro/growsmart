@@ -1,14 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -18,13 +13,14 @@ import {
   Clock4,
   Calendar,
   CalendarCheck,
-  ArrowLeft,
+  ChevronRight,
 } from 'lucide-react'
 
 const reportCategories = [
   {
     category: 'Rice',
     Icon: Wheat,
+    color: 'text-amber-500',
     reports: [
       {
         label: 'Standing Rice Crops',
@@ -46,6 +42,7 @@ const reportCategories = [
   {
     category: 'Corn',
     Icon: TreePine,
+    color: 'text-green-500',
     reports: [
       {
         label: 'Standing Corn Crops',
@@ -67,6 +64,7 @@ const reportCategories = [
   {
     category: 'High Value',
     Icon: Sprout,
+    color: 'text-purple-500',
     reports: [
       {
         label: 'High Value Crops Report',
@@ -77,9 +75,25 @@ const reportCategories = [
   },
 ]
 
-export default function ReportsPage() {
+export default function CleanReportsDashboard() {
+  const [activeCategory, setActiveCategory] = useState(
+    reportCategories[0].category.toLowerCase(),
+  )
   const [activeReport, setActiveReport] = useState<string | null>(null)
+  const [currentDate, setCurrentDate] = useState<string>('')
   const router = useRouter()
+
+  useEffect(() => {
+    const now = new Date()
+    setCurrentDate(
+      now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+    )
+  }, [])
 
   const handleReportClick = (href: string) => {
     setActiveReport(href)
@@ -87,62 +101,81 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className='container mx-auto py-8 px-4 sm:px-6 lg:px-8'>
-      <div className='mb-8 flex items-center justify-between'>
-        <h1 className='text-3xl font-bold'>Generate Reports</h1>
-        <Button variant='outline' onClick={() => router.push('/dashboard')}>
-          <ArrowLeft className='mr-2 h-4 w-4' />
-          Back to Dashboard
-        </Button>
-      </div>
+    <div>
+      <header className='mb-6'>
+        <h1 className='text-2xl font-semibold text-gray-900 dark:text-gray-100'>
+          Agricultural Reports
+        </h1>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>
+          {currentDate}
+        </p>
+      </header>
 
-      <Tabs defaultValue={reportCategories[0].category.toLowerCase()}>
-        <TabsList className='mb-6'>
-          {reportCategories.map((category) => (
-            <TabsTrigger
-              key={category.category}
-              value={category.category.toLowerCase()}
-            >
-              <category.Icon className='mr-2 h-5 w-5' />
-              {category.category}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {reportCategories.map((category) => (
-          <TabsContent
-            key={category.category}
-            value={category.category.toLowerCase()}
+      <Card className='overflow-hidden'>
+        <CardContent className='p-6'>
+          <Tabs
+            value={activeCategory}
+            onValueChange={setActiveCategory}
+            className='w-full'
           >
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center text-2xl'>
-                  <category.Icon className='mr-2 h-6 w-6' />
-                  {category.category} Reports
-                </CardTitle>
-                <CardDescription>Select a report to generate</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-                  {category.reports.map((report) => (
-                    <Button
-                      key={report.label}
-                      variant={
-                        activeReport === report.href ? 'default' : 'outline'
-                      }
-                      className='h-auto py-4 justify-start'
-                      onClick={() => handleReportClick(report.href)}
-                    >
-                      <report.Icon className='mr-2 h-5 w-5' />
-                      <span className='text-left'>{report.label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        ))}
-      </Tabs>
+            <TabsList className='grid w-full grid-cols-3 mb-6'>
+              {reportCategories.map((category) => (
+                <TabsTrigger
+                  key={category.category}
+                  value={category.category.toLowerCase()}
+                  className='flex items-center justify-center'
+                >
+                  <category.Icon className={`mr-2 h-5 w-5 ${category.color}`} />
+                  {category.category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {reportCategories.map((category) => (
+              <TabsContent
+                key={category.category}
+                value={category.category.toLowerCase()}
+              >
+                <AnimatePresence mode='wait'>
+                  <motion.div
+                    key={category.category}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className='grid gap-4 md:grid-cols-2'>
+                      {category.reports.map((report) => (
+                        <Button
+                          key={report.label}
+                          variant={
+                            activeReport === report.href ? 'default' : 'outline'
+                          }
+                          className='h-auto py-4 justify-between text-left'
+                          onClick={() => handleReportClick(report.href)}
+                        >
+                          <div className='flex items-center'>
+                            <report.Icon
+                              className={`mr-3 h-5 w-5 ${category.color}`}
+                            />
+                            <div>
+                              <div className='font-medium'>{report.label}</div>
+                              <div className='text-xs text-gray-500 dark:text-gray-400'>
+                                Generate report
+                              </div>
+                            </div>
+                          </div>
+                          <ChevronRight className='h-4 w-4' />
+                        </Button>
+                      ))}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   )
 }

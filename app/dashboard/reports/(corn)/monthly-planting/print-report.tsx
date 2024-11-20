@@ -13,6 +13,7 @@ import { formatDate } from '@/lib/utils'
 import useFetchMonthlyPlantingCorn from '@/hooks/reports/useFetchMonthlyPlantingCorn'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
+import { Printer } from 'lucide-react'
 
 const municipalities = [
   'Boac',
@@ -27,7 +28,7 @@ export default function CornMonthlyPlantingAccomplishment() {
   const { data } = useFetchMonthlyPlantingCorn()
   const [selectedMunicipality, setSelectedMunicipality] = useState<
     string | null
-  >(null)
+  >('Gasan')
   const printableRef = useRef<HTMLDivElement>(null)
   const { data: user } = useCurrentUserProfile()
 
@@ -414,7 +415,7 @@ export default function CornMonthlyPlantingAccomplishment() {
         className='mt-4'
         disabled={!selectedMunicipality}
       >
-        Print Report
+        <Printer className='mr-2 h-4 w-4' /> Print Corn Planting Report
       </Button>
     </div>
   )

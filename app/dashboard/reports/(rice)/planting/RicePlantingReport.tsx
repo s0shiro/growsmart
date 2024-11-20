@@ -299,82 +299,132 @@ export default function RicePlantingReport() {
   return (
     <div className='container mx-auto p-4'>
       <Button onClick={handlePrint} className='mb-4 no-print'>
-        <Printer className='mr-2 h-4 w-4' /> Print Report (Landscape)
+        <Printer className='mr-2 h-4 w-4' /> Print Rice Planting Report
       </Button>
 
-      <div ref={printableRef}>
-        <div className='header no-print'>
-          <h1 className='text-xl font-bold'>Department of Agriculture</h1>
-          <h2 className='text-lg font-semibold'>
-            REGIONAL FIELD OFFICE MIMAROPA
-          </h2>
-          <p className='text-md'>DRY SEASON 2024 Planting Report</p>
-        </div>
-
-        <table>
+      <div ref={printableRef} className='overflow-x-auto'>
+        <table className='w-full border-collapse border border-[hsl(var(--border))] dark:border-[hsl(var(--border))]'>
           <thead>
             <tr>
-              <th rowSpan={3}>MUNICIPALITY</th>
-              <th rowSpan={3}>NO. OF FARMERS PLANTED</th>
-              <th className='irrigated' colSpan={6}>
+              <th
+                rowSpan={3}
+                className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'
+              >
+                MUNICIPALITY
+              </th>
+              <th
+                rowSpan={3}
+                className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'
+              >
+                NO. OF FARMERS PLANTED
+              </th>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                colSpan={6}
+              >
                 IRRIGATED
               </th>
-              <th className='rainfed' colSpan={11}>
+              <th
+                className='rainfed border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.1)]'
+                colSpan={11}
+              >
                 RAINFED
               </th>
             </tr>
             <tr>
-              <th className='irrigated' rowSpan={2}>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                rowSpan={2}
+              >
                 HYBRID
               </th>
-              <th className='irrigated' rowSpan={2}>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                rowSpan={2}
+              >
                 REGISTERED
               </th>
-              <th className='irrigated' rowSpan={2}>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                rowSpan={2}
+              >
                 CERTIFIED
               </th>
-              <th className='irrigated' rowSpan={2}>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                rowSpan={2}
+              >
                 GOOD QUALITY
               </th>
-              <th className='irrigated' rowSpan={2}>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                rowSpan={2}
+              >
                 FARMER SAVED SEEDS
               </th>
-              <th className='irrigated' rowSpan={2}>
+              <th
+                className='irrigated border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--primary)/.1)]'
+                rowSpan={2}
+              >
                 TOTAL
               </th>
-              <th className='rainfed-lowland' colSpan={5}>
+              <th
+                className='rainfed-lowland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.2)]'
+                colSpan={5}
+              >
                 LOWLAND
               </th>
-              <th className='rainfed-upland' colSpan={6}>
+              <th
+                className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'
+                colSpan={6}
+              >
                 UPLAND
               </th>
             </tr>
             <tr>
-              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.2)]'>
                 HYBRID
               </th>
-              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.2)]'>
                 REGISTERED
               </th>
-              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.2)]'>
                 CERTIFIED
               </th>
-              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1'>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.2)]'>
                 GOOD QUALITY
               </th>
-              <th className='rainfed-lowland'>FARMER SAVED SEEDS</th>
-              <th className='rainfed-upland'>HYBRID</th>
-              <th className='rainfed-upland'>REGISTERED</th>
-              <th className='rainfed-upland'>CERTIFIED</th>
-              <th className='rainfed-upland'>GOOD QUALITY</th>
-              <th className='rainfed-upland'>FARMER SAVED SEEDS</th>
-              <th className='rainfed-upland'>TOTAL</th>
+              <th className='rainfed-lowland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.2)]'>
+                FARMER SAVED SEEDS
+              </th>
+              <th className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'>
+                HYBRID
+              </th>
+              <th className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'>
+                REGISTERED
+              </th>
+              <th className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'>
+                CERTIFIED
+              </th>
+              <th className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'>
+                GOOD QUALITY
+              </th>
+              <th className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'>
+                FARMER SAVED SEEDS
+              </th>
+              <th className='rainfed-upland border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))] dark:bg-[hsl(var(--secondary)/.3)]'>
+                TOTAL
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr className='total-row'>
-              <td>MARINDUQUE</td>
-              <td>{processedData.totals.farmers.size}</td>
+              <td className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'>
+                MARINDUQUE
+              </td>
+              <td className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'>
+                {processedData.totals.farmers.size}
+              </td>
               {['irrigated', 'rainfedLowland', 'rainfedUpland']
                 .flatMap((category, index) => {
                   const values = [
@@ -408,14 +458,23 @@ export default function RicePlantingReport() {
                   return values
                 })
                 .map((value, index) => (
-                  <td key={index}>{value}</td>
+                  <td
+                    key={index}
+                    className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'
+                  >
+                    {value}
+                  </td>
                 ))}
             </tr>
             {Object.entries(processedData.municipalities).map(
               ([municipality, data]) => (
                 <tr key={municipality}>
-                  <td>{municipality}</td>
-                  <td>{data.farmers.size}</td>
+                  <td className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'>
+                    {municipality}
+                  </td>
+                  <td className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'>
+                    {data.farmers.size}
+                  </td>
                   {['irrigated', 'rainfedLowland', 'rainfedUpland']
                     .flatMap((category, index) => {
                       const values = [
@@ -449,7 +508,12 @@ export default function RicePlantingReport() {
                       return values
                     })
                     .map((value, index) => (
-                      <td key={index}>{value}</td>
+                      <td
+                        key={index}
+                        className='border border-[hsl(var(--border))] p-1 dark:border-[hsl(var(--border))]'
+                      >
+                        {value}
+                      </td>
                     ))}
                 </tr>
               ),
