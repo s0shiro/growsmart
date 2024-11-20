@@ -37,6 +37,7 @@ import {
   Wheat,
   User2,
   EyeIcon,
+  ExternalLinkIcon,
 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -185,16 +186,12 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
             </CardDescription>
           </div>
           <div className='flex space-x-2'>
-            <Button
-              variant='secondary'
-              className='bg-secondary text-secondary-foreground hover:bg-secondary/90'
-              asChild
-            >
-              <Link href={`/dashboard/f/${harvest.farmer_id}`}>
-                <EyeIcon className='mr-2 h-4 w-4' />
-                View Farmer
-              </Link>
-            </Button>
+            <Link href={`/dashboard/f/${harvest.farmer_id}`} passHref>
+              <Button variant='secondary' className='w-full'>
+                View Profile
+                <ExternalLinkIcon className='ml-2 h-4 w-4' />
+              </Button>
+            </Link>
             {/* <Button
               size='sm'
               variant='destructive'
