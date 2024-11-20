@@ -27,7 +27,8 @@ export default function DialogForm({
       <DialogTrigger asChild id={id}>
         {Trigger}
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[700px] w-full sm:w-auto max-h-[90vh] rounded-md sm:max-h-[650px] sm:min-w-[450px]'>
+      {/* className='sm:max-w-[700px] w-full sm:w-auto max-h-[90vh] rounded-md sm:max-h-[650px] sm:min-w-[450px]' */}
+      <DialogContent>
         <ScrollArea className='h-full max-h-[calc(90vh-4rem)]'>
           <div className='pr-5'>
             <DialogHeader>
