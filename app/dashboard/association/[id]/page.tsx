@@ -1,4 +1,4 @@
-import AssociationMembers from './components/Association MembersTable'
+import AssociationMembers from './components/AssociationMembersTable'
 
 const AssociationPage = async ({ params }: { params: { id: string } }) => {
   return (

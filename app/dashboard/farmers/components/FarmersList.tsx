@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/dialog'
 import useFetchAllFarmers from '@/hooks/farmer/useFetchAllFarmers'
 import DownloadButton from '../../(components)/ui/DownloadButton'
+import PrintButton from './PrintButton'
 
 interface Farmer {
   id: string
@@ -130,11 +131,8 @@ export default function FarmerList() {
             A comprehensive list of all registered farmers
           </p>
         </div>
-        <DownloadButton
-          fileName='farmer_masterlist'
-          url='/dashboard/farmers/pdf'
-          buttonName='Download Masterlist'
-        />
+
+        <PrintButton farmers={farmers || []} />
       </div>
 
       <div className='flex flex-col sm:flex-row gap-4'>
