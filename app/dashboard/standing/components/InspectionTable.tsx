@@ -18,13 +18,31 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { ChevronLeft, ChevronRight, Eye } from 'lucide-react'
+import {
+  Check,
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+} from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import useReadInspections from '@/hooks/crop/useReadInspection'
 import { formatDate } from '@/lib/utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { usePlantingMutation } from '@/hooks/crop/usePlantingMutation'
 
 interface Crop {
   id: string
@@ -45,6 +63,7 @@ interface Crop {
 
 export default function CropInspections() {
   const { data: crops, isLoading, error } = useReadInspections()
+  const { mutate, isPending, error: mutationError } = usePlantingMutation()
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCrop, setFilterCrop] = useState<string | null>(null)
@@ -91,6 +110,10 @@ export default function CropInspections() {
         Error loading crop inspections. Please try again later.
       </div>
     )
+  }
+
+  const handleUpdateStatus = (plantingId: string) => {
+    mutate(plantingId)
   }
 
   return (
@@ -181,6 +204,39 @@ export default function CropInspections() {
                           View
                         </Button>
                       </Link>
+
+                      {/* Updating the crop status to harvest */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            className='ml-2'
+                            disabled={isPending}
+                          >
+                            <CheckSquare className='mr-2 h-4 w-4' />
+                            Mark as harvest
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action will mark the crop as harvest. This
+                              action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleUpdateStatus(crop.id)}
+                              disabled={isPending}
+                            >
+                              {isPending ? 'Updating...' : 'Confirm'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}

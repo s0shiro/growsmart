@@ -280,3 +280,19 @@ export const getPlantingRecordById = async (plantingID: string) => {
 
   return data
 }
+
+//updating the planting record to harvest status
+export const updatePlantingRecord = async (plantingID: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('planting_records')
+    .update({ status: 'harvest' })
+    .eq('id', plantingID)
+
+  if (error) {
+    console.error('Error updating planting record status:', error)
+  } else {
+    console.log('Planting record status updated successfully:', data)
+  }
+}

@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { ChevronLeft, ChevronRight, Wheat } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, Wheat } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/utils'
 import useFetchPlantings from '@/hooks/crop/useFetchPlantings'
@@ -178,6 +178,7 @@ export default function HarvestCropTable() {
                         <Link
                           href={`/dashboard/harvest/${planting.id}?farmerId=${planting.farmer_id}`}
                         >
+                          <Eye className='mr-2 h-4 w-4' />
                           View
                         </Link>
                       </Button>
