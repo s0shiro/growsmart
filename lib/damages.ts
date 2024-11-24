@@ -86,7 +86,6 @@ export const getDamagesPerMonth = async () => {
     return null
   }
 
-  // Initialize damages per municipality
   const municipalityDamages = {
     Boac: 0,
     Buenavista: 0,
@@ -96,19 +95,21 @@ export const getDamagesPerMonth = async () => {
     Torrijos: 0,
   }
 
-  // Aggregate damages
+  // Aggregate damages with precision handling
   data?.forEach((inspection) => {
     const municipality = inspection.planting_records?.location_id?.municipality
     if (municipality && municipality in municipalityDamages) {
-      municipalityDamages[municipality] += inspection.damaged
+      // Convert to number and fix precision
+      municipalityDamages[municipality] = +(
+        municipalityDamages[municipality] + inspection.damaged
+      ).toFixed(4)
     }
   })
 
-  // Convert to array format if needed
   const result = Object.entries(municipalityDamages).map(
     ([municipality, total]) => ({
       municipality,
-      total,
+      total: +total.toFixed(4), // Ensure consistent decimal places
     }),
   )
 
