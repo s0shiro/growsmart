@@ -25,7 +25,20 @@ export const createNewFarmer = async (data: FarmerCreateData) => {
   const supabase = createClient()
   const user = await getCurrentUser()
 
-  // Start transaction
+  // Check if farmer with RSBSA already exists
+  const { data: existingFarmer } = await supabase
+    .from('technician_farmers')
+    .select()
+    .eq('rsbsa_number', data.rsbsaNumber)
+    .single()
+
+  if (existingFarmer) {
+    throw new Error(
+      `Farmer with RSBSA number ${data.rsbsaNumber} already exists.`,
+    )
+  }
+
+  // Proceed with creation if no duplicate found
   const { data: farmer, error: farmerError } = await supabase
     .from('technician_farmers')
     .insert({
