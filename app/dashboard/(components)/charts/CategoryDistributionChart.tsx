@@ -1,22 +1,22 @@
+// CategoryDistributionChart.tsx
+import { useCategoryAnalytics } from '@/hooks/crop/useCropAnalytics'
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 import {
-  PieChart,
-  Pie,
-  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts'
 
-const categoryData = [
-  { name: 'Palay', value: 4500 },
-  { name: 'Corn', value: 3200 },
-  { name: 'Other Crops', value: 2800 },
-]
-
-const COLORS = ['#6366F1', '#8B5CF6', '#EC4899']
-
 const CategoryDistributionChart = () => {
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear)
+  const { data } = useCategoryAnalytics(selectedYear)
+
   return (
     <motion.div
       className='background bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700'
@@ -25,30 +25,28 @@ const CategoryDistributionChart = () => {
       transition={{ delay: 0.3 }}
     >
       <h2 className='text-lg font-medium mb-4 foreground'>
-        Category Distribution
+        Crop Category Distribution {selectedYear}
       </h2>
       <div className='h-80'>
         <ResponsiveContainer width={'100%'} height={'100%'}>
-          <PieChart>
-            <Pie
-              data={categoryData}
-              cx={'50%'}
-              cy={'50%'}
-              labelLine={false}
-              outerRadius={80}
-              fill='#8884d8'
-              dataKey='value'
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
-            >
-              {categoryData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
+          <BarChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray='3 3' stroke='#4B5563' />
+            <XAxis
+              dataKey='name'
+              stroke='#9ca3af'
+              label={{ value: 'Category', position: 'bottom' }}
+            />
+            <YAxis
+              stroke='#9ca3af'
+              label={{
+                value: 'Area Planted (ha)',
+                angle: -90,
+                position: 'insideLeft',
+              }}
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'rgba(31, 41, 55, 0.8)',
@@ -56,11 +54,12 @@ const CategoryDistributionChart = () => {
               }}
               itemStyle={{ color: '#E5E7EB' }}
             />
-            <Legend />
-          </PieChart>
+            <Bar dataKey='area' fill='#22c55e' label={{ position: 'top' }} />
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </motion.div>
   )
 }
+
 export default CategoryDistributionChart
