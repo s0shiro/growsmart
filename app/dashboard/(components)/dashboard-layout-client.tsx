@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Menu, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutList, Menu } from 'lucide-react'
 import Side from './navigation/Side'
 import SheetNav from './navigation/SheetNav'
 import { useSession } from '@/stores/useSession'
@@ -73,9 +73,9 @@ const DashboardLayoutClient = ({
             ) : (
               <Button variant='ghost' className='mr-2' onClick={toggleSidebar}>
                 {isSidebarOpen ? (
-                  <ChevronLeft className='h-6 w-6' />
+                  <Menu className='h-6 w-6 transition-all duration-300 ease-in-out hover:-translate-x-1' />
                 ) : (
-                  <ChevronRight className='h-6 w-6' />
+                  <LayoutList className='h-6 w-6 transition-all duration-300 ease-in-out hover:translate-x-1' />
                 )}
               </Button>
             )}

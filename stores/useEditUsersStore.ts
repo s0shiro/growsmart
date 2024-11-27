@@ -22,7 +22,7 @@ interface EditMemberStore {
     error?: string
   }>
   updateAdvance: (data: {
-    role: 'technician' | 'admin'
+    role: 'technician' | 'admin' | 'program coordinator'
     status: 'active' | 'resigned'
   }) => Promise<{
     success: boolean

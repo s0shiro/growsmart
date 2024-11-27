@@ -16,6 +16,8 @@ import {
   X,
   TriangleAlert,
   History,
+  Clock,
+  HomeIcon,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -36,6 +38,31 @@ import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
   { href: '/dashboard/myfarmers', Icon: Users2, label: 'My Farmers' },
+]
+
+const programCoordinatorLinks = [
+  { href: '/dashboard', Icon: Home, label: 'Overview' },
+  { href: '/dashboard/crops', Icon: Sprout, label: 'Crops' },
+  { href: '/dashboard/association', Icon: FileText, label: 'Associations' },
+]
+
+const coordinatorProductionLinks = [
+  {
+    href: '/dashboard/coordinator-standing',
+    Icon: ClipboardList,
+    label: 'Standing Crops',
+  },
+  {
+    href: '/dashboard/coordinator-harvested',
+    Icon: ClipboardList,
+    label: 'Harvested Crops',
+  },
+  {
+    href: '/dashboard/harvested-history',
+    Icon: History,
+    label: 'All Harvested Crops',
+  },
+  { href: '/dashboard/damages', Icon: TriangleAlert, label: 'Damages Report' },
 ]
 
 const productionLinks = [
@@ -91,7 +118,9 @@ export default function Sidebar({
       ? adminLinks
       : role === 'technician'
         ? technicianLinks
-        : defaultLinks
+        : role === 'program coordinator' // Add your new role condition
+          ? programCoordinatorLinks
+          : defaultLinks
 
   const path = usePathname()
   const { data, error } = useCurrentUserProfile()
@@ -152,6 +181,7 @@ export default function Sidebar({
               </Tooltip>
             </TooltipProvider>
           ))}
+
           {role === 'technician' && (
             <>
               <Separator className='my-4' />
@@ -189,6 +219,7 @@ export default function Sidebar({
               ))}
             </>
           )}
+
           {role === 'admin' && (
             <>
               <Separator className='my-4' />
@@ -226,6 +257,45 @@ export default function Sidebar({
               ))}
             </>
           )}
+
+          {role === 'program coordinator' && (
+            <>
+              <Separator className='my-4' />
+              <div
+                className={clsx(
+                  'text-sm font-medium text-muted-foreground mb-2',
+                  !isOpen && 'sr-only',
+                )}
+              >
+                Productions
+              </div>
+              {coordinatorProductionLinks.map(({ href, Icon, label }) => (
+                <TooltipProvider key={label}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={isActive(path, href) ? 'default' : 'ghost'}
+                        className={clsx(
+                          'w-full justify-start mb-2',
+                          !isOpen && 'justify-center p-0',
+                        )}
+                        asChild
+                      >
+                        <Link href={href}>
+                          <Icon className={clsx('h-4 w-4', isOpen && 'mr-2')} />
+                          {isOpen && <span>{label}</span>}
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    {!isOpen && (
+                      <TooltipContent side='right'>{label}</TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+            </>
+          )}
+
           {(role === 'admin' || role === 'technician') && (
             <>
               <Separator className='my-4' />

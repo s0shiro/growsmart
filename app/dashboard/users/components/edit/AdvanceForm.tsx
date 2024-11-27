@@ -24,13 +24,12 @@ import {
 
 import { cn } from '@/lib/utils'
 import { Loader } from 'lucide-react'
-import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEditMemberStore } from '@/stores/useEditUsersStore'
 import { useToast } from '@/components/hooks/use-toast'
 
 const FormSchema = z.object({
-  role: z.enum(['admin', 'technician']),
+  role: z.enum(['admin', 'technician', 'program coordinator']),
   status: z.enum(['active', 'resigned']),
 })
 
@@ -43,7 +42,7 @@ export default function AdvanceForm({ onSuccess }: AdvanceFormProps) {
   const queryClient = useQueryClient()
   const { toast } = useToast()
 
-  const roles = ['admin', 'technician']
+  const roles = ['admin', 'technician', 'program coordinator']
   const status = ['active', 'resigned']
 
   const form = useForm<z.infer<typeof FormSchema>>({

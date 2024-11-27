@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils'
 import { useToast } from '@/components/hooks/use-toast'
 import { useEdgeStore } from '@/lib/edgestore'
 import { SingleImageDropzone } from '@/app/dashboard/(components)/forms/single-image-dropzone'
+import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 
 const FormSchema = z.object({
   name: z.string().min(2, {
@@ -42,6 +43,7 @@ const FormSchema = z.object({
     .string()
     .min(6, { message: 'Password must be at least 6 characters.' }),
   avatarUrl: z.string().optional(),
+  programType: z.string().optional(),
 })
 
 async function createMember(data: z.infer<typeof FormSchema>) {
@@ -65,10 +67,12 @@ export default function MemberForm() {
   const [isPending, startTransition] = useTransition()
   const roles = ['admin', 'technician', 'program coordinator']
   const status = ['active', 'resigned']
+  const programTypes = ['rice', 'corn', 'high-value']
   const { toast } = useToast()
   const [file, setFile] = useState<File>()
   const [uploadProgress, setUploadProgress] = useState(0)
   const { edgestore } = useEdgeStore()
+  const { data: cropCategories, isLoading } = useGetAllCropData()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -82,6 +86,9 @@ export default function MemberForm() {
       avatarUrl: '',
     },
   })
+
+  // Watch the role field to show/hide program type
+  const selectedRole = form.watch('role')
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
@@ -257,6 +264,47 @@ export default function MemberForm() {
             </FormItem>
           )}
         />
+
+        {selectedRole === 'program coordinator' && (
+          <FormField
+            control={form.control}
+            name='programType'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Program Type</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select a program type' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {isLoading ? (
+                      <SelectItem value='loading'>Loading...</SelectItem>
+                    ) : Array.isArray(cropCategories) ? (
+                      cropCategories.map((category: any) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id.toString()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))
+                    ) : null}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Select the program type you will coordinate
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <FormField
           control={form.control}
           name='status'

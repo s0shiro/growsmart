@@ -162,3 +162,84 @@ export const getAllHarvestedCrops = async () => {
 
   return data
 }
+
+// Get all standing crops based on the program coordinator program type
+export const getAllStandingCropBasedOnUserProgramType = async () => {
+  const supabase = createClient()
+
+  // Get the current user
+  const { data: user, error: userError } = await supabase.auth.getUser()
+
+  if (userError) {
+    console.error('Error fetching user:', userError.message)
+    return []
+  }
+
+  //   console.log('User:', JSON.stringify(user, null, 2))
+
+  // Get the user's program type from the metadata
+  const programType = user.user?.user_metadata?.programType
+
+  if (!programType) {
+    console.error('Program type not found in user metadata')
+    return []
+  }
+
+  // Fetch standing crops based on the user's program type
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select(
+      `id, farmer_id (id, firstname, lastname), crop_type(id, name), variety(id, name), crop_categoryId(id, name), status`,
+    )
+    .eq('crop_categoryId', programType)
+    .eq('status', 'inspection')
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return []
+  }
+
+  console.log(JSON.stringify(data, null, 2))
+
+  return data
+}
+
+export const getAllHarvestedCropBasedOnUserProgramType = async () => {
+  const supabase = createClient()
+
+  // Get the current user
+  const { data: user, error: userError } = await supabase.auth.getUser()
+
+  if (userError) {
+    console.error('Error fetching user:', userError.message)
+    return []
+  }
+
+  //   console.log('User:', JSON.stringify(user, null, 2))
+
+  // Get the user's program type from the metadata
+  const programType = user.user?.user_metadata?.programType
+
+  if (!programType) {
+    console.error('Program type not found in user metadata')
+    return []
+  }
+
+  // Fetch standing crops based on the user's program type
+  const { data, error } = await supabase
+    .from('planting_records')
+    .select(
+      `id, farmer_id (id, firstname, lastname), crop_type(id, name), variety(id, name), crop_categoryId(id, name), status`,
+    )
+    .eq('crop_categoryId', programType)
+    .eq('status', 'harvested')
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+    return []
+  }
+
+  console.log(JSON.stringify(data, null, 2))
+
+  return data
+}
