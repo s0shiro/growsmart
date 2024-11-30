@@ -416,9 +416,16 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                                 </span>
                                 <Badge
                                   variant={
+                                    record.status === 'harvest'
+                                      ? 'secondary'
+                                      : record.status === 'harvested'
+                                        ? 'default'
+                                        : 'outline'
+                                  }
+                                  className={
                                     record.status === 'harvested'
-                                      ? 'default'
-                                      : 'default'
+                                      ? 'line-through'
+                                      : ''
                                   }
                                 >
                                   {record.status}
@@ -516,7 +523,7 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
 
 function FarmerProfileSkeleton() {
   return (
-    <div className='container mx-auto p-4 space-y-6'>
+    <div className='space-y-6'>
       <Card>
         <CardHeader className='flex flex-col sm:flex-row items-center sm:items-start gap-4'>
           <Skeleton className='w-24 h-24 rounded-full' />

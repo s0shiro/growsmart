@@ -18,6 +18,7 @@ import {
   History,
   Clock,
   HomeIcon,
+  Settings,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -35,6 +36,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { capitalizeFirst, getInitials } from '@/lib/utils'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 
+const adminLinks = [
+  { href: '/dashboard', Icon: Home, label: 'Dashboard' },
+  { href: '/dashboard/crops', Icon: Sprout, label: 'Manage Crops' },
+  { href: '/dashboard/users', Icon: Settings, label: 'Manage Users' },
+  { href: '/dashboard/coordinators', Icon: UserPlus, label: 'Coordinators' },
+  { href: '/dashboard/technicians', Icon: UserPlus, label: 'Technicians' },
+]
+
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
   { href: '/dashboard/myfarmers', Icon: Users2, label: 'My Farmers' },
@@ -42,21 +51,20 @@ const technicianLinks = [
 
 const programCoordinatorLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
-  { href: '/dashboard/crops', Icon: Sprout, label: 'Crops' },
-  { href: '/dashboard/association', Icon: FileText, label: 'Associations' },
+  { href: '/dashboard/my-technicians', Icon: Users2, label: 'My Technicians' },
 ]
 
 const coordinatorProductionLinks = [
-  {
-    href: '/dashboard/coordinator-standing',
-    Icon: ClipboardList,
-    label: 'Standing Crops',
-  },
-  {
-    href: '/dashboard/coordinator-harvested',
-    Icon: ClipboardList,
-    label: 'Harvested Crops',
-  },
+  //   {
+  //     href: '/dashboard/coordinator-standing',
+  //     Icon: ClipboardList,
+  //     label: 'Standing Crops',
+  //   },
+  //   {
+  //     href: '/dashboard/coordinator-harvested',
+  //     Icon: ClipboardList,
+  //     label: 'Harvested Crops',
+  //   },
   {
     href: '/dashboard/harvested-history',
     Icon: History,
@@ -81,12 +89,6 @@ const productionLinks = [
 const profilingLinks = [
   { href: '/dashboard/farmers', Icon: User, label: 'Farmers' },
   { href: '/dashboard/association', Icon: FileText, label: 'Associations' },
-]
-
-const adminLinks = [
-  { href: '/dashboard', Icon: Home, label: 'Dashboard' },
-  { href: '/dashboard/crops', Icon: Sprout, label: 'Crops' },
-  { href: '/dashboard/users', Icon: UserPlus, label: 'Users' },
 ]
 
 const defaultLinks = [

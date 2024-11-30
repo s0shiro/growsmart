@@ -33,17 +33,14 @@ export const categoryAnalytics = async (year: number) => {
     .from('planting_records')
     .select(
       `
-        planting_date,
-        area_planted,
-        crop_categories(name)
-      `,
+          planting_date,
+          area_planted,
+          crop_categories(name)
+        `,
     )
     .gte('planting_date', startDate)
     .lte('planting_date', endDate)
 
-  //   console.log(JSON.stringify(data, null, 2))
-
-  // Initialize with all three categories
   const categoryData = {
     rice: { name: 'Rice', area: 0 },
     corn: { name: 'Corn', area: 0 },
@@ -57,5 +54,9 @@ export const categoryAnalytics = async (year: number) => {
     }
   })
 
-  return Object.values(categoryData)
+  // Format areas to 4 decimal places before returning
+  return Object.values(categoryData).map((item) => ({
+    ...item,
+    area: parseFloat(item.area.toFixed(4)),
+  }))
 }

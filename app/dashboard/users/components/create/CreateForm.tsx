@@ -28,6 +28,7 @@ import { useToast } from '@/components/hooks/use-toast'
 import { useEdgeStore } from '@/lib/edgestore'
 import { SingleImageDropzone } from '@/app/dashboard/(components)/forms/single-image-dropzone'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
+import { useGetCoordinators } from '@/hooks/users/useGetCoordinators'
 
 const FormSchema = z.object({
   name: z.string().min(2, {
@@ -44,6 +45,7 @@ const FormSchema = z.object({
     .min(6, { message: 'Password must be at least 6 characters.' }),
   avatarUrl: z.string().optional(),
   programType: z.string().optional(),
+  coordinatorId: z.string().optional(),
 })
 
 async function createMember(data: z.infer<typeof FormSchema>) {
@@ -73,6 +75,8 @@ export default function MemberForm() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const { edgestore } = useEdgeStore()
   const { data: cropCategories, isLoading } = useGetAllCropData()
+  const { data: coordinators, isLoading: loadingCoordinators } =
+    useGetCoordinators()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -240,6 +244,7 @@ export default function MemberForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='role'
@@ -264,6 +269,43 @@ export default function MemberForm() {
             </FormItem>
           )}
         />
+
+        {selectedRole === 'technician' && (
+          <FormField
+            control={form.control}
+            name='coordinatorId'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assign to Coordinator</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger disabled={loadingCoordinators}>
+                      <SelectValue placeholder='Select coordinator' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {loadingCoordinators ? (
+                      <SelectItem value='loading'>
+                        Loading coordinators...
+                      </SelectItem>
+                    ) : coordinators?.length === 0 ? (
+                      <SelectItem value='no-coordinators'>
+                        No coordinators available
+                      </SelectItem>
+                    ) : (
+                      coordinators?.map((coord) => (
+                        <SelectItem key={coord.user_id} value={coord.user_id}>
+                          {coord.users.full_name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {selectedRole === 'program coordinator' && (
           <FormField

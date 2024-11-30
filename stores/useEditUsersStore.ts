@@ -24,6 +24,7 @@ interface EditMemberStore {
   updateAdvance: (data: {
     role: 'technician' | 'admin' | 'program coordinator'
     status: 'active' | 'resigned'
+    coordinatorId?: string
   }) => Promise<{
     success: boolean
     error?: string
@@ -95,9 +96,20 @@ export const useEditMemberStore = create<EditMemberStore>((set, get) => ({
         ),
       )
       if (response.error) throw response.error
+
+      // Update local state including coordinator_id
       set((state) => ({
-        member: state.member ? { ...state.member, ...data } : null,
+        member: state.member
+          ? {
+              ...state.member,
+              role: data.role,
+              status: data.status,
+              coordinator_id:
+                data.role === 'technician' ? data.coordinatorId : null,
+            }
+          : null,
       }))
+
       return { success: true }
     } catch (error) {
       set({ error: (error as Error).message })

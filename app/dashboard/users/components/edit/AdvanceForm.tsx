@@ -27,18 +27,33 @@ import { Loader } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEditMemberStore } from '@/stores/useEditUsersStore'
 import { useToast } from '@/components/hooks/use-toast'
+import { useGetCoordinators } from '@/hooks/users/useGetCoordinators'
+import { useEffect } from 'react'
+
+const validateCoordinator = (val: string | undefined, ctx: z.RefinementCtx) => {
+  if (ctx.path.includes('role') && ctx.path[0] === 'technician' && !val) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Coordinator is required for technicians',
+    })
+    return false
+  }
+  return true
+}
 
 const FormSchema = z.object({
   role: z.enum(['admin', 'technician', 'program coordinator']),
   status: z.enum(['active', 'resigned']),
+  coordinatorId: z.string().optional().superRefine(validateCoordinator),
 })
-
 interface AdvanceFormProps {
   onSuccess?: () => void
 }
 
 export default function AdvanceForm({ onSuccess }: AdvanceFormProps) {
   const { member, updateAdvance, isLoading } = useEditMemberStore()
+  const { data: coordinators, isLoading: loadingCoordinators } =
+    useGetCoordinators()
   const queryClient = useQueryClient()
   const { toast } = useToast()
 
@@ -50,18 +65,41 @@ export default function AdvanceForm({ onSuccess }: AdvanceFormProps) {
     defaultValues: {
       role: member?.role ?? 'technician',
       status: member?.status ?? 'active',
+      coordinatorId: member?.coordinator_id ?? undefined,
     },
   })
+
+  // Add role watch effect
+  const selectedRole = form.watch('role')
+  useEffect(() => {
+    // Reset coordinatorId when role changes away from technician
+    if (selectedRole !== 'technician') {
+      form.setValue('coordinatorId', undefined)
+    }
+  }, [selectedRole, form])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const result = await updateAdvance(data)
 
     if (result.success) {
-      const message = `Successfully updated ${member?.users.full_name}'s ${
-        data.role !== member?.role
-          ? `role to ${data.role}`
-          : `status to ${data.status}`
-      }`
+      const changes = []
+      if (data.role !== member?.role) {
+        changes.push(`role to ${data.role}`)
+      }
+      if (data.status !== member?.status) {
+        changes.push(`status to ${data.status}`)
+      }
+      if (
+        data.role === 'technician' &&
+        data.coordinatorId !== member?.coordinator_id
+      ) {
+        const coordinator = coordinators?.find(
+          (c) => c.user_id === data.coordinatorId,
+        )
+        changes.push(`coordinator to ${coordinator?.users.full_name}`)
+      }
+
+      const message = `Successfully updated ${member?.users.full_name}'s ${changes.join(' and ')}`
 
       toast({
         description: message,
@@ -138,6 +176,49 @@ export default function AdvanceForm({ onSuccess }: AdvanceFormProps) {
             </FormItem>
           )}
         />
+
+        {form.watch('role') === 'technician' && (
+          <FormField
+            control={form.control}
+            name='coordinatorId'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assign to Coordinator</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value ?? ''}
+                  disabled={loadingCoordinators}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select coordinator' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {loadingCoordinators ? (
+                      <SelectItem value='loading'>Loading...</SelectItem>
+                    ) : coordinators?.length === 0 ? (
+                      <SelectItem value='none'>
+                        No coordinators available
+                      </SelectItem>
+                    ) : (
+                      coordinators?.map((coord) => (
+                        <SelectItem key={coord.user_id} value={coord.user_id}>
+                          {coord.users.full_name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Select which program coordinator this technician reports to
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <Button
           type='submit'
           className='flex gap-2 items-center w-full'

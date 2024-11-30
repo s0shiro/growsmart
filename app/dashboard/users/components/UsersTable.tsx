@@ -37,6 +37,7 @@ import { useUsersStore } from '@/stores/usersStore'
 import UserDetails from './UserDetails'
 import TableSkeleton from './TableSkeleton'
 import { useReadUsers } from '@/hooks/users/useReadUsers'
+import Link from 'next/link'
 
 export default function UsersTable() {
   const {
@@ -181,7 +182,7 @@ export default function UsersTable() {
                     <TableCell>{formatDate(member.created_at)}</TableCell>
                     <TableCell>
                       <div className='flex space-x-2'>
-                        <Dialog>
+                        {/* <Dialog>
                           <DialogTrigger asChild>
                             <Button variant='ghost' size='icon'>
                               <Eye className='h-4 w-4' />
@@ -193,7 +194,12 @@ export default function UsersTable() {
                             </DialogHeader>
                             <UserDetails user={member} />
                           </DialogContent>
-                        </Dialog>
+                        </Dialog> */}
+                        {/* <Link href={`/dashboard/users/${member.id}`}>
+                          <Button variant='ghost' size='icon' asChild>
+                            <Eye className='h-4 w-4' />
+                          </Button>
+                        </Link> */}
                         <EditMember permission={member} />
                       </div>
                     </TableCell>

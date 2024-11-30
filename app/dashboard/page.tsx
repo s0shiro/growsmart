@@ -42,7 +42,7 @@ export default async function DashboardPage() {
   const role =
     userData.permissions?.[0]?.role ??
     sessionData.user.user_metadata?.role ??
-    'user'
+    'farmer'
   const status =
     userData.permissions?.[0]?.status ??
     sessionData.user.user_metadata?.status ??
@@ -55,9 +55,13 @@ export default async function DashboardPage() {
     fullName: userData.full_name,
     jobTitle: userData.job_title,
     avatarUrl: userData.avatar_url,
+    programType: userData.program_type,
+
     role,
     status,
   }
+
+  console.log('User data:', serializableUserData)
 
   return <DashboardClient userData={serializableUserData} />
 }

@@ -107,6 +107,7 @@ export default function HarvestedCropsDashboard() {
                 variant={
                   crop.status === 'harvested' ? 'default' : 'destructive'
                 }
+                className={crop.status === 'harvested' ? 'line-through' : ''}
               >
                 {crop.status}
               </Badge>
@@ -126,8 +127,8 @@ export default function HarvestedCropsDashboard() {
   )
 
   return (
-    <div className='container mx-auto p-4'>
-      <h1 className='text-3xl font-bold mb-6'>Harvested Crops Dashboard</h1>
+    <div>
+      <h1 className='text-3xl font-bold mb-6'>Harvested Crops History</h1>
       <Card className='mb-6'>
         <CardContent className='pt-6'>
           <DatePickerWithRange

@@ -251,6 +251,38 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
     />
   )
 
+  //   const renderNumberInput = (
+  //     name: string,
+  //     label: string,
+  //     placeholder: string,
+  //   ) => (
+  //     <FormField
+  //       key={name}
+  //       control={control}
+  //       name={name}
+  //       render={({ field }) => (
+  //         <FormItem>
+  //           <FormLabel>{label}</FormLabel>
+  //           <FormControl>
+  //             <Input
+  //               placeholder={placeholder}
+  //               type='number'
+  //               min='0'
+  //               onInput={(e) => {
+  //                 const input = e.target as HTMLInputElement
+  //                 if (input.value < '0') {
+  //                   input.value = ''
+  //                 }
+  //               }}
+  //               {...field}
+  //             />
+  //           </FormControl>
+  //           <FormMessage />
+  //         </FormItem>
+  //       )}
+  //     />
+  //   )
+
   const renderDatePicker = (
     name: string,
     label: string,
@@ -388,7 +420,10 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
                     placeholder,
                     name === 'harvestDate',
                   )
-                } else {
+                }
+                // } else if (type === 'number') {
+                //   return renderNumberInput(name, label, placeholder)}
+                else {
                   return (
                     <FormField
                       key={name}

@@ -5,59 +5,69 @@ import { createClient, createSupabaseAdmin } from '@/utils/supabase/server'
 import { revalidatePath, unstable_noStore } from 'next/cache'
 
 //Creating account for admin
-export async function createMember(data: {
-  name: string
-  role: 'technician' | 'admin' | 'program coordinator'
-  status: 'active' | 'resigned'
-  email: string
-  password: string
-  confirm: string
-}) {
-  const supabase = await createSupabaseAdmin()
+//Disabled for now
+// export async function createMember(data: {
+//   name: string
+//   role: 'technician' | 'admin' | 'program coordinator'
+//   status: 'active' | 'resigned'
+//   email: string
+//   password: string
+//   confirm: string
+//   coordinatorId?: string
+// }) {
+//   const supabase = await createSupabaseAdmin()
 
-  //create account
-  const createResult = await supabase.auth.admin.createUser({
-    email: data.email,
-    password: data.password,
-    email_confirm: true,
-    user_metadata: {
-      role: data.role,
-      full_name: data.name,
-      status: data.status,
-    },
-  })
+//   // Simplified metadata construction
+//   const metadata = {
+//     role: data.role,
+//     full_name: data.name,
+//     status: data.status,
+//   }
 
-  if (createResult.error?.message) {
-    return JSON.stringify(createResult)
-  }
+//   // Add coordinatorId for technicians
+//   if (data.role === 'technician' && data.coordinatorId) {
+//     metadata['coordinatorId'] = data.coordinatorId
+//   }
 
-  const userId = createResult.data.user?.id
-  if (!userId) {
-    return JSON.stringify({ error: { message: 'User ID is undefined' } })
-  }
+//   //create account
+//   const createResult = await supabase.auth.admin.createUser({
+//     email: data.email,
+//     password: data.password,
+//     email_confirm: true,
+//     user_metadata: metadata,
+//   })
 
-  //   else {
-  //     const userResult = await supabase.from('users').insert({
-  //       full_name: data.name,
-  //       id: createResult.data.user?.id,
-  //       email: data.email,
-  //     })
+//   if (createResult.error?.message) {
+//     return JSON.stringify(createResult)
+//   }
 
-  //     if (userResult.error?.message) {
-  //       return JSON.stringify(userResult)
-  //     } else {
-  //       const permessionResult = await supabase.from('permissions').insert({
-  //         role: data.role,
-  //         user_id: createResult.data.user?.id,
-  //         status: data.status,
-  //       })
+//   const userId = createResult.data.user?.id
+//   if (!userId) {
+//     return JSON.stringify({ error: { message: 'User ID is undefined' } })
+//   }
 
-  //       return JSON.stringify(permessionResult)
-  //     }
-  //   }
+//   //   else {
+//   //     const userResult = await supabase.from('users').insert({
+//   //       full_name: data.name,
+//   //       id: createResult.data.user?.id,
+//   //       email: data.email,
+//   //     })
 
-  return JSON.stringify({ success: true })
-}
+//   //     if (userResult.error?.message) {
+//   //       return JSON.stringify(userResult)
+//   //     } else {
+//   //       const permessionResult = await supabase.from('permissions').insert({
+//   //         role: data.role,
+//   //         user_id: createResult.data.user?.id,
+//   //         status: data.status,
+//   //       })
+
+//   //       return JSON.stringify(permessionResult)
+//   //     }
+//   //   }
+
+//   return JSON.stringify({ success: true })
+// }
 
 //Updating user for admin only
 //TODO: Also update the metadata of the user
@@ -104,17 +114,26 @@ export async function updateMemberAdvanceAndMetadataById(
   permissionId: string,
   userId: string,
   data: {
-    role: 'admin' | 'technician'
+    role: 'admin' | 'technician' | 'program coordinator'
     status: 'active' | 'resigned'
+    coordinatorId?: string
   },
 ) {
   const supabase = await createClient()
   const supabaseAdmin = await createSupabaseAdmin()
 
+  // Prepare update data with conditional coordinator_id
+  const updateData = {
+    role: data.role,
+    status: data.status,
+    // Reset or set coordinator_id based on role
+    coordinator_id: data.role === 'technician' ? data.coordinatorId : null,
+  }
+
   // Update permissions table
   const permissionsRes = await supabase
     .from('permissions')
-    .update(data)
+    .update(updateData)
     .eq('id', permissionId)
 
   // Update user metadata
@@ -122,10 +141,11 @@ export async function updateMemberAdvanceAndMetadataById(
     user_metadata: {
       role: data.role,
       status: data.status,
+      ...(data.role === 'technician' && {
+        coordinatorId: data.coordinatorId,
+      }),
     },
   })
-
-  revalidatePath('/dashboard/create-user')
 
   return JSON.stringify({
     permissionsRes,

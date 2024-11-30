@@ -188,7 +188,7 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
           <div className='flex space-x-2'>
             <Link href={`/dashboard/f/${harvest.farmer_id}`} passHref>
               <Button variant='secondary' className='w-full'>
-                View Profile
+                Farmer Profile
                 <ExternalLinkIcon className='ml-2 h-4 w-4' />
               </Button>
             </Link>

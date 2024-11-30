@@ -16,7 +16,16 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { useAddFarmer } from '@/hooks/farmer/useAddFarmer'
 import SelectField from '../../(components)/forms/CustomSelectField'
-import { Loader2, User, Phone, MapPin, CirclePlus } from 'lucide-react'
+import {
+  Loader2,
+  User,
+  Phone,
+  MapPin,
+  CirclePlus,
+  XCircle,
+  AlertCircle,
+  CheckCircle2,
+} from 'lucide-react'
 import {
   useFetchBarangays,
   useFetchMunicipalities,
@@ -177,16 +186,46 @@ function CreateFarmerForm() {
         associationPositions: associationPositions,
       })
       toast({
-        description: `Farmer added to you list.`,
+        variant: 'default',
+        description: (
+          <div className='flex items-center gap-2'>
+            <CheckCircle2 className='h-4 w-4 text-green-500 shrink-0' />
+            <span className='font-medium'>
+              Farmer successfully added to your list!
+            </span>
+          </div>
+        ),
+        className:
+          'bg-green-50 dark:bg-green-900 border-green-200 dark:border-green-900/50',
+        duration: 5000,
       })
       document.getElementById('create-trigger')?.click()
     } catch (error) {
       console.error('Error creating farmer:', error)
       toast({
         variant: 'destructive',
-        title: 'Failed to add farmer!😢',
-        description:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        title: 'Failed to add farmer',
+        description: (
+          <div className='flex flex-col gap-1'>
+            <p className='font-medium flex items-center'>
+              {error instanceof Error ? (
+                <>
+                  <XCircle className='h-4 w-4 mr-2 shrink-0' />
+                  {error.message}
+                </>
+              ) : (
+                <>
+                  <AlertCircle className='h-4 w-4 mr-2 shrink-0' />
+                  Something went wrong. Please try again.
+                </>
+              )}
+            </p>
+            <p className='text-xs opacity-80'>
+              If this problem persists, please contact support.
+            </p>
+          </div>
+        ),
+        duration: 6000,
       })
     }
   }
