@@ -2,21 +2,48 @@
 
 import { createClient } from '@/utils/supabase/server'
 
-export const getAllDamagesDuringVisitation = async () => {
+interface DateRange {
+  from?: Date
+  to?: Date
+}
+
+export const getAllDamagesDuringVisitation = async (dateRange?: DateRange) => {
   const supabase = createClient()
+
+  // Default to 6 months ago if no date range provided
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+  // Use provided dates or fallback
+  const fromDate = dateRange?.from || sixMonthsAgo
+  const toDate = dateRange?.to || new Date()
 
   const { data, error } = await supabase
     .from('inspections')
     .select(
-      `*, planting_records(crop_categoryId(name), crop_type(name), variety(name)), technician_farmers(firstname, lastname)`,
+      `
+        *,
+        planting_records(
+          crop_categoryId(name),
+          crop_type(name),
+          variety(name)
+        ),
+        technician_farmers(
+          firstname,
+          lastname
+        )
+      `,
     )
-    .gt('damaged', 0) // Add this line to filter damages greater than 0
+    .gt('damaged', 0)
+    .gte('date', fromDate.toISOString())
+    .lte('date', toDate.toISOString())
+    .order('is_priority', { ascending: false })
     .order('damaged', { ascending: false })
     .order('created_at', { ascending: false })
 
   if (error) {
     console.error('Supabase error:', error.message)
-    return null // Explicitly return null on error
+    return null
   }
   return data
 }
@@ -72,13 +99,21 @@ export const getCalculatedDamagesOfPlantingRecord = async (
 }
 
 //getting the damages per month
-export const getDamagesPerMonth = async () => {
+export const getDamagesPerMunicipality = async (dateRange?: DateRange) => {
   const supabase = createClient()
+
+  // Default to 6 months ago if no date range provided
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+  const fromDate = dateRange?.from || sixMonthsAgo
+  const toDate = dateRange?.to || new Date()
 
   const { data, error } = await supabase
     .from('inspections')
     .select('damaged, date, planting_records(location_id(municipality))')
     .gt('damaged', 0)
+    .gte('date', fromDate.toISOString())
+    .lte('date', toDate.toISOString())
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -95,23 +130,17 @@ export const getDamagesPerMonth = async () => {
     Torrijos: 0,
   }
 
-  // Aggregate damages with precision handling
   data?.forEach((inspection) => {
     const municipality = inspection.planting_records?.location_id?.municipality
     if (municipality && municipality in municipalityDamages) {
-      // Convert to number and fix precision
       municipalityDamages[municipality] = +(
         municipalityDamages[municipality] + inspection.damaged
       ).toFixed(4)
     }
   })
 
-  const result = Object.entries(municipalityDamages).map(
-    ([municipality, total]) => ({
-      municipality,
-      total: +total.toFixed(4), // Ensure consistent decimal places
-    }),
-  )
-
-  return result
+  return Object.entries(municipalityDamages).map(([municipality, total]) => ({
+    municipality,
+    total: +total.toFixed(4),
+  }))
 }

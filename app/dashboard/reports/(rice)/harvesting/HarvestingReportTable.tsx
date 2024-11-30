@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,6 +17,7 @@ import useHarvestStore from '@/stores/useRiceHarvestStore'
 import { formatDateRange, getBgColor, getSeasonAndYear } from '@/lib/utils'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 import { Printer } from 'lucide-react'
+import { NotedBySection } from '@/app/dashboard/(components)/NotedBySection'
 
 type SeedData = {
   area: number
@@ -120,6 +121,11 @@ export default function HarvestingReportTable() {
     setSelectedWaterSupply,
     setDateRange,
   } = useHarvestStore()
+
+  const [notedByName, setNotedByName] = useState('VANESSA TAYABA')
+  const [notedByTitle, setNotedByTitle] = useState(
+    'Municipal Agricultural Officer',
+  )
 
   const {
     data: specificData,
@@ -307,8 +313,8 @@ export default function HarvestingReportTable() {
                 <div class="signature-block">
                   <p>Noted by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${notedByName}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
             </div>
             </body>
@@ -494,7 +500,7 @@ export default function HarvestingReportTable() {
               )}
             </tbody>
           </table>
-        </div>
+        </div>{' '}
         <ScrollBar orientation='horizontal' />
       </ScrollArea>
       <Button
@@ -504,6 +510,16 @@ export default function HarvestingReportTable() {
       >
         <Printer className='mr-2 h-4 w-4' /> Print Rice Harvesting Report
       </Button>
+
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={notedByName}
+          notedByTitle={notedByTitle}
+          setNotedByName={setNotedByName}
+          setNotedByTitle={setNotedByTitle}
+          className='mt-4 sm:w-auto'
+        />
+      </div>
     </div>
   )
 }

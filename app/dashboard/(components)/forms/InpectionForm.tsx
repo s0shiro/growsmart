@@ -17,15 +17,51 @@ import { recordInspection } from '@/lib/inspection'
 import { useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/components/hooks/use-toast'
 import { formatDate } from '@/lib/utils'
+import { useSession } from '@/stores/useSession'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
+
+const DamageSeverityEnum = {
+  MINIMAL: 'Minimal (0-25%)',
+  MODERATE: 'Moderate (26-50%)',
+  SEVERE: 'Severe (51-75%)',
+  TOTAL: 'Total Loss (76-100%)',
+} as const
+
+const DamageTypesEnum = {
+  PEST: 'Pest Infestation',
+  DISEASE: 'Plant Disease',
+  WEATHER: 'Weather Damage',
+  FLOOD: 'Flood Damage',
+  DROUGHT: 'Drought Impact',
+  SOIL: 'Soil Problems',
+  OTHER: 'Other',
+} as const
+
+const GrowthStagesEnum = {
+  SEEDLING: 'Seedling',
+  VEGETATIVE: 'Vegetative',
+  REPRODUCTIVE: 'Reproductive',
+  MATURITY: 'Maturity',
+} as const
 
 const FormSchema = z.object({
   dateOfInspection: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid date format for Date of Inspection',
+    message: 'Invalid date format',
   }),
-  damagedQuantity: z.coerce.number().nonnegative(),
-  damagedReason: z
-    .string()
-    .max(256, 'Damaged Reason must be 256 characters or less'),
+  damagedArea: z.coerce.number().positive(),
+  damageSeverity: z.enum(
+    Object.values(DamageSeverityEnum) as [string, ...string[]],
+  ),
+  damageType: z.enum(Object.values(DamageTypesEnum) as [string, ...string[]]),
+  growthStage: z.enum(Object.values(GrowthStagesEnum) as [string, ...string[]]),
+  isPriority: z.boolean().default(false),
   findings: z.string().optional(),
 })
 
@@ -36,34 +72,41 @@ function InspectionForm({
   plantingID: string
   farmerID: string
 }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {},
-  })
-
+  const user = useSession((state) => state.user)
   const queryClient = useQueryClient()
   const { toast } = useToast()
 
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      isPriority: false,
+    },
+  })
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      const res = await recordInspection({
-        plantingID: plantingID,
-        farmerID: farmerID,
+      await recordInspection({
+        plantingID,
+        farmerID,
+        technicianID: user?.id as string,
         dateOfInspection: data.dateOfInspection,
-        damagedQuantity: data.damagedQuantity,
-        damagedReason: data.damagedReason,
+        damagedArea: data.damagedArea,
+        damageSeverity: data.damageSeverity,
+        damageType: data.damageType,
+        growthStage: data.growthStage,
+        isPriority: data.isPriority,
         findings: data.findings,
       })
+
       toast({
-        title: 'Visitation Added!🎉',
-        description: `Visited at ${formatDate(data.dateOfInspection)}📅.`,
+        title: 'Inspection Recorded!',
+        description: `Visited at ${formatDate(data.dateOfInspection)}`,
       })
+
       document.getElementById('create-visit')?.click()
-      console.log('visit record successfully!')
       await queryClient.invalidateQueries({
         queryKey: ['crop-planting-record', plantingID],
       })
-      //   form.reset()
     } catch (error) {
       console.error('Failed to submit form:', error)
     }
@@ -80,13 +123,7 @@ function InspectionForm({
               <FormItem>
                 <FormLabel>Date Of Inspection</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder='Date of Inspection'
-                    type='date'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
+                  <Input type='date' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -95,18 +132,90 @@ function InspectionForm({
 
           <FormField
             control={form.control}
-            name='damagedQuantity'
+            name='damageSeverity'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Damaged Quantity (ha)</FormLabel>
+                <FormLabel>Damage Severity</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select severity' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(DamageSeverityEnum).map((severity) => (
+                      <SelectItem key={severity} value={severity}>
+                        {severity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='damageType'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type of Damage</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select damage type' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(DamageTypesEnum).map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='growthStage'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Growth Stage</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select growth stage' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(GrowthStagesEnum).map((stage) => (
+                      <SelectItem key={stage} value={stage}>
+                        {stage}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='damagedArea'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Damaged Area (ha)</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder='Damaged Quantity'
-                    type='number'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                  />
+                  <Input type='number' step='0.01' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,20 +224,16 @@ function InspectionForm({
 
           <FormField
             control={form.control}
-            name='damagedReason'
+            name='isPriority'
             render={({ field }) => (
-              <FormItem className='col-span-2'>
-                <FormLabel>Damaged Reason</FormLabel>
+              <FormItem className='flex items-center space-x-2'>
                 <FormControl>
-                  <Input
-                    placeholder='Reason for Damage'
-                    type='text'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full'
-                    maxLength={256}
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
                   />
                 </FormControl>
+                <FormLabel>Priority Case</FormLabel>
                 <FormMessage />
               </FormItem>
             )}
@@ -141,12 +246,7 @@ function InspectionForm({
               <FormItem className='col-span-2'>
                 <FormLabel>Findings</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder='Findings (optional)'
-                    {...field}
-                    onChange={field.onChange}
-                    className='mt-1 block w-full h-32 resize-none'
-                  />
+                  <Textarea {...field} className='h-32 resize-none' />
                 </FormControl>
                 <FormMessage />
               </FormItem>

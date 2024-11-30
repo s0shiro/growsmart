@@ -14,6 +14,7 @@ import { formatDate } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 import { Printer } from 'lucide-react'
+import { NotedBySection } from '@/app/dashboard/(components)/NotedBySection'
 
 const municipalities = [
   'Boac',
@@ -34,6 +35,11 @@ export default function CornStandingCrop() {
 
   const currentDate = new Date()
   const formattedDate = formatDate(currentDate)
+
+  const [notedByName, setNotedByName] = useState('VANESSA TAYABA')
+  const [notedByTitle, setNotedByTitle] = useState(
+    'Municipal Agricultural Officer',
+  )
 
   const handlePrint = () => {
     if (printableRef.current) {
@@ -172,8 +178,8 @@ export default function CornStandingCrop() {
                 <div class="signature-block">
                   <p>Certified true and correct:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${notedByName}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
               </div>
             </body>
@@ -253,7 +259,7 @@ export default function CornStandingCrop() {
   }
 
   return (
-    <div className='p-4'>
+    <div>
       <div className='mb-4'>
         <Select onValueChange={(value) => setSelectedMunicipality(value)}>
           <SelectTrigger className='w-[180px]'>
@@ -492,6 +498,16 @@ export default function CornStandingCrop() {
       >
         <Printer className='mr-2 h-4 w-4' /> Print Corn Standing Report
       </Button>
+
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={notedByName}
+          notedByTitle={notedByTitle}
+          setNotedByName={setNotedByName}
+          setNotedByTitle={setNotedByTitle}
+          className='mt-4 sm:w-auto'
+        />
+      </div>
     </div>
   )
 }

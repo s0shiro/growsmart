@@ -2,29 +2,40 @@
 
 import { createClient } from '@/utils/supabase/server'
 
-export const recordInspection = async (data: {
+interface InspectionData {
   plantingID: string
   farmerID: string
+  technicianID: string // New field
   dateOfInspection: string
-  damagedQuantity: number
-  damagedReason: string
+  damagedArea: number
+  damageSeverity: string
+  damageType: string
+  growthStage: string
+  isPriority: boolean
   findings?: string
-}) => {
+}
+
+export const recordInspection = async (data: InspectionData) => {
   const supabase = createClient()
 
   const inspectionData = {
     planting_id: data.plantingID,
     farmer_id: data.farmerID,
+    technician_id: data.technicianID,
     date: data.dateOfInspection,
+    damaged: data.damagedArea,
+    damage_severity: data.damageSeverity,
+    damage_type: data.damageType,
+    growth_stage: data.growthStage,
+    is_priority: data.isPriority,
     findings: data.findings,
-    damaged: data.damagedQuantity,
-    damaged_reason: data.damagedReason,
   }
 
   const { error } = await supabase.from('inspections').insert([inspectionData])
 
   if (error) {
     console.error('Supabase error:', error.message)
+    throw error
   }
 }
 
@@ -33,14 +44,23 @@ export const getInspectionsByPlantingID = async (plantingID: string) => {
 
   const { data, error } = await supabase
     .from('inspections')
-    .select('*, planting_records(status)')
+    .select(
+      `
+      *,
+      planting_records(status),
+      users!technician_id (
+        full_name,
+        email,
+        job_title
+      )
+    `,
+    )
     .eq('planting_id', plantingID)
-
-  console.log(data)
+    .order('date', { ascending: false })
 
   if (error) {
     console.error('Supabase error:', error.message)
-    return []
+    throw error
   }
 
   return data

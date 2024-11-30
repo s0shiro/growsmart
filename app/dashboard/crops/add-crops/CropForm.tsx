@@ -30,6 +30,7 @@ const FormSchema = z.object({
   newCropName: z.string().optional(),
   isNewVariety: z.boolean().optional(), // Boolean to track whether the user is adding a new variety
   newVarietyName: z.string().optional(), // Field for the new variety name, only needed if isNewVariety is true
+  maturityDays: z.coerce.number().min(1).max(365).optional(), // Coerce string to number
 })
 
 type FieldName = keyof z.infer<typeof FormSchema>
@@ -57,6 +58,12 @@ const fieldConfigs: {
     placeholder: 'Select Variety',
     label: 'Variety',
     type: 'select',
+  },
+  {
+    name: 'maturityDays',
+    placeholder: 'Enter days to maturity (optional)',
+    label: 'Maturity Days',
+    type: 'number',
   },
 ]
 
@@ -111,6 +118,7 @@ const CropForm = () => {
           cropVariety: isNewVariety
             ? (data.newVarietyName ?? '')
             : (data.cropVariety ?? ''),
+          maturityDays: data.maturityDays,
         })
 
         if (res.error) {

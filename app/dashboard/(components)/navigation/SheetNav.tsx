@@ -98,11 +98,11 @@ const SheetNav = () => {
         className={`flex items-center justify-between w-full ${isLoggingOut ? 'pointer-events-none opacity-50' : ''}`}
       >
         <Breadcrumb className='hidden md:flex'>
-          <BreadcrumbList>
+          {/* <BreadcrumbList>
             {formattedPathname.map((segment, index) => (
               <BreadcrumbItem key={index}>{segment}</BreadcrumbItem>
             ))}
-          </BreadcrumbList>
+          </BreadcrumbList> */}
         </Breadcrumb>
 
         <div className='flex items-center gap-4 ml-auto md:ml-0'>

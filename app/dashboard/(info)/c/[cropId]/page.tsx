@@ -269,6 +269,8 @@ export default function CropsDetailsPage({
         </TabsContent>
 
         <TabsContent value='visitations'>
+          {' '}
+          {/* This line might need adjustment depending on where TabsContent is defined */}
           <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle className='text-xl font-semibold'>
@@ -304,31 +306,31 @@ export default function CropsDetailsPage({
                     <Card key={inspection.id}>
                       <CardContent className='flex items-center justify-between p-4'>
                         <div className='flex items-center gap-4'>
-                          {(inspection.damaged ?? 0) > 0 ? (
+                          {inspection.is_priority ? (
                             <AlertTriangleIcon className='h-8 w-8 text-destructive' />
                           ) : (
                             <CheckCircleIcon className='h-8 w-8 text-primary' />
                           )}
                           <div>
                             <p className='font-semibold'>
-                              {formatDate(inspection?.date ?? '')}
+                              {formatDate(inspection.date)}
                             </p>
                             <p className='text-sm text-muted-foreground'>
-                              Damage: {inspection.damaged} | Reason:{' '}
-                              {inspection.damaged_reason}
+                              Damage: {inspection.damaged} ha | Type:{' '}
+                              {inspection.damage_type}
+                            </p>
+                            <p className='text-sm text-muted-foreground'>
+                              Growth Stage: {inspection.growth_stage} |
+                              Severity: {inspection.damage_severity}
                             </p>
                           </div>
                         </div>
                         <Badge
                           variant={
-                            (inspection?.damaged ?? 0) > 0
-                              ? 'destructive'
-                              : 'secondary'
+                            inspection.is_priority ? 'destructive' : 'secondary'
                           }
                         >
-                          {(inspection?.damaged ?? 0) > 0
-                            ? 'Damaged'
-                            : 'Healthy'}
+                          {inspection.is_priority ? 'Priority' : 'Normal'}
                         </Badge>
                       </CardContent>
                     </Card>

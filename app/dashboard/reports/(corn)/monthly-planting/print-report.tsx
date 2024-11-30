@@ -14,6 +14,7 @@ import useFetchMonthlyPlantingCorn from '@/hooks/reports/useFetchMonthlyPlanting
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 import { Printer } from 'lucide-react'
+import { NotedBySection } from '@/app/dashboard/(components)/NotedBySection'
 
 const municipalities = [
   'Boac',
@@ -37,6 +38,11 @@ export default function CornMonthlyPlantingAccomplishment() {
   const isFirstHalf = currentMonth >= 1 && currentMonth <= 6
 
   const formattedDate = formatDate(currentDate)
+
+  const [notedByName, setNotedByName] = useState('VANESSA TAYABA')
+  const [notedByTitle, setNotedByTitle] = useState(
+    'Municipal Agricultural Officer',
+  )
 
   const processedData = useMemo(() => {
     if (!selectedMunicipality) return {}
@@ -234,8 +240,8 @@ export default function CornMonthlyPlantingAccomplishment() {
                 <div class="signature-block">
                   <p>Certified true and correct:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${notedByName}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
               </div>
             </body>
@@ -417,6 +423,16 @@ export default function CornMonthlyPlantingAccomplishment() {
       >
         <Printer className='mr-2 h-4 w-4' /> Print Corn Planting Report
       </Button>
+
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={notedByName}
+          notedByTitle={notedByTitle}
+          setNotedByName={setNotedByName}
+          setNotedByTitle={setNotedByTitle}
+          className='mt-4 sm:w-auto'
+        />
+      </div>
     </div>
   )
 }

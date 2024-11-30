@@ -62,7 +62,7 @@ export default function DashboardClient({ userData }: DashboardClientProps) {
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
             <MonthlyProductionChart />
             <CategoryDistributionChart />
-            <SalesChannelChart />
+            {/* <SalesChannelChart /> */}
           </div>
         </CardContent>
       </Card>

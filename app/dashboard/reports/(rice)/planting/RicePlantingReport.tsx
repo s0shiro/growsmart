@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
 import useFetchMonthlyPlantingRice from '@/hooks/reports/useFetchMonthlyPlantingRice'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 import { formatDate, getSeasonAndYear } from '@/lib/utils'
 import { format } from 'date-fns'
+import { NotedBySection } from '@/app/dashboard/(components)/NotedBySection'
 
 type PlantingData = {
   location_id: {
@@ -31,6 +32,11 @@ export default function RicePlantingReport() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, error, isLoading } = useFetchMonthlyPlantingRice()
   const { data: user } = useCurrentUserProfile()
+
+  const [notedByName, setNotedByName] = useState('VANESSA TAYABA')
+  const [notedByTitle, setNotedByTitle] = useState(
+    'Municipal Agricultural Officer',
+  )
 
   const processedData = useMemo(() => {
     if (!data || !Array.isArray(data)) return null
@@ -270,8 +276,8 @@ export default function RicePlantingReport() {
                 <div class="signature-block">
                   <p>Noted by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${notedByName}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
             </div>
             </body>
@@ -297,7 +303,7 @@ export default function RicePlantingReport() {
   const formatNumber = (num: number) => (num === 0 ? '' : num.toFixed(4))
 
   return (
-    <div className='container mx-auto p-4'>
+    <div>
       <Button onClick={handlePrint} className='mb-4 no-print'>
         <Printer className='mr-2 h-4 w-4' /> Print Rice Planting Report
       </Button>
@@ -520,6 +526,15 @@ export default function RicePlantingReport() {
             )}
           </tbody>
         </table>
+      </div>
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={notedByName}
+          notedByTitle={notedByTitle}
+          setNotedByName={setNotedByName}
+          setNotedByTitle={setNotedByTitle}
+          className='mt-4 sm:w-auto'
+        />
       </div>
     </div>
   )

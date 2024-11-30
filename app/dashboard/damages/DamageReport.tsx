@@ -22,19 +22,25 @@ import {
 } from '@/components/ui/popover'
 import { format } from 'date-fns'
 import { cn, formatDate } from '@/lib/utils'
-import useFetchAllDamagesDuringVisitation from '@/hooks/useFetchAllDamages'
-import useFetchDamagesCurrentMonth from '@/hooks/reports/useFetchCurrentMonthDamages'
+
 import DamagePieChart from './DamagesGraph'
+import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  DamageSeverityEnum,
+  DamageTypesEnum,
+  GrowthStagesEnum,
+} from '@/lib/constant'
+import useFetchAllDamagesDuringVisitation from '@/hooks/useFetchAllDamages'
+import useFetchDamagesByMunicipality from '@/hooks/reports/useFetchCurrentMonthDamages'
 
 export default function DamageReport() {
-  const { data, isLoading, error } = useFetchAllDamagesDuringVisitation()
-  const {
-    data: damages,
-    isFetching: damagesFetching,
-    error: damagesError,
-  } = useFetchDamagesCurrentMonth()
-  const printableRef = useRef<HTMLDivElement>(null)
-  const [activeCategory, setActiveCategory] = useState('All')
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined
     to: Date | undefined
@@ -42,6 +48,16 @@ export default function DamageReport() {
     from: undefined,
     to: undefined,
   })
+  const { data, isLoading, error } =
+    useFetchAllDamagesDuringVisitation(dateRange)
+  const { data: municipalityDamages, isLoading: damagesLoading } =
+    useFetchDamagesByMunicipality(dateRange)
+  const printableRef = useRef<HTMLDivElement>(null)
+  const [activeCategory, setActiveCategory] = useState('All')
+  const [damageSeverityFilter, setDamageSeverityFilter] = useState('all')
+  const [damageTypeFilter, setDamageTypeFilter] = useState('all')
+  const [growthStageFilter, setGrowthStageFilter] = useState('all')
+  const [priorityFilter, setPriorityFilter] = useState('all')
 
   const handlePrint = () => {
     if (printableRef.current) {
@@ -203,7 +219,25 @@ export default function DamageReport() {
           activeCategory === 'All' ||
           item.planting_records.crop_categoryId.name.toLowerCase() ===
             activeCategory.toLowerCase()
-        return isInDateRange && isInCategory
+        const matchesSeverity =
+          damageSeverityFilter === 'all' ||
+          item.damage_severity === damageSeverityFilter
+        const matchesType =
+          damageTypeFilter === 'all' || item.damage_type === damageTypeFilter
+        const matchesGrowthStage =
+          growthStageFilter === 'all' || item.growth_stage === growthStageFilter
+        const matchesPriority =
+          priorityFilter === 'all' ||
+          (priorityFilter === 'priority' ? item.is_priority : !item.is_priority)
+
+        return (
+          isInDateRange &&
+          isInCategory &&
+          matchesSeverity &&
+          matchesType &&
+          matchesGrowthStage &&
+          matchesPriority
+        )
       })
     : []
 
@@ -224,13 +258,27 @@ export default function DamageReport() {
             <TableHead className='bg-muted text-xs'>Crop</TableHead>
             <TableHead className='bg-muted text-xs'>Variety</TableHead>
             <TableHead className='bg-muted text-xs'>Damage Area (ha)</TableHead>
+            <TableHead className='bg-muted text-xs'>
+              Damage Severity
+            </TableHead>{' '}
+            {/* New */}
+            <TableHead className='bg-muted text-xs'>Damage Type</TableHead>{' '}
+            {/* New */}
+            <TableHead className='bg-muted text-xs'>
+              Growth Stage
+            </TableHead>{' '}
+            {/* New */}
+            <TableHead className='bg-muted text-xs'>Priority</TableHead>{' '}
+            {/* New */}
             <TableHead className='bg-muted text-xs'>Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((item: any) => (
             <TableRow key={item.id}>
-              <TableCell className='text-xs'>{`${item.technician_farmers.firstname} ${item.technician_farmers.lastname}`}</TableCell>
+              <TableCell className='text-xs'>
+                {`${item.technician_farmers.firstname} ${item.technician_farmers.lastname}`}
+              </TableCell>
               <TableCell className='text-xs'>
                 {item.planting_records.crop_type.name}
               </TableCell>
@@ -238,6 +286,16 @@ export default function DamageReport() {
                 {item.planting_records.variety.name}
               </TableCell>
               <TableCell className='text-xs'>{`${item.damaged} ha`}</TableCell>
+              <TableCell className='text-xs'>{item.damage_severity}</TableCell>
+              <TableCell className='text-xs'>{item.damage_type}</TableCell>
+              <TableCell className='text-xs'>{item.growth_stage}</TableCell>
+              <TableCell className='text-xs'>
+                {item.is_priority ? (
+                  <Badge variant='destructive'>Priority</Badge>
+                ) : (
+                  <Badge variant='secondary'>Normal</Badge>
+                )}
+              </TableCell>
               <TableCell className='text-xs'>{formatDate(item.date)}</TableCell>
             </TableRow>
           ))}
@@ -293,96 +351,123 @@ export default function DamageReport() {
 
   return (
     <div>
-      <div className='flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 no-print'>
-        <div className='w-full sm:w-auto order-2 sm:order-1'>
-          <Tabs
-            defaultValue='All'
-            onValueChange={setActiveCategory}
-            className='w-full sm:w-auto'
-          >
-            <TabsList className='w-full sm:w-auto flex overflow-x-auto'>
-              <TabsTrigger
-                value='All'
-                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
-              >
-                All
-              </TabsTrigger>
-              <TabsTrigger
-                value='Rice'
-                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
-              >
-                Rice
-              </TabsTrigger>
-              <TabsTrigger
-                value='Corn'
-                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
-              >
-                Corn
-              </TabsTrigger>
-              <TabsTrigger
-                value='High-Value'
-                className='flex-1 whitespace-nowrap px-2 py-1.5 text-xs sm:text-sm'
-              >
-                High Value
-              </TabsTrigger>
+      <div className='flex flex-col gap-4 mb-6 no-print'>
+        <div className='flex items-center justify-between'>
+          <Tabs defaultValue='All' onValueChange={setActiveCategory}>
+            <TabsList>
+              <TabsTrigger value='All'>All</TabsTrigger>
+              <TabsTrigger value='Rice'>Rice</TabsTrigger>
+              <TabsTrigger value='Corn'>Corn</TabsTrigger>
+              <TabsTrigger value='High-Value'>High Value</TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
-        <div className='flex items-center gap-2 w-full sm:w-auto order-1 sm:order-2'>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id='date'
-                variant={'outline'}
-                className={cn(
-                  'w-full sm:w-[300px] justify-start text-left font-normal',
-                  !dateRange && 'text-muted-foreground',
-                )}
-              >
-                <CalendarIcon className='mr-2 h-4 w-4' />
-                {dateRange?.from ? (
-                  dateRange.to ? (
-                    <>
-                      {format(dateRange.from, 'LLL dd, y')} -{' '}
-                      {format(dateRange.to, 'LLL dd, y')}
-                    </>
+          <div className='flex items-center gap-2'>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant='outline' className='w-[240px]'>
+                  <CalendarIcon className='mr-2 h-4 w-4' />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, 'LLL dd, y')} -{' '}
+                        {format(dateRange.to, 'LLL dd, y')}
+                      </>
+                    ) : (
+                      format(dateRange.from, 'LLL dd, y')
+                    )
                   ) : (
-                    format(dateRange.from, 'LLL dd, y')
-                  )
-                ) : (
-                  <span>Pick a date range</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-auto p-0' align='start'>
-              <Calendar
-                initialFocus
-                mode='range'
-                defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={(newDateRange) =>
-                  setDateRange({
-                    from: newDateRange?.from,
-                    to: newDateRange?.to,
-                  })
-                }
-                numberOfMonths={2}
-              />
-              <div className='p-3 border-t border-border'>
-                <Button
-                  variant='outline'
-                  className='w-full'
-                  onClick={clearDateRange}
-                >
-                  <X className='mr-2 h-4 w-4' />
-                  Clear
+                    <span>Pick a date range</span>
+                  )}
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Button onClick={handlePrint} className='whitespace-nowrap'>
-            <Printer className='mr-2 h-4 w-4' /> Print
-          </Button>
+              </PopoverTrigger>
+              <PopoverContent className='w-auto p-0' align='start'>
+                <Calendar
+                  initialFocus
+                  mode='range'
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={(newDateRange) =>
+                    setDateRange({
+                      from: newDateRange?.from,
+                      to: newDateRange?.to,
+                    })
+                  }
+                  numberOfMonths={2}
+                />
+                <div className='p-3 border-t border-border'>
+                  <Button
+                    variant='outline'
+                    className='w-full'
+                    onClick={clearDateRange}
+                  >
+                    <X className='mr-2 h-4 w-4' />
+                    Clear
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Button onClick={handlePrint}>
+              <Printer className='mr-2 h-4 w-4' /> Print
+            </Button>
+          </div>
+        </div>
+
+        <div className='flex flex-wrap gap-2'>
+          <Select
+            value={damageSeverityFilter}
+            onValueChange={setDamageSeverityFilter}
+          >
+            <SelectTrigger className='w-[160px]'>
+              <SelectValue placeholder='All Severities' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Severities</SelectItem>
+              {Object.values(DamageSeverityEnum).map((severity) => (
+                <SelectItem key={severity} value={severity}>
+                  {severity}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={damageTypeFilter} onValueChange={setDamageTypeFilter}>
+            <SelectTrigger className='w-[160px]'>
+              <SelectValue placeholder='All Types' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Types</SelectItem>
+              {Object.values(DamageTypesEnum).map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={growthStageFilter}
+            onValueChange={setGrowthStageFilter}
+          >
+            <SelectTrigger className='w-[160px]'>
+              <SelectValue placeholder='All Stages' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Stages</SelectItem>
+              {Object.values(GrowthStagesEnum).map((stage) => (
+                <SelectItem key={stage} value={stage}>
+                  {stage}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+            <SelectTrigger className='w-[160px]'>
+              <SelectValue placeholder='All Status' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Status</SelectItem>
+              <SelectItem value='priority'>Priority</SelectItem>
+              <SelectItem value='normal'>Normal</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -409,9 +494,9 @@ export default function DamageReport() {
           <ScrollBar orientation='vertical' className='no-print' />
         </ScrollArea>
 
-        {damages && !damagesFetching && !damagesError && (
+        {municipalityDamages && !damagesLoading && (
           <div className='mt-8 no-print'>
-            <DamagePieChart data={damages} />
+            <DamagePieChart data={municipalityDamages} />
           </div>
         )}
       </div>

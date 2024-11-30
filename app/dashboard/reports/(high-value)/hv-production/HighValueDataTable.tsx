@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import useHighValueInspection from '@/hooks/reports/useFetchHighValueInspectionData'
 import { format } from 'date-fns'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 import { Printer } from 'lucide-react'
+import { NotedBySection } from '@/app/dashboard/(components)/NotedBySection'
 
 type CropData = {
   area_planted: number
@@ -59,6 +60,12 @@ export default function Component() {
   const printableRef = useRef<HTMLDivElement>(null)
   const { data, error, isFetching } = useHighValueInspection()
   const { data: user } = useCurrentUserProfile()
+
+  const [notedByName, setNotedByName] = useState('')
+  const [notedByTitle, setNotedByTitle] = useState('')
+
+  const [submittedByName, setSubmittedByName] = useState('')
+  const [summittedByTitle, setSubmittedByTitle] = useState('')
 
   const handlePrint = () => {
     if (printableRef.current) {
@@ -140,14 +147,14 @@ export default function Component() {
                 <div class="signature-block">
                   <p>Submitted by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${submittedByName}</strong></p>
+                  <p>${submittedByName}</p>
                 </div>
                 <div class="signature-block">
                   <p>Noted by:</p>
                   <div class="signature-line"></div>
-                  <p><strong>EDILBERTO M. DE LUNA</strong></p>
-                  <p>Provincial Agricuturist</p>
+                  <p><strong>${notedByName}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
             </div>
             </body>
@@ -343,6 +350,26 @@ export default function Component() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={notedByName}
+          notedByTitle={notedByTitle}
+          setNotedByName={setNotedByName}
+          setNotedByTitle={setNotedByTitle}
+          className='mt-4 sm:w-auto'
+        />
+      </div>
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={submittedByName}
+          notedByTitle={summittedByTitle}
+          setNotedByName={setSubmittedByName}
+          setNotedByTitle={setSubmittedByTitle}
+          className='mt-4 sm:w-auto'
+          nameLabel='Submitted by'
+        />
       </div>
     </div>
   )

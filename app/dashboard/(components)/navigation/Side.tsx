@@ -83,7 +83,6 @@ const productionLinks = [
     Icon: History,
     label: 'All Harvested Crops',
   },
-  { href: '/dashboard/damages', Icon: TriangleAlert, label: 'Damages Report' },
 ]
 
 const profilingLinks = [
@@ -336,6 +335,33 @@ export default function Sidebar({
                     <TooltipContent side='right'>
                       Generate Reports
                     </TooltipContent>
+                  )}
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={
+                        isActive(path, '/dashboard/damages')
+                          ? 'default'
+                          : 'ghost'
+                      }
+                      className={clsx(
+                        'w-full justify-start mb-2',
+                        !isOpen && 'justify-center p-0',
+                      )}
+                      asChild
+                    >
+                      <Link href='/dashboard/damages'>
+                        <TriangleAlert
+                          className={clsx('h-4 w-4', isOpen && 'mr-2')}
+                        />
+                        {isOpen && <span>Damages Report</span>}
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  {!isOpen && (
+                    <TooltipContent side='right'>Damages Report</TooltipContent>
                   )}
                 </Tooltip>
               </TooltipProvider>

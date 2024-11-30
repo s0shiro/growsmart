@@ -6,6 +6,7 @@ type CropData = {
   cropName: string
   cropVariety?: string
   cropCategory: string
+  maturityDays?: number
 }
 
 type SupabaseResponse = {
@@ -18,6 +19,7 @@ export const addCrop = async ({
   cropCategory,
   cropName,
   cropVariety,
+  maturityDays,
 }: CropData): Promise<SupabaseResponse> => {
   const supabase = createClient()
 
@@ -67,7 +69,9 @@ export const addCrop = async ({
     if (cropVariety) {
       const { error: varietyError } = await supabase
         .from('crop_varieties')
-        .insert([{ name: cropVariety, crop_id: cropId }])
+        .insert([
+          { name: cropVariety, crop_id: cropId, maturity_days: maturityDays },
+        ])
 
       if (varietyError) {
         return { error: `Variety creation error: ${varietyError.message}` }

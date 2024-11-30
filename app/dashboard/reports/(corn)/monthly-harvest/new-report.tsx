@@ -14,6 +14,7 @@ import { formatDate } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useCurrentUserProfile } from '@/hooks/users/useUserProfile'
 import { Printer } from 'lucide-react'
+import { NotedBySection } from '@/app/dashboard/(components)/NotedBySection'
 
 type CornData = {
   location_id: {
@@ -65,6 +66,11 @@ export default function MonthlyCornHarvesting() {
   const isFirstHalf = currentMonth >= 1 && currentMonth <= 6
 
   const formattedDate = formatDate(currentDate)
+
+  const [notedByName, setNotedByName] = useState('VANESSA TAYABA')
+  const [notedByTitle, setNotedByTitle] = useState(
+    'Municipal Agricultural Officer',
+  )
 
   const handlePrint = () => {
     if (printableRef.current) {
@@ -174,8 +180,8 @@ export default function MonthlyCornHarvesting() {
                 <div class="signature-block">
                   <p>Certified true and correct:</p>
                   <div class="signature-line"></div>
-                  <p><strong>VANESSA TAYABA</strong></p>
-                  <p>Municipal Agricultural Officer</p>
+                  <p><strong>${notedByName}</strong></p>
+                  <p>${notedByTitle}</p>
                 </div>
               </div>
           </body>
@@ -562,6 +568,16 @@ export default function MonthlyCornHarvesting() {
       >
         <Printer className='mr-2 h-4 w-4' /> Print Corn Harvesting Report
       </Button>
+
+      <div className='flex justify-end w-full print:hidden'>
+        <NotedBySection
+          notedByName={notedByName}
+          notedByTitle={notedByTitle}
+          setNotedByName={setNotedByName}
+          setNotedByTitle={setNotedByTitle}
+          className='mt-4 sm:w-auto'
+        />
+      </div>
     </div>
   )
 }

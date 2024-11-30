@@ -100,6 +100,8 @@ export default function ImprovedPlantingForm() {
   const selectedFarmer = watch('farmerId')
   const selectedCategory = watch('cropCategory')
   const plantingDate = watch('plantingDate')
+  const selectedCrop = watch('cropType')
+  const selectedVariety = watch('variety')
 
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
   const [selectedLocation, setSelectedLocation] = useState<string>('')
@@ -115,8 +117,12 @@ export default function ImprovedPlantingForm() {
     console.log('Coordinates:', coords)
   }
 
-  function calculateHarvestDate(plantingDate: string, cropCategory: string) {
-    const daysToHarvest: { [key: string]: number } = {
+  function calculateHarvestDate(
+    plantingDate: string,
+    cropCategory: string,
+    selectedVariety: any,
+  ) {
+    const defaultDaysToHarvest: { [key: string]: number } = {
       rice: 120,
       corn: 90,
       'high-value': 60,
@@ -124,22 +130,50 @@ export default function ImprovedPlantingForm() {
 
     if (!plantingDate || !cropCategory) return ''
 
-    const days = daysToHarvest[cropCategory.toLowerCase()] || 0
+    console.log('Selected Variety:', selectedVariety)
+    console.log('Variety Maturity Days:', selectedVariety?.maturity_days)
+    console.log(
+      'Default Days:',
+      defaultDaysToHarvest[cropCategory.toLowerCase()],
+    )
+
+    // Use variety's maturity_days if available, otherwise use default
+    const days =
+      selectedVariety?.maturity_days ||
+      defaultDaysToHarvest[cropCategory.toLowerCase()] ||
+      90
+
     const planting = new Date(plantingDate)
     planting.setDate(planting.getDate() + days)
-
     return planting.toISOString().split('T')[0]
   }
 
+  const varieties = selectedCrop
+    ? categories
+        .find((c: any) => c.id === selectedCategory)
+        ?.crops.find((crop: any) => crop.id === selectedCrop)?.crop_varieties ||
+      []
+    : []
+
   useEffect(() => {
     if (plantingDate && selectedCategory) {
+      const variety = varieties.find((v: any) => v.id === selectedVariety)
+      console.log('Current Variety:', variety)
       const harvestDate = calculateHarvestDate(
         plantingDate,
         categoryNames[selectedCategory],
+        variety,
       )
       setValue('harvestDate', harvestDate)
     }
-  }, [plantingDate, selectedCategory, setValue, categoryNames])
+  }, [
+    plantingDate,
+    selectedCategory,
+    selectedVariety,
+    setValue,
+    categoryNames,
+    varieties,
+  ])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {

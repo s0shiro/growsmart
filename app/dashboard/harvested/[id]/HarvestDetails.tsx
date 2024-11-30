@@ -153,14 +153,14 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
   const damageData = harvest.inspections.map((inspection) => ({
     date: formatDate(inspection.date),
     damaged: inspection.damaged,
-    reason: inspection.damaged_reason,
+    // reason: inspection.damaged_reason,
   }))
 
   if (latestHarvest) {
     damageData.push({
       date: formatDate(latestHarvest.harvest_date),
       damaged: latestHarvest.damaged_quantity || 0,
-      reason: latestHarvest.damaged_reason || 'Unknown',
+      //   reason: latestHarvest.damaged_reason || 'Unknown',
     })
   }
 
@@ -554,22 +554,52 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                               )}
                               {formatDate(visit.date)}
                             </span>
-                            <Badge
-                              variant={
-                                visit.damaged > 0 ? 'destructive' : 'default'
-                              }
-                            >
-                              {visit.damaged > 0
-                                ? `${visit.damaged} ha damaged`
-                                : 'No damage'}
-                            </Badge>
+                            <div className='flex gap-2'>
+                              {visit.is_priority && (
+                                <Badge variant='destructive'>Priority</Badge>
+                              )}
+                              <Badge
+                                variant={
+                                  visit.damaged > 0 ? 'destructive' : 'default'
+                                }
+                              >
+                                {visit.damaged > 0
+                                  ? `${visit.damaged} ha damaged`
+                                  : 'No damage'}
+                              </Badge>
+                            </div>
                           </div>
-                          <p className='text-muted-foreground mb-2'>
+
+                          <div className='grid grid-cols-3 gap-4 mb-4 text-sm'>
+                            <div>
+                              <p className='text-muted-foreground'>Severity</p>
+                              <p className='font-medium'>
+                                {visit.damage_severity || 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className='text-muted-foreground'>Type</p>
+                              <p className='font-medium'>
+                                {visit.damage_type || 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className='text-muted-foreground'>
+                                Growth Stage
+                              </p>
+                              <p className='font-medium'>
+                                {visit.growth_stage || 'N/A'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <p className='text-muted-foreground mb-4'>
                             {visit.findings || 'No findings recorded'}
                           </p>
-                          <div className='flex justify-between items-center text-sm'>
+
+                          {/* <div className='flex justify-between items-center text-sm'>
                             <span className='text-muted-foreground'>
-                              Reason: {visit.damaged_reason || 'N/A'}
+                              Inspector: {visit.users?.full_name}
                             </span>
                             <Button
                               variant='ghost'
@@ -579,17 +609,17 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                               View Details
                               <ChevronRight className='ml-2 h-4 w-4' />
                             </Button>
-                          </div>
+                          </div> */}
                         </CardContent>
                       </Card>
                     ))}
                   </ScrollArea>
                 </CardContent>
                 <CardFooter>
-                  <Button variant='outline' className='w-full'>
+                  {/* <Button variant='outline' className='w-full'>
                     <Eye className='mr-2 h-4 w-4' />
                     View All Visits
-                  </Button>
+                  </Button> */}
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -616,17 +646,17 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                             className='object-cover transition-transform group-hover:scale-110'
                           />
                           <div className='absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'>
-                            <p className='text-white text-sm'>View Full Size</p>
+                            {/* <p className='text-white text-sm'>View Full Size</p> */}
                           </div>
                         </div>
                       ))}
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className='w-full' variant='outline'>
+                  {/* <Button className='w-full' variant='outline'>
                     <UploadCloud className='mr-2 h-4 w-4' />
                     Upload New Photos
-                  </Button>
+                  </Button> */}
                 </CardFooter>
               </Card>
             </TabsContent>

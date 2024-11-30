@@ -1,15 +1,17 @@
-import { getDamagesPerMonth } from '@/lib/damages'
+import { getDamagesPerMunicipality } from '@/lib/damages'
 import { useQuery } from '@tanstack/react-query'
 
+interface DateRange {
+  from?: Date
+  to?: Date
+}
+
 //useGetCurrentMonthDamages
-const useFetchDamagesCurrentMonth = () => {
+export const useFetchDamagesByMunicipality = (dateRange?: DateRange) => {
   return useQuery({
-    queryKey: ['damages-current-month'],
-    queryFn: async () => {
-      const data = await getDamagesPerMonth()
-      return data
-    },
+    queryKey: ['damages-by-municipality', dateRange?.from, dateRange?.to],
+    queryFn: () => getDamagesPerMunicipality(dateRange),
   })
 }
 
-export default useFetchDamagesCurrentMonth
+export default useFetchDamagesByMunicipality
