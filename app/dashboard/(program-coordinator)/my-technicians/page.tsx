@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Info, MoreHorizontal } from 'lucide-react'
+import { Activity, Info, MoreHorizontal, TrendingUp } from 'lucide-react'
 import { useSession } from '@/stores/useSession'
 import { useGetTechniciansByCoordinator } from '@/hooks/users/useGetTechniciansByCoordinator'
 import Link from 'next/link'
@@ -130,8 +130,8 @@ function TechnicianTable({
                     size='sm'
                     className='flex items-center'
                   >
-                    <Info className='mr-2 h-4 w-4' />
-                    More Info
+                    <Activity className='mr-2 h-4 w-4' />
+                    View Activity
                   </Button>
                 </Link>
               </TableCell>

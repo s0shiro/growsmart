@@ -8,8 +8,17 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
-    const { name, jobTitle, role, status, email, password, avatarUrl } =
-      await request.json()
+    const {
+      name,
+      jobTitle,
+      role,
+      status,
+      email,
+      password,
+      avatarUrl,
+      programType,
+      coordinatorId,
+    } = await request.json()
     const origin = getURL()
     const supabase = createSupabaseAdmin()
 
@@ -25,6 +34,9 @@ export async function POST(request: Request) {
           role,
           status,
           avatarUrl,
+          // Only include programType if role is program coordinator
+          ...(role === 'program coordinator' && { programType }),
+          ...(role === 'technician' && coordinatorId && { coordinatorId }),
         },
       })
 

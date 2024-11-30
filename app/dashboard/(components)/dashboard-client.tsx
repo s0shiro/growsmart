@@ -3,11 +3,14 @@
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import StatCard from '@/components/StatCard'
-import { BarChart2, ShoppingBag, Zap } from 'lucide-react'
+import { BarChart2, Clock, ShoppingBag, Sprout, Users, Zap } from 'lucide-react'
 import FarmersCountCard from './FarmersCountCard'
 import MonthlyProductionChart from './charts/MonthlyProductionChart'
 import CategoryDistributionChart from './charts/CategoryDistributionChart'
 import SalesChannelChart from './charts/SalesChannelChart'
+import { Greeting } from './Greeting'
+import { useTechnicianProfile } from '@/hooks/users/useTechnicianProfile'
+import { useSession } from '@/stores/useSession'
 
 interface UserData {
   id: string
@@ -24,44 +27,60 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({ userData }: DashboardClientProps) {
+  const user = useSession((state) => state.user)
+
+  const { data, error, isFetching } = useTechnicianProfile(user.id)
   return (
     <>
-      <Card className='px-4 py-6'>
+      <motion.div
+        className='mb-8'
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Greeting name={userData.fullName} />
+      </motion.div>
+      <Card className='py-4'>
         <CardContent>
           <motion.div
-            className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'
+            className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
             {userData?.role === 'technician' && (
               <>
-                <FarmersCountCard />
                 <StatCard
-                  name='Pending Harvest'
-                  icon={ShoppingBag}
-                  value='567'
+                  name='My Farmers'
+                  icon={Users}
+                  value={isFetching ? 'Loading...' : data?.totalFarmers}
+                  color='#8B5CF6'
+                />
+                <StatCard
+                  name='Standing Crops'
+                  icon={Clock}
+                  value={isFetching ? 'Loading...' : data?.pendingInspections}
                   color='#EC4899'
                 />
                 <StatCard
                   name='Harvested Farms'
-                  icon={Zap}
-                  value='200'
-                  color='#6366F1'
+                  icon={Sprout}
+                  value={isFetching ? 'Loading...' : data?.harvestedPlantings}
+                  color='#10B981'
                 />
-                <StatCard
+                {/* <StatCard
                   name='Conversion Rate'
                   icon={BarChart2}
                   value='12.5%'
                   color='#10B981'
-                />
+                /> */}
               </>
             )}
           </motion.div>
 
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-            <MonthlyProductionChart />
+          <div className='grid grid-cols-1 lg:grid-cols-1 gap-8'>
             <CategoryDistributionChart />
+            <MonthlyProductionChart />
             {/* <SalesChannelChart /> */}
           </div>
         </CardContent>

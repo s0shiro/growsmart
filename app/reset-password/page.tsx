@@ -1,7 +1,16 @@
 import { createClient } from '@/utils/supabase/server'
-
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card'
 
 export default async function ResetPassword({
   searchParams,
@@ -30,7 +39,7 @@ export default async function ResetPassword({
 
       if (error) {
         return redirect(
-          `/reset-password?message= Unable to reset password. Link Expired!`,
+          `/reset-password?message=Unable to reset password. Link Expired!`,
         )
       }
     }
@@ -43,54 +52,68 @@ export default async function ResetPassword({
       )
     }
 
-    redirect('/login?message=Password reset succesfully.')
+    redirect('/login?message=Password reset successfully.')
   }
 
   return (
-    <div>
+    <div className='min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900'>
       <Link
         href='/'
-        className='px-4 py-2 m-4 text-sm no-underline rounded-md text-foreground bg-btn-background hover:bg-btn-background-hover'
+        className='absolute top-4 left-4 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 py-2 px-4'
       >
-        Home
+        ← Back to Home
       </Link>
 
-      <div className='w-full px-8 mx-auto mt-4 sm:max-w-md'>
-        <form
-          action={resetPassword}
-          className='flex flex-col justify-center flex-1 w-full gap-2 mb-4 animate-in text-foreground'
-        >
-          <label className='text-md' htmlFor='password'>
-            New Password
-          </label>
-          <input
-            className='px-4 py-2 mb-6 border rounded-md bg-inherit'
-            type='password'
-            name='password'
-            placeholder='••••••••'
-            required
-          />
-          <label className='text-md' htmlFor='password'>
-            Confirm New Password
-          </label>
-          <input
-            className='px-4 py-2 mb-6 border rounded-md bg-inherit'
-            type='password'
-            name='confirmPassword'
-            placeholder='••••••••'
-            required
-          />
-          <button className='px-4 py-2 mb-2 bg-indigo-700 rounded-md text-foreground'>
-            Reset
-          </button>
-
+      <Card className='w-full max-w-md'>
+        <CardHeader>
+          <CardTitle className='text-2xl font-bold'>Reset Password</CardTitle>
+          <CardDescription>Enter your new password below</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={resetPassword} className='space-y-4'>
+            <div className='space-y-2'>
+              <label
+                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                htmlFor='password'
+              >
+                New Password
+              </label>
+              <Input
+                id='password'
+                type='password'
+                name='password'
+                placeholder='••••••••'
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <label
+                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                htmlFor='confirmPassword'
+              >
+                Confirm New Password
+              </label>
+              <Input
+                id='confirmPassword'
+                type='password'
+                name='confirmPassword'
+                placeholder='••••••••'
+                required
+              />
+            </div>
+            <Button type='submit' className='w-full'>
+              Reset Password
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter>
           {searchParams?.message && (
-            <p className='p-4 mt-4 text-center bg-foreground/10 text-foreground'>
+            <p className='text-sm text-center text-red-500 dark:text-red-400 w-full'>
               {searchParams.message}
             </p>
           )}
-        </form>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

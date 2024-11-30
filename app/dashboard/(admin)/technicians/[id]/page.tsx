@@ -100,17 +100,17 @@ export default function TechnicianProfilePage({
         </CardHeader>
       </Card>
 
-      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8'>
+      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8'>
         <StatCard
           title='Total Farmers'
           value={totalFarmers}
           icon={<UserIcon className='h-4 w-4' />}
         />
-        <StatCard
+        {/* <StatCard
           title='Active Plantings'
           value={activePlantings}
           icon={<CalendarIcon className='h-4 w-4' />}
-        />
+        /> */}
         <StatCard
           title='Harvested Plantings'
           value={harvestedPlantings}
@@ -339,9 +339,7 @@ function PlantingTable({
             </TableCell>
             <TableCell>
               <Badge
-                variant={
-                  record.status === 'harvested' ? 'default' : 'destructive'
-                }
+                variant={record.status === 'harvested' ? 'default' : 'pending'}
               >
                 {record.status}
               </Badge>
