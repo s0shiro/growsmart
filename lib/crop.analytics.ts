@@ -2,6 +2,21 @@
 
 import { createClient } from '@/utils/supabase/server'
 
+interface PlantingRecord {
+  planting_date: string
+  area_planted: number
+  crop_categories: {
+    name: string | null
+  } | null
+}
+
+interface CategoryData {
+  [key: string]: {
+    name: string
+    area: number
+  }
+}
+
 export const cropAnalytics = async (year: any) => {
   const supabase = createClient()
   const startDate = `${year}-01-01`
@@ -40,17 +55,20 @@ export const categoryAnalytics = async (year: number) => {
     )
     .gte('planting_date', startDate)
     .lte('planting_date', endDate)
+    .returns<PlantingRecord[]>()
 
-  const categoryData = {
+  const categoryData: CategoryData = {
     rice: { name: 'Rice', area: 0 },
     corn: { name: 'Corn', area: 0 },
     'high-value': { name: 'High Value', area: 0 },
   }
 
   data?.forEach((record) => {
-    const category = record?.crop_categories?.name?.toLowerCase()
-    if (category in categoryData) {
-      categoryData[category].area += record.area_planted
+    if (record?.crop_categories?.name) {
+      const category = record.crop_categories.name.toLowerCase()
+      if (category in categoryData) {
+        categoryData[category].area += record.area_planted
+      }
     }
   })
 

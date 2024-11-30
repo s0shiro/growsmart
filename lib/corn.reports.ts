@@ -2,6 +2,39 @@
 
 import { createClient } from '@/utils/supabase/server'
 
+interface Location {
+  barangay: string
+  municipality: string
+  province: string
+}
+
+interface Farmer {
+  firstname: string
+  lastname: string
+}
+
+interface CropCategory {
+  name: string
+}
+
+interface CropType {
+  name: string
+}
+
+interface Variety {
+  name: string
+}
+
+interface PlantingRecord {
+  crop_categoryId: CropCategory
+  crop_type: CropType
+  variety: Variety
+  farmer_id: Farmer
+  area_planted: number
+  planting_date: string
+  location_id: Location
+}
+
 export const getHarvestedCornCropsData = async () => {
   const supabase = createClient()
 
@@ -76,6 +109,7 @@ export const getMonthlyCornPlantingAccomplishment = async () => {
     .eq('crop_categoryId.name', 'corn')
     .gte('planting_date', startOfMonth.toISOString())
     .lt('planting_date', startOfNextMonth.toISOString())
+    .returns<PlantingRecord[]>()
 
   if (error) {
     console.error('Supabase error:', error.message)
