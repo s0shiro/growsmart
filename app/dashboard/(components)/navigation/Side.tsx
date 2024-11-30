@@ -47,6 +47,7 @@ const adminLinks = [
 const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
   { href: '/dashboard/myfarmers', Icon: Users2, label: 'My Farmers' },
+  { href: '/dashboard/crops', Icon: Sprout, label: 'Manage Crops' },
 ]
 
 const programCoordinatorLinks = [
@@ -119,7 +120,7 @@ export default function Sidebar({
       ? adminLinks
       : role === 'technician'
         ? technicianLinks
-        : role === 'program coordinator' // Add your new role condition
+        : role === 'program coordinator'
           ? programCoordinatorLinks
           : defaultLinks
 
