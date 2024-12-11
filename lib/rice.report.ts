@@ -2,6 +2,57 @@
 
 import { createClient } from '@/utils/supabase/server'
 
+// Define interfaces for nested types
+interface Location {
+  barangay: string
+  municipality: string
+  province: string
+}
+
+interface Farmer {
+  id: string
+  firstname: string
+  lastname: string
+}
+
+interface CropCategory {
+  name: string
+}
+
+interface CropType {
+  name: string
+}
+
+interface Variety {
+  name: string
+}
+
+interface CategorySpecific {
+  waterSupply?: string
+  landType?: string
+  classification?: string
+}
+
+interface HarvestRecord {
+  area_harvested: number
+  yield_quantity: number
+  harvest_date: string
+}
+
+interface PlantingRecord {
+  crop_categoryId: CropCategory
+  crop_type: CropType
+  variety: Variety
+  farmer_id: Farmer
+  area_planted: number
+  planting_date: string
+  category_specific: CategorySpecific
+  location_id: Location
+  status?: string
+  remarks?: string
+  harvest_records?: HarvestRecord[]
+}
+
 export const getPlantingRiceCropForTheCurrentMonth = async () => {
   const supabase = createClient()
 
@@ -24,6 +75,7 @@ export const getPlantingRiceCropForTheCurrentMonth = async () => {
     .eq('crop_categoryId.name', 'rice')
     .gte('planting_date', startOfMonth.toISOString())
     .lt('planting_date', startOfNextMonth.toISOString())
+    .returns<PlantingRecord[]>()
 
   if (error) {
     console.error('Supabase error:', error.message)
@@ -204,17 +256,29 @@ export const getRiceStandingData = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `crop_categoryId!inner(name), crop_type(name), variety(name), farmer_id(id, firstname, lastname), area_planted, planting_date, category_specific, location_id(barangay, municipality, province), status, remarks`,
+      `
+      crop_categoryId!inner(name),
+      crop_type(name),
+      variety(name),
+      farmer_id(id, firstname, lastname),
+      area_planted,
+      planting_date,
+      category_specific,
+      location_id(barangay, municipality, province),
+      status,
+      remarks
+    `,
     )
     .eq('crop_categoryId.name', 'rice')
     .eq('status', 'inspection')
+    .returns<PlantingRecord[]>()
 
   if (error) {
     console.error('Supabase error:', error.message)
     return null
   }
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return null
   }
 
@@ -222,10 +286,10 @@ export const getRiceStandingData = async () => {
     a.location_id.barangay.localeCompare(b.location_id.barangay),
   )
 
-  const renamedData = sortedData.map((record) => {
-    const { location_id, ...rest } = record
-    return { ...rest, location: location_id }
-  })
+  const renamedData = sortedData.map(({ location_id, ...rest }) => ({
+    ...rest,
+    location: location_id,
+  }))
 
   return renamedData
 }

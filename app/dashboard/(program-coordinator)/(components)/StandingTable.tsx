@@ -32,7 +32,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { PlantingRecordDialog } from '../coordinator-standing/PlantingRecordsDialog'
 import Link from 'next/link'
 
 export interface PlantingRecord {
@@ -42,6 +41,9 @@ export interface PlantingRecord {
     id: string
     lastname: string
     firstname: string
+  }
+  user_id: {
+    full_name: string
   }
   crop_type: {
     id: string
@@ -128,6 +130,26 @@ const columns: ColumnDef<PlantingRecord>[] = [
         <Badge className={`${getStatusColor(status)} text-white`}>
           {status.replace('_', ' ')}
         </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: 'user_id',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Technician
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const user = row.getValue('user_id') as PlantingRecord['user_id']
+      return (
+        <span className='font-medium'>{user?.full_name || 'Unassigned'}</span>
       )
     },
   },

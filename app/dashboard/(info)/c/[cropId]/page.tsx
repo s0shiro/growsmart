@@ -30,6 +30,7 @@ import {
   Droplet,
   FileText,
   Shapes,
+  ChevronRightIcon,
 } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import InspectionForm from '@/app/dashboard/(components)/forms/InpectionForm'
@@ -38,6 +39,14 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import LocationMap from '@/app/dashboard/(components)/LocationMap'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
+import Image from 'next/image'
 
 export default function CropsDetailsPage({
   params,
@@ -271,7 +280,7 @@ export default function CropsDetailsPage({
         <TabsContent value='visitations'>
           {' '}
           {/* This line might need adjustment depending on where TabsContent is defined */}
-          <Card>
+          <Card className='w-full'>
             <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle className='text-xl font-semibold'>
                 Visitation Records
@@ -304,34 +313,113 @@ export default function CropsDetailsPage({
                 <div className='space-y-4'>
                   {data.inspections.map((inspection) => (
                     <Card key={inspection.id}>
-                      <CardContent className='flex items-center justify-between p-4'>
-                        <div className='flex items-center gap-4'>
-                          {inspection.is_priority ? (
-                            <AlertTriangleIcon className='h-8 w-8 text-destructive' />
-                          ) : (
-                            <CheckCircleIcon className='h-8 w-8 text-primary' />
-                          )}
-                          <div>
-                            <p className='font-semibold'>
-                              {formatDate(inspection.date)}
+                      <CardContent className='p-6'>
+                        {/* Header Section */}
+                        <div className='flex items-center justify-between mb-4'>
+                          <div className='flex items-center gap-3'>
+                            {inspection.is_priority ? (
+                              <AlertTriangleIcon className='h-8 w-8 text-destructive' />
+                            ) : (
+                              <CheckCircleIcon className='h-8 w-8 text-primary' />
+                            )}
+                            <div>
+                              <p className='font-semibold text-lg'>
+                                {formatDate(inspection.date)}
+                              </p>
+                              <Badge
+                                variant={
+                                  inspection.is_priority
+                                    ? 'destructive'
+                                    : 'secondary'
+                                }
+                              >
+                                {inspection.is_priority ? 'Priority' : 'Normal'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
+                          <div className='space-y-2'>
+                            <p className='text-sm'>
+                              <span className='text-muted-foreground'>
+                                Damaged Area:
+                              </span>{' '}
+                              <span className='font-medium'>
+                                {inspection.damaged} ha
+                              </span>
                             </p>
-                            <p className='text-sm text-muted-foreground'>
-                              Damage: {inspection.damaged} ha | Type:{' '}
-                              {inspection.damage_type}
+                            <p className='text-sm'>
+                              <span className='text-muted-foreground'>
+                                Damage Type:
+                              </span>{' '}
+                              <span className='font-medium'>
+                                {inspection.damage_type}
+                              </span>
                             </p>
-                            <p className='text-sm text-muted-foreground'>
-                              Growth Stage: {inspection.growth_stage} |
-                              Severity: {inspection.damage_severity}
+                          </div>
+                          <div className='space-y-2'>
+                            <p className='text-sm'>
+                              <span className='text-muted-foreground'>
+                                Growth Stage:
+                              </span>{' '}
+                              <span className='font-medium'>
+                                {inspection.growth_stage}
+                              </span>
+                            </p>
+                            <p className='text-sm'>
+                              <span className='text-muted-foreground'>
+                                Severity:
+                              </span>{' '}
+                              <span className='font-medium'>
+                                {inspection.damage_severity}
+                              </span>
                             </p>
                           </div>
                         </div>
-                        <Badge
-                          variant={
-                            inspection.is_priority ? 'destructive' : 'secondary'
-                          }
-                        >
-                          {inspection.is_priority ? 'Priority' : 'Normal'}
-                        </Badge>
+
+                        {/* Findings Section */}
+                        {inspection.findings && (
+                          <div className='mt-4'>
+                            <p className='text-sm text-muted-foreground mb-1'>
+                              Findings:
+                            </p>
+                            <p className='text-sm bg-muted p-3 rounded-md'>
+                              {inspection.findings}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Images Carousel */}
+                        {inspection.visitation_images &&
+                          inspection.visitation_images.length > 0 && (
+                            <div className='mt-4'>
+                              <Carousel className='w-full max-w-xs mx-auto'>
+                                <CarouselContent>
+                                  {inspection.visitation_images.map(
+                                    (image, index) => (
+                                      <CarouselItem key={index}>
+                                        <div className='p-1'>
+                                          <Image
+                                            src={image}
+                                            alt={`Inspection image ${index + 1}`}
+                                            width={300}
+                                            height={200}
+                                            className='rounded-md object-cover w-full h-[200px]'
+                                            priority={index === 0}
+                                            quality={75}
+                                          />
+                                        </div>
+                                      </CarouselItem>
+                                    ),
+                                  )}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          )}
                       </CardContent>
                     </Card>
                   ))}

@@ -38,6 +38,8 @@ import {
   User2,
   EyeIcon,
   ExternalLinkIcon,
+  AlertTriangleIcon,
+  CheckCircleIcon,
 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -54,6 +56,16 @@ import {
   Bar,
 } from 'recharts'
 import Link from 'next/link'
+import { toast } from '@/components/hooks/use-toast'
+import { createClient } from '@/utils/supabase/client'
+import { Input } from '@/components/ui/input'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
 
 interface Inspection {
   id: string
@@ -135,6 +147,9 @@ const CustomTooltip = ({
 
 export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
   const [activeTab, setActiveTab] = useState('overview')
+  const [isEditingExpenses, setIsEditingExpenses] = useState(false)
+  const [expenses, setExpenses] = useState(harvest.expenses)
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const { barangay, municipality, province } = harvest.location_id
 
@@ -171,6 +186,37 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
 
   const formatCurrency = (amount: number | undefined) => {
     return amount !== undefined ? `₱${amount.toLocaleString()}` : 'N/A'
+  }
+
+  const handleUpdateExpenses = async () => {
+    try {
+      setIsUpdating(true)
+
+      const supabase = await createClient()
+
+      const { error } = await supabase
+        .from('planting_records') // adjust table name if different
+        .update({ expenses })
+        .eq('id', harvest.id)
+
+      if (error) throw error
+
+      toast({
+        title: 'Success',
+        description: 'Expenses updated successfully',
+      })
+
+      setIsEditingExpenses(false)
+    } catch (error) {
+      console.error('Failed to update expenses:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to update expenses',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   return (
@@ -284,9 +330,49 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                           <DollarSign className='mr-2 h-4 w-4' />
                           Expenses
                         </span>
-                        <Badge variant='outline'>
-                          {formatCurrency(harvest.expenses)}
-                        </Badge>
+                        {isEditingExpenses ? (
+                          <div className='flex items-center gap-2'>
+                            <Input
+                              type='number'
+                              value={expenses}
+                              onChange={(e) =>
+                                setExpenses(Number(e.target.value))
+                              }
+                              className='w-32'
+                            />
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={handleUpdateExpenses}
+                              disabled={isUpdating}
+                            >
+                              {isUpdating ? 'Saving...' : 'Save'}
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => {
+                                setIsEditingExpenses(false)
+                                setExpenses(harvest.expenses)
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className='flex items-center gap-2'>
+                            <Badge variant='outline'>
+                              {formatCurrency(expenses)}
+                            </Badge>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => setIsEditingExpenses(true)}
+                            >
+                              <Edit3 className='h-4 w-4' />
+                            </Button>
+                          </div>
+                        )}
                       </li>
                     </ul>
                   </CardContent>
@@ -544,72 +630,113 @@ export default function HarvestDetails({ harvest }: { harvest: HarvestData }) {
                   <ScrollArea className='h-[300px] pr-4'>
                     {harvest.inspections.map((visit, index) => (
                       <Card key={visit.id} className='mb-4'>
-                        <CardContent className='p-4'>
-                          <div className='flex justify-between items-center mb-2'>
-                            <span className='font-medium text-lg flex items-center'>
-                              {visit.damaged > 0 ? (
-                                <XCircle className='mr-2 h-5 w-5 text-destructive' />
+                        <CardContent className='p-6'>
+                          {/* Header Section */}
+                          <div className='flex items-center justify-between mb-4'>
+                            <div className='flex items-center gap-3'>
+                              {visit.is_priority ? (
+                                <AlertTriangleIcon className='h-8 w-8 text-destructive' />
                               ) : (
-                                <CheckCircle className='mr-2 h-5 w-5 text-primary' />
+                                <CheckCircleIcon className='h-8 w-8 text-primary' />
                               )}
-                              {formatDate(visit.date)}
-                            </span>
-                            <div className='flex gap-2'>
-                              {visit.is_priority && (
-                                <Badge variant='destructive'>Priority</Badge>
-                              )}
-                              <Badge
-                                variant={
-                                  visit.damaged > 0 ? 'destructive' : 'default'
-                                }
-                              >
-                                {visit.damaged > 0
-                                  ? `${visit.damaged} ha damaged`
-                                  : 'No damage'}
-                              </Badge>
+                              <div>
+                                <p className='font-semibold text-lg'>
+                                  {formatDate(visit.date)}
+                                </p>
+                                <Badge
+                                  variant={
+                                    visit.is_priority
+                                      ? 'destructive'
+                                      : 'secondary'
+                                  }
+                                >
+                                  {visit.is_priority ? 'Priority' : 'Normal'}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
 
-                          <div className='grid grid-cols-3 gap-4 mb-4 text-sm'>
-                            <div>
-                              <p className='text-muted-foreground'>Severity</p>
-                              <p className='font-medium'>
-                                {visit.damage_severity || 'N/A'}
+                          {/* Details Grid */}
+                          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
+                            <div className='space-y-2'>
+                              <p className='text-sm'>
+                                <span className='text-muted-foreground'>
+                                  Damaged Area:
+                                </span>{' '}
+                                <span className='font-medium'>
+                                  {visit.damaged} ha
+                                </span>
+                              </p>
+                              <p className='text-sm'>
+                                <span className='text-muted-foreground'>
+                                  Damage Type:
+                                </span>{' '}
+                                <span className='font-medium'>
+                                  {visit.damage_type || 'N/A'}
+                                </span>
                               </p>
                             </div>
-                            <div>
-                              <p className='text-muted-foreground'>Type</p>
-                              <p className='font-medium'>
-                                {visit.damage_type || 'N/A'}
+                            <div className='space-y-2'>
+                              <p className='text-sm'>
+                                <span className='text-muted-foreground'>
+                                  Growth Stage:
+                                </span>{' '}
+                                <span className='font-medium'>
+                                  {visit.growth_stage || 'N/A'}
+                                </span>
                               </p>
-                            </div>
-                            <div>
-                              <p className='text-muted-foreground'>
-                                Growth Stage
-                              </p>
-                              <p className='font-medium'>
-                                {visit.growth_stage || 'N/A'}
+                              <p className='text-sm'>
+                                <span className='text-muted-foreground'>
+                                  Severity:
+                                </span>{' '}
+                                <span className='font-medium'>
+                                  {visit.damage_severity || 'N/A'}
+                                </span>
                               </p>
                             </div>
                           </div>
 
-                          <p className='text-muted-foreground mb-4'>
-                            {visit.findings || 'No findings recorded'}
-                          </p>
+                          {/* Findings Section */}
+                          {visit.findings && (
+                            <div className='mt-4'>
+                              <p className='text-sm text-muted-foreground mb-1'>
+                                Findings:
+                              </p>
+                              <p className='text-sm bg-muted p-3 rounded-md'>
+                                {visit.findings}
+                              </p>
+                            </div>
+                          )}
 
-                          {/* <div className='flex justify-between items-center text-sm'>
-                            <span className='text-muted-foreground'>
-                              Inspector: {visit.users?.full_name}
-                            </span>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              className='text-primary hover:text-primary/80'
-                            >
-                              View Details
-                              <ChevronRight className='ml-2 h-4 w-4' />
-                            </Button>
-                          </div> */}
+                          {/* Images Carousel */}
+                          {visit.visitation_images &&
+                            visit.visitation_images.length > 0 && (
+                              <div className='mt-4'>
+                                <Carousel className='w-full max-w-xs mx-auto'>
+                                  <CarouselContent>
+                                    {visit.visitation_images.map(
+                                      (image, index) => (
+                                        <CarouselItem key={index}>
+                                          <div className='p-1'>
+                                            <Image
+                                              src={image}
+                                              alt={`Inspection image ${index + 1}`}
+                                              width={300}
+                                              height={200}
+                                              className='rounded-md object-cover w-full h-[200px]'
+                                              priority={index === 0}
+                                              quality={75}
+                                            />
+                                          </div>
+                                        </CarouselItem>
+                                      ),
+                                    )}
+                                  </CarouselContent>
+                                  <CarouselPrevious />
+                                  <CarouselNext />
+                                </Carousel>
+                              </div>
+                            )}
                         </CardContent>
                       </Card>
                     ))}

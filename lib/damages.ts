@@ -7,6 +7,31 @@ interface DateRange {
   to?: Date
 }
 
+// Define municipality type
+type Municipality =
+  | 'Boac'
+  | 'Buenavista'
+  | 'Gasan'
+  | 'Mogpog'
+  | 'Santa Cruz'
+  | 'Torrijos'
+
+// Define damages record type using Record utility type
+type MunicipalityDamages = Record<Municipality, number>
+
+interface LocationId {
+  municipality: Municipality
+}
+
+interface PlantingRecord {
+  location_id: LocationId
+}
+
+interface Inspection {
+  damaged: number
+  planting_records: PlantingRecord
+}
+
 export const getAllDamagesDuringVisitation = async (dateRange?: DateRange) => {
   const supabase = createClient()
 
@@ -110,18 +135,21 @@ export const getDamagesPerMunicipality = async (dateRange?: DateRange) => {
 
   const { data, error } = await supabase
     .from('inspections')
-    .select('damaged, date, planting_records(location_id(municipality))')
+    .select(
+      'damaged, date, planting_records!inner(location_id!inner(municipality))',
+    )
     .gt('damaged', 0)
     .gte('date', fromDate.toISOString())
     .lte('date', toDate.toISOString())
     .order('created_at', { ascending: false })
+    .returns<Inspection[]>()
 
   if (error) {
     console.error('Supabase error:', error.message)
     return null
   }
 
-  const municipalityDamages = {
+  const municipalityDamages: MunicipalityDamages = {
     Boac: 0,
     Buenavista: 0,
     Gasan: 0,
@@ -130,12 +158,14 @@ export const getDamagesPerMunicipality = async (dateRange?: DateRange) => {
     Torrijos: 0,
   }
 
+  const isMunicipality = (value: string): value is Municipality => {
+    return Object.keys(municipalityDamages).includes(value)
+  }
+
   data?.forEach((inspection) => {
-    const municipality = inspection.planting_records?.location_id?.municipality
-    if (municipality && municipality in municipalityDamages) {
-      municipalityDamages[municipality] = +(
-        municipalityDamages[municipality] + inspection.damaged
-      ).toFixed(4)
+    const municipality = inspection.planting_records.location_id.municipality
+    if (isMunicipality(municipality)) {
+      municipalityDamages[municipality] += +inspection.damaged.toFixed(4)
     }
   })
 

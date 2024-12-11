@@ -106,3 +106,19 @@ export const getURL = () => {
   url = url.endsWith('/') ? url : `${url}/`
   return url
 }
+
+export const formatAmountWithUnit = (amount: number, type: string) => {
+  switch (type) {
+    case 'Financial Aid':
+      return `₱${amount.toLocaleString('en-PH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+    case 'Equipment':
+      return `${amount} pcs`
+    case 'Seeds':
+      return `${amount} kg`
+    default:
+      return amount.toString()
+  }
+}

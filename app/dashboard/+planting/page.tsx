@@ -14,11 +14,12 @@ import CropDetails from '@/app/dashboard/+planting/components/CropDetailsCompone
 import FieldLocation from '@/app/dashboard/+planting/components/FieldLocationComponent'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 import { useToast } from '@/components/hooks/use-toast'
 import { formatDate } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { getOneFarmer } from '@/lib/farmer'
 
 export default function ImprovedPlantingForm() {
   const { data: allCropData = [] } = useGetAllCropData()
@@ -108,6 +109,12 @@ export default function ImprovedPlantingForm() {
   const [step, setStep] = useState(1)
   const { toast } = useToast()
   const router = useRouter()
+
+  const { data: selectedFarmerDetails } = useQuery({
+    queryKey: ['farmer', selectedFarmer],
+    queryFn: () => (selectedFarmer ? getOneFarmer(selectedFarmer) : null),
+    enabled: !!selectedFarmer,
+  })
 
   const onLocationSelect = (locationName: string, coords: [number, number]) => {
     setSelectedLocation(locationName)
@@ -281,7 +288,12 @@ export default function ImprovedPlantingForm() {
                   <CardTitle className='text-2xl'>Crop Details</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CropDetails control={form.control} setValue={setValue} />
+                  <CropDetails
+                    control={form.control}
+                    setValue={form.setValue}
+                    farmerLandSize={selectedFarmerDetails?.land_size}
+                    errors={form.formState.errors}
+                  />
                 </CardContent>
               </Card>
               <div className='flex justify-between mt-4'>

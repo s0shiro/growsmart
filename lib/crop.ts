@@ -193,7 +193,7 @@ export const getAllStandingCropBasedOnUserProgramType = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `id, farmer_id (id, firstname, lastname), crop_type(id, name), variety(id, name), crop_categoryId(id, name), status`,
+      `id, farmer_id (id, firstname, lastname), user_id(full_name), crop_type(id, name), variety(id, name), crop_categoryId(id, name), status`,
     )
     .eq('crop_categoryId', programType)
     .eq('status', 'inspection')
@@ -233,7 +233,7 @@ export const getAllHarvestedCropBasedOnUserProgramType = async () => {
   const { data, error } = await supabase
     .from('planting_records')
     .select(
-      `id, farmer_id (id, firstname, lastname), crop_type(id, name), variety(id, name), crop_categoryId(id, name), status`,
+      `id, farmer_id (id, firstname, lastname),user_id(full_name), crop_type(id, name), variety(id, name), crop_categoryId(id, name), status`,
     )
     .eq('crop_categoryId', programType)
     .eq('status', 'harvested')

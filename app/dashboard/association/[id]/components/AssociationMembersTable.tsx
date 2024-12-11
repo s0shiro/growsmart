@@ -17,7 +17,6 @@ import { Download, ChevronLeft, ChevronRight, User } from 'lucide-react'
 import useAssociationDetails from '@/hooks/association/useAssociationDetails'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import Link from 'next/link'
-import DownloadButton from '@/app/dashboard/(components)/ui/DownloadButton'
 import PrintAssociation from './PrintAssociation'
 
 export default function AssociationMembers({

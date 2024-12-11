@@ -2,6 +2,46 @@
 
 import { createClient } from '@/utils/supabase/server'
 
+// Add interfaces for nested types
+interface Location {
+  barangay: string
+  municipality: string
+}
+
+interface Crop {
+  name: string
+}
+
+interface TechnicianFarmer {
+  firstname: string
+  lastname: string
+}
+
+interface PlantingRecord {
+  id: string
+  status: string
+  created_at: string
+  crops: Crop | null
+  technician_farmers: TechnicianFarmer | null
+  location_id: Location | null
+}
+
+interface TechnicianProfile {
+  email: string
+  full_name: string
+  job_title: string | null
+  avatar_url: string | null
+}
+
+interface Farmer {
+  id: string
+  firstname: string
+  lastname: string
+  avatar: string | null
+  rsbsa_number: string
+  phone: string | null
+}
+
 export const getTechnicianStats = async (technicianId: string) => {
   const supabase = createClient()
 
@@ -46,6 +86,7 @@ export const getTechnicianStats = async (technicianId: string) => {
     )
     .eq('user_id', technicianId)
     .order('created_at', { ascending: false })
+    .returns<PlantingRecord[]>()
 
   if (plantingsError) {
     console.error('Plantings query error:', plantingsError)

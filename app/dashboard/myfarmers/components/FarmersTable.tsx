@@ -19,6 +19,7 @@ import Link from 'next/link'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import CreateFarmerForm from '@/app/dashboard/myfarmers/components/CreateFarmerForm'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
 
 interface Farmer {
   id: string
@@ -92,6 +93,7 @@ export default function FarmerUI() {
               <TableHead>Name</TableHead>
               <TableHead>Municipality</TableHead>
               <TableHead>Barangay</TableHead>
+              <TableHead>Assistance</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -135,6 +137,22 @@ export default function FarmerUI() {
                     </TableCell>
                     <TableCell>{farmer.municipality}</TableCell>
                     <TableCell>{farmer.barangay}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          farmer.assistance_count > 0 ? 'default' : 'secondary'
+                        }
+                        className={`${
+                          farmer.assistance_count > 0
+                            ? 'dark:bg-green-900 dark:text-green-100 bg-green-100 text-green-800'
+                            : 'dark:bg-slate-800 dark:text-slate-400 bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {farmer.assistance_count > 0
+                          ? `${farmer.assistance_count} Assistance Given`
+                          : 'No Assistance'}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
                       <Link href={`/dashboard/f/${farmer.id}`} passHref>
                         <Button variant='ghost' size='sm'>

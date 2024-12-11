@@ -17,28 +17,46 @@ type FarmerCreateData = {
   barangay: string
   phoneNumber: string
   associationPositions: AssociationPosition[]
-  avatar?: string
-  rsbsaNumber: number
+  avatar?: string | null
+  landsize?: number
+  rsbsaNumber?: number
 }
 
 export const createNewFarmer = async (data: FarmerCreateData) => {
   const supabase = createClient()
   const user = await getCurrentUser()
 
-  // Check if farmer with RSBSA already exists
+  // Check for duplicates based on name and barangay
   const { data: existingFarmer } = await supabase
     .from('technician_farmers')
     .select()
-    .eq('rsbsa_number', data.rsbsaNumber)
+    .eq('firstname', data.firstname)
+    .eq('lastname', data.lastname)
+    .eq('barangay', data.barangay)
     .single()
 
   if (existingFarmer) {
     throw new Error(
-      `Farmer with RSBSA number ${data.rsbsaNumber} already exists.`,
+      `Farmer ${data.firstname} ${data.lastname} from ${data.barangay} already exists.`,
     )
   }
 
-  // Proceed with creation if no duplicate found
+  // If RSBSA is provided, check for duplicates
+  if (data.rsbsaNumber) {
+    const { data: existingRSBSA } = await supabase
+      .from('technician_farmers')
+      .select()
+      .eq('rsbsa_number', data.rsbsaNumber)
+      .single()
+
+    if (existingRSBSA) {
+      throw new Error(
+        `Farmer with RSBSA number ${data.rsbsaNumber} already exists.`,
+      )
+    }
+  }
+
+  // Proceed with creation
   const { data: farmer, error: farmerError } = await supabase
     .from('technician_farmers')
     .insert({
@@ -49,8 +67,9 @@ export const createNewFarmer = async (data: FarmerCreateData) => {
       municipality: data.municipality,
       barangay: data.barangay,
       phone: data.phoneNumber,
-      avatar: data.avatar,
-      rsbsa_number: data.rsbsaNumber,
+      land_size: data.landsize,
+      avatar: data.avatar || null,
+      ...(data.rsbsaNumber && { rsbsa_number: data.rsbsaNumber }), // Only include if provided
     })
     .select()
     .single()
@@ -96,7 +115,8 @@ export const getListOfFarmers = async (userId: string) => {
             id,
             name
           )
-        )
+        ),
+        assistance_count:farmer_assistance(count)
       `,
     )
     .eq('user_id', userId)
@@ -107,7 +127,14 @@ export const getListOfFarmers = async (userId: string) => {
     throw error
   }
 
-  return data || []
+  // Transform data to include assistance count
+  const transformedData =
+    data?.map((farmer) => ({
+      ...farmer,
+      assistance_count: farmer.assistance_count?.[0]?.count ?? 0,
+    })) || []
+
+  return transformedData
 }
 
 export const getOneFarmer = async (farmerId: string) => {
@@ -204,4 +231,67 @@ export const getAllFarmers = async () => {
   }
 
   return data
+}
+
+export const updateFarmer = async (farmerId: string, data: any) => {
+  const supabase = createClient()
+
+  // First verify the farmer exists
+  const { data: exists, error: existsError } = await supabase
+    .from('technician_farmers')
+    .select('id')
+    .eq('id', farmerId)
+    .single()
+
+  if (existsError || !exists) {
+    throw new Error(`Farmer with ID ${farmerId} not found`)
+  }
+
+  // Update with modified query
+  const { data: updatedFarmer, error: updateError } = await supabase
+    .from('technician_farmers')
+    .update({
+      firstname: data.firstname,
+      lastname: data.lastname,
+      gender: data.gender,
+      municipality: data.municipality,
+      barangay: data.barangay,
+      phone: data.phone,
+      land_size: data.landsize,
+      rsbsa_number: data.rsbsa_number || null,
+    })
+    .eq('id', farmerId)
+    .select(
+      `
+        id,
+        firstname,
+        lastname,
+        gender,
+        municipality,
+        barangay,
+        phone,
+        rsbsa_number,
+        created_at,
+        farmer_associations (
+          id,
+          position,
+          association (
+            id,
+            name
+          )
+        )
+      `,
+    )
+    .single()
+
+  if (updateError) {
+    console.error('Supabase update error:', updateError)
+    throw updateError
+  }
+
+  if (!updatedFarmer) {
+    throw new Error('Failed to update farmer')
+  }
+
+  return updatedFarmer
 }

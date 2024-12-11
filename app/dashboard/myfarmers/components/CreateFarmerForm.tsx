@@ -43,7 +43,7 @@ const AssociationPositionSchema = z.object({
 })
 
 const FormSchema = z.object({
-  rsbsaNumber: z.coerce.number(),
+  rsbsaNumber: z.coerce.number().optional(),
   firstname: z.string().min(1, 'First name is required'),
   lastname: z.string().min(1, 'Last name is required'),
   gender: z.string(),
@@ -54,6 +54,7 @@ const FormSchema = z.object({
     .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
   avatar: z.string().optional(),
   associationPositions: z.array(AssociationPositionSchema).min(1),
+  landsize: z.number().min(0, 'Land size must be positive'),
 })
 
 type FarmerFieldNames =
@@ -64,6 +65,7 @@ type FarmerFieldNames =
   | 'municipality'
   | 'barangay'
   | 'phoneNumber'
+  | 'landsize'
 
 const fieldConfigs: {
   name: FarmerFieldNames
@@ -120,6 +122,13 @@ const fieldConfigs: {
     label: 'Phone Number',
     type: 'number',
     icon: Phone,
+  },
+  {
+    name: 'landsize',
+    placeholder: 'Land size in hectares',
+    label: 'Land Size (ha)',
+    type: 'number',
+    icon: MapPin,
   },
 ]
 
@@ -183,6 +192,7 @@ function CreateFarmerForm() {
         phoneNumber: data.phoneNumber,
         avatar: avatarUrl,
         rsbsaNumber: data.rsbsaNumber,
+        landsize: data.landsize,
         associationPositions: associationPositions,
       })
       toast({

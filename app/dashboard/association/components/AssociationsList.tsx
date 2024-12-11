@@ -26,6 +26,8 @@ import useReadAssociation from '@/hooks/association/useReadAssociations'
 import Link from 'next/link'
 import AssociationForm from './create/AssociationForm'
 import DialogForm from '../../(components)/forms/DialogForm'
+import AssistanceForm from './AssistanceForm'
+import { Badge } from '@/components/ui/badge'
 
 interface Association {
   id: string
@@ -93,6 +95,7 @@ export default function AssociationsList() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Members</TableHead>
+                <TableHead>Assistance</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -123,19 +126,55 @@ export default function AssociationsList() {
                       <TableCell>
                         <div className='flex items-center'>
                           <Users className='mr-2 h-4 w-4 text-muted-foreground' />
-                          {association.memberCount[0]?.count || 0}
+                          {association.memberCount}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            association.assistanceCount > 0
+                              ? 'default'
+                              : 'secondary'
+                          }
+                          className={`${
+                            association.assistanceCount > 0
+                              ? 'dark:bg-green-900 dark:text-green-100 bg-green-100 text-green-800'
+                              : 'dark:bg-slate-800 dark:text-slate-400 bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {association.assistanceCount > 0
+                            ? `${association.assistanceCount} Assistance Given`
+                            : 'No Assistance'}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         {format(new Date(association.created_at), 'PPP')}
                       </TableCell>
                       <TableCell>
-                        <Link href={`/dashboard/association/${association.id}`}>
-                          <Button variant='ghost' className='p-2'>
-                            <Eye className='mr-2 h-4 w-4' />
-                            View
-                          </Button>
-                        </Link>
+                        <div className='flex space-x-2'>
+                          <Link
+                            href={`/dashboard/association/${association.id}`}
+                          >
+                            <Button variant='ghost' className='p-2'>
+                              <Eye className='mr-2 h-4 w-4' />
+                              View
+                            </Button>
+                          </Link>
+                          <DialogForm
+                            id={`assistance-${association.id}`}
+                            title={`Record Assistance - ${association.name}`}
+                            description='Record a new assistance entry for this association'
+                            Trigger={
+                              <Button variant='ghost' className='p-2'>
+                                <PlusCircle className='mr-2 h-4 w-4' />
+                                Record Assistance
+                              </Button>
+                            }
+                            form={
+                              <AssistanceForm associationId={association.id} />
+                            }
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

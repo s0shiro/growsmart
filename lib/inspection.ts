@@ -13,6 +13,7 @@ interface InspectionData {
   growthStage: string
   isPriority: boolean
   findings?: string
+  visitationImages?: string[]
 }
 
 export const recordInspection = async (data: InspectionData) => {
@@ -29,6 +30,7 @@ export const recordInspection = async (data: InspectionData) => {
     growth_stage: data.growthStage,
     is_priority: data.isPriority,
     findings: data.findings,
+    visitation_images: data.visitationImages,
   }
 
   const { error } = await supabase.from('inspections').insert([inspectionData])

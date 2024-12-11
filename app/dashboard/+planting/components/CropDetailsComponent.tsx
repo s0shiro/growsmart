@@ -8,6 +8,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -47,9 +48,16 @@ import useGetAllCropData from '@/hooks/crop/useGetAllCropData'
 interface CropDetailsProps {
   control: Control<any>
   setValue: UseFormSetValue<any>
+  farmerLandSize: number | undefined
+  errors: any
 }
 
-const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
+const CropDetails: React.FC<CropDetailsProps> = ({
+  control,
+  setValue,
+  farmerLandSize,
+  errors,
+}) => {
   const { data: allCropData = [] } = useGetAllCropData()
 
   const categories = Array.isArray(allCropData) ? allCropData : []
@@ -346,6 +354,74 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
     />
   )
 
+  const renderAreaPlantedInput = (
+    name: string,
+    label: string,
+    placeholder: string,
+    farmerLandSize: number | undefined,
+  ) => (
+    <FormField
+      key={name}
+      control={control}
+      name={name}
+      rules={{
+        validate: (value) => {
+          const areaPlanted = Number(value)
+          if (isNaN(areaPlanted) || areaPlanted <= 0) {
+            return 'Area must be a positive number'
+          }
+          if (farmerLandSize && areaPlanted > farmerLandSize) {
+            return `Area planted cannot exceed farmer's total land size of ${farmerLandSize} ha`
+          }
+          return true
+        },
+      }}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <div className='relative'>
+              <MapPin className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+              <Input
+                placeholder={placeholder}
+                type='number'
+                step='0.01'
+                min='0'
+                max={farmerLandSize}
+                className={cn(
+                  'pl-10',
+                  errors.areaPlanted &&
+                    'border-destructive focus-visible:ring-destructive',
+                )}
+                {...field}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value)
+                  if (value < 0) {
+                    e.target.value = '0'
+                  } else if (farmerLandSize && value > farmerLandSize) {
+                    e.target.value = farmerLandSize.toString()
+                  }
+                  field.onChange(e)
+                }}
+              />
+            </div>
+          </FormControl>
+          <FormMessage />
+          {errors.areaPlanted && (
+            <p className='text-xs text-destructive mt-1'>
+              {errors.areaPlanted.message}
+            </p>
+          )}
+          {farmerLandSize && (
+            <FormDescription className='text-xs mt-1'>
+              Maximum area: {farmerLandSize} ha
+            </FormDescription>
+          )}
+        </FormItem>
+      )}
+    />
+  )
+
   return (
     <div className='flex flex-col lg:flex-row gap-6'>
       <Card className='flex-1'>
@@ -355,7 +431,15 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
         <CardContent>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             {fieldConfigs.map(
-              ({ name, placeholder, label, type, options, showIf }) => {
+              ({
+                name,
+                placeholder,
+                label,
+                type,
+                options,
+                showIf,
+                icon: Icon,
+              }) => {
                 if (showIf && !showIf(formValues.cropCategory)) {
                   return null
                 }
@@ -420,10 +504,14 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
                     placeholder,
                     name === 'harvestDate',
                   )
-                }
-                // } else if (type === 'number') {
-                //   return renderNumberInput(name, label, placeholder)}
-                else {
+                } else if (name === 'areaPlanted') {
+                  return renderAreaPlantedInput(
+                    name,
+                    label,
+                    placeholder,
+                    farmerLandSize,
+                  )
+                } else {
                   return (
                     <FormField
                       key={name}
@@ -433,11 +521,15 @@ const CropDetails: React.FC<CropDetailsProps> = ({ control, setValue }) => {
                         <FormItem>
                           <FormLabel>{label}</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder={placeholder}
-                              type={type}
-                              {...field}
-                            />
+                            <div className='relative'>
+                              <Icon className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                              <Input
+                                placeholder={placeholder}
+                                type={type}
+                                className='pl-10'
+                                {...field}
+                              />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>

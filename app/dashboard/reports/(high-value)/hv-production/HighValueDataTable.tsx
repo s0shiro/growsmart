@@ -186,7 +186,7 @@ export default function Component() {
   }
 
   // Process existing data
-  data?.existing?.forEach((crop: CropData) => {
+  data?.existing?.forEach((crop: any) => {
     const category = classificationMap[crop.classification] || 'Other'
     if (category === 'Other') return // Skip if classification is not recognized
 
@@ -203,7 +203,7 @@ export default function Component() {
   })
 
   // Process current month data
-  data?.currentMonth?.forEach((crop: CropData) => {
+  data?.currentMonth?.forEach((crop: any) => {
     const category = classificationMap[crop.classification] || 'Other'
     if (category === 'Other') return // Skip if classification is not recognized
 

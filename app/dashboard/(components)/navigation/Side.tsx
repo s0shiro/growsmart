@@ -48,6 +48,7 @@ const technicianLinks = [
   { href: '/dashboard', Icon: Home, label: 'Overview' },
   { href: '/dashboard/myfarmers', Icon: Users2, label: 'My Farmers' },
   { href: '/dashboard/crops', Icon: Sprout, label: 'Manage Crops' },
+  { href: '/dashboard/association', Icon: FileText, label: 'Associations' },
 ]
 
 const programCoordinatorLinks = [
@@ -56,16 +57,16 @@ const programCoordinatorLinks = [
 ]
 
 const coordinatorProductionLinks = [
-  //   {
-  //     href: '/dashboard/coordinator-standing',
-  //     Icon: ClipboardList,
-  //     label: 'Standing Crops',
-  //   },
-  //   {
-  //     href: '/dashboard/coordinator-harvested',
-  //     Icon: ClipboardList,
-  //     label: 'Harvested Crops',
-  //   },
+  {
+    href: '/dashboard/coordinator-standing',
+    Icon: ClipboardList,
+    label: 'Standing Crops',
+  },
+  {
+    href: '/dashboard/coordinator-harvested',
+    Icon: ClipboardList,
+    label: 'Harvested Crops',
+  },
   {
     href: '/dashboard/harvested-history',
     Icon: History,

@@ -263,7 +263,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ onLocationSelect }) => {
           maxBounds={MARINDUQUE_BOUNDS}
           minZoom={10}
         >
-          // Update TileLayer with error handling
           <TileLayer
             url={
               mapTilerQuotaExceeded

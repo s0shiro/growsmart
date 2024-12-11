@@ -4,12 +4,12 @@
 import { createClient } from '@/utils/supabase/server'
 import { unstable_noStore } from 'next/cache'
 
-type Association = {
+interface Association {
   id: string
   name: string
-  description: string
   created_at: string
-  memberCount: number
+  memberCount: { count: number }[]
+  assistanceCount: { count: number }[]
 }
 
 export async function addAssociation(data: { name: string }) {
@@ -32,14 +32,14 @@ export async function addAssociation(data: { name: string }) {
 export async function readAssociations() {
   const supabase = await createClient()
 
-  // Single query using count and group by
   const { data, error } = await supabase
     .from('association')
     .select(
       `
-        *,
-        memberCount:farmer_associations(count)
-      `,
+          *,
+          memberCount:farmer_associations(count),
+          assistanceCount:association_assistance(count)
+        `,
     )
     .returns<Association[]>()
 
@@ -48,10 +48,11 @@ export async function readAssociations() {
     throw error
   }
 
-  // Transform the data to include member count
+  // Transform the data to include both counts
   const associationsWithCounts = data.map((association) => ({
     ...association,
-    memberCount: association.memberCount || 0,
+    memberCount: association.memberCount?.[0]?.count || 0,
+    assistanceCount: association.assistanceCount?.[0]?.count || 0,
   }))
 
   return associationsWithCounts
@@ -107,4 +108,37 @@ export const getAssociationDetails = async (associationId: string) => {
   }
 
   return data
+}
+
+export async function addAssistance(formData: FormData) {
+  const supabase = createClient()
+
+  const assistanceData = {
+    association_id: formData.get('association_id'),
+    assistance_type: formData.get('assistance_type'),
+    description: formData.get('description'),
+    amount: parseFloat(formData.get('amount') as string),
+    date_given: formData.get('date_given'),
+    unit:
+      formData.get('unit') ||
+      getDefaultUnit(formData.get('assistance_type') as string),
+  }
+
+  const { error } = await supabase
+    .from('association_assistance')
+    .insert([assistanceData])
+
+  if (error) throw error
+
+  return { success: true }
+}
+
+function getDefaultUnit(assistanceType: string): string {
+  const units = {
+    'Financial Aid': '₱',
+    Equipment: 'pcs',
+    Seeds: 'kg',
+    Other: '',
+  }
+  return units[assistanceType as keyof typeof units] || ''
 }

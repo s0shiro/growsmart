@@ -39,6 +39,7 @@ import {
   ChevronUp,
   Info,
   Plus,
+  Pencil,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -57,6 +58,7 @@ import { getOneFarmer } from '@/lib/farmer'
 import DialogForm from '@/app/dashboard/(components)/forms/DialogForm'
 import AddAssistanceForm from './AssistanceForm'
 import useFetchAssitanceOfFarmerById from '@/hooks/farmer/useFetchAssitanceOfFarmerById'
+import EditFarmerForm from './EditFarmerForm'
 
 interface FarmerProfileProps {
   id: string
@@ -138,7 +140,7 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
         <CardHeader className='flex flex-col sm:flex-row items-center sm:items-start gap-4'>
           <Avatar className='w-24 h-24 border-4 border-primary-foreground'>
             <AvatarImage
-              src={farmer.avatar}
+              src={farmer.avatar || ''}
               alt={`${farmer.firstname} ${farmer.lastname}`}
             />
             <AvatarFallback>
@@ -159,10 +161,27 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
               </Badge>
               {farmer.farmer_associations.map((assoc, index) => (
                 <Badge key={index} variant='secondary'>
-                  {assoc.position.replace('_', ' ')} - {assoc.association.name}
+                  {assoc.position.replace('_', ' ')} -{' '}
+                  {assoc?.association?.name}
                 </Badge>
               ))}
             </div>
+            <DialogForm
+              id='edit-farmer'
+              title='Edit Farmer Information'
+              description='Update farmer details'
+              Trigger={
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='mt-4 bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                >
+                  <Pencil className='h-4 w-4 mr-2' />
+                  Edit Profile
+                </Button>
+              }
+              form={<EditFarmerForm farmer={farmer} />}
+            />
           </div>
         </CardHeader>
       </Card>
@@ -207,6 +226,11 @@ export default function FarmerProfile({ id }: FarmerProfileProps) {
                   <Calendar className='h-5 w-5 text-primary' />
                   <span className='font-medium'>Joined:</span>{' '}
                   {formatDate(farmer.created_at)}
+                </div>
+                <div className='flex items-center gap-2'>
+                  <MapPin className='h-5 w-5 text-primary' />
+                  <span className='font-medium'>Land Size:</span>{' '}
+                  {farmer.land_size} ha
                 </div>
               </CardContent>
             </Card>
