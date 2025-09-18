@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import StatCard from '@/components/StatCard'
 import { BarChart2, Clock, ShoppingBag, Sprout, Users, Zap } from 'lucide-react'
-import FarmersCountCard from './FarmersCountCard'
 import MonthlyProductionChart from './charts/MonthlyProductionChart'
 import CategoryDistributionChart from './charts/CategoryDistributionChart'
 import SalesChannelChart from './charts/SalesChannelChart'
@@ -29,7 +28,7 @@ interface DashboardClientProps {
 export default function DashboardClient({ userData }: DashboardClientProps) {
   const user = useSession((state) => state.user)
 
-  const { data, error, isFetching } = useTechnicianProfile(user.id)
+  const { data, error, isFetching } = useTechnicianProfile(userData.id)
   return (
     <>
       <motion.div
