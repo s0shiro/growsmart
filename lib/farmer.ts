@@ -120,7 +120,7 @@ export const getListOfFarmers = async (userId: string) => {
       `,
     )
     .eq('user_id', userId)
-    .order('firstname', { ascending: true })
+    .order('firstname', { ascending: false })
 
   if (error) {
     console.error('Supabase error:', error.message)

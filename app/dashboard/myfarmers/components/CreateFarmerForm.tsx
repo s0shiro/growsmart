@@ -54,7 +54,7 @@ const FormSchema = z.object({
     .regex(/^\d{11}$/, 'Phone number must be exactly 11 digits'),
   avatar: z.string().optional(),
   associationPositions: z.array(AssociationPositionSchema).min(1),
-  landsize: z.number().min(0, 'Land size must be positive'),
+  landsize: z.coerce.number().min(0, 'Land size must be positive'),
 })
 
 type FarmerFieldNames =

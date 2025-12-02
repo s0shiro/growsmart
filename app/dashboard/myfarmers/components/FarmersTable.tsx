@@ -21,18 +21,6 @@ import CreateFarmerForm from '@/app/dashboard/myfarmers/components/CreateFarmerF
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 
-interface Farmer {
-  id: string
-  firstname: string
-  lastname: string
-  gender: string
-  municipality: string
-  barangay: string
-  phone: string
-  avatar: string
-  rsbsa_number: number
-}
-
 export default function FarmerUI() {
   const { data: farmersData, isLoading } = useFetchFarmersByUserId()
   const [currentPage, setCurrentPage] = useState(1)
